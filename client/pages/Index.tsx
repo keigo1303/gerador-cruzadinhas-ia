@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CrosswordLayoutGenerator } from 'crossword-layout-generator';
+import clg from 'crossword-layout-generator';
 import jsPDF from 'jspdf';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
