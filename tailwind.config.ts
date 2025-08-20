@@ -84,6 +84,10 @@ export default {
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "fade-in": "fadeIn 0.5s ease-in-out",
+        "slide-in-from-top": "slideInFromTop 0.5s ease-out",
+        "slide-in-from-bottom": "slideInFromBottom 0.5s ease-out",
+        "slide-in-from-left": "slideInFromLeft 0.3s ease-out",
       },
     },
   },
