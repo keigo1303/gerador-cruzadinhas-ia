@@ -364,59 +364,16 @@ export default function Index() {
                 />
               </div>
               
-              <div className="space-y-4">
-                <div className="flex items-center space-x-2">
-                  <Checkbox 
-                    id="header-info" 
-                    checked={showHeaderInfo}
-                    onCheckedChange={setShowHeaderInfo}
-                    className="border-2 border-blue-300"
-                  />
-                  <Label htmlFor="header-info" className="text-sm font-medium text-gray-700">
-                    Incluir campos para Nome, Turma e Data no cabeçalho
-                  </Label>
-                </div>
-                
-                {showHeaderInfo && (
-                  <div className="grid md:grid-cols-3 gap-4 p-4 bg-blue-50 rounded-lg border border-blue-200 animate-in slide-in-from-top duration-300">
-                    <div>
-                      <Label htmlFor="name" className="text-sm font-medium text-gray-700 mb-1 block">
-                        Nome
-                      </Label>
-                      <Input
-                        id="name"
-                        placeholder="Nome do aluno"
-                        value={headerInfo.name}
-                        onChange={(e) => setHeaderInfo({...headerInfo, name: e.target.value})}
-                        className="border-blue-200"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="turma" className="text-sm font-medium text-gray-700 mb-1 block">
-                        Turma
-                      </Label>
-                      <Input
-                        id="turma"
-                        placeholder="Turma"
-                        value={headerInfo.turma}
-                        onChange={(e) => setHeaderInfo({...headerInfo, turma: e.target.value})}
-                        className="border-blue-200"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="date" className="text-sm font-medium text-gray-700 mb-1 block">
-                        Data
-                      </Label>
-                      <Input
-                        id="date"
-                        type="date"
-                        value={headerInfo.date}
-                        onChange={(e) => setHeaderInfo({...headerInfo, date: e.target.value})}
-                        className="border-blue-200"
-                      />
-                    </div>
-                  </div>
-                )}
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="header-info"
+                  checked={showHeaderInfo}
+                  onCheckedChange={setShowHeaderInfo}
+                  className="border-2 border-blue-300"
+                />
+                <Label htmlFor="header-info" className="text-sm font-medium text-gray-700">
+                  Incluir campos para Nome, Turma e Data no PDF (linhas em branco para o aluno preencher)
+                </Label>
               </div>
             </CardContent>
           </Card>
