@@ -327,38 +327,20 @@ export default function Index() {
           )}
         </div>
 
-        <div className="w-full max-w-4xl grid lg:grid-cols-2 gap-8">
-          <Card className="border-l-4 border-l-blue-500 shadow-lg hover:shadow-xl transition-all duration-300">
-            <CardHeader className="bg-gradient-to-r from-blue-50 to-blue-100">
-              <CardTitle className="text-blue-700 flex items-center gap-2">
-                <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
-                Horizontais
+        <div className="w-full max-w-4xl">
+          <Card className="border-l-4 border-l-purple-500 shadow-lg hover:shadow-xl transition-all duration-300">
+            <CardHeader className="bg-gradient-to-r from-purple-50 to-purple-100">
+              <CardTitle className="text-purple-700 flex items-center gap-2">
+                <span className="w-2 h-2 bg-purple-500 rounded-full"></span>
+                Dicas
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-6">
-              <div className="space-y-3">
-                {crosswordGrid.filter(cw => !cw.vertical).map(cw => (
-                  <div key={cw.number} className="text-sm p-2 rounded-lg bg-blue-50 hover:bg-blue-100 transition-colors duration-200">
-                    <span className="font-bold text-blue-600 mr-2">{cw.number}.</span> 
-                    <span className="text-gray-700">{cw.clue}</span>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-l-4 border-l-green-500 shadow-lg hover:shadow-xl transition-all duration-300">
-            <CardHeader className="bg-gradient-to-r from-green-50 to-green-100">
-              <CardTitle className="text-green-700 flex items-center gap-2">
-                <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-                Verticais
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-6">
-              <div className="space-y-3">
-                {crosswordGrid.filter(cw => cw.vertical).map(cw => (
-                  <div key={cw.number} className="text-sm p-2 rounded-lg bg-green-50 hover:bg-green-100 transition-colors duration-200">
-                    <span className="font-bold text-green-600 mr-2">{cw.number}.</span> 
+              <div className="grid md:grid-cols-2 gap-4">
+                {[...crosswordGrid].sort((a, b) => a.number - b.number).map((cw, index) => (
+                  <div key={cw.number} className="text-sm p-3 rounded-lg bg-purple-50 hover:bg-purple-100 transition-colors duration-200">
+                    <span className="font-bold text-purple-600 mr-2">{index + 1}.</span>
+                    <span className="text-xs text-gray-500 mr-2">{cw.vertical ? '↓' : '→'}</span>
                     <span className="text-gray-700">{cw.clue}</span>
                   </div>
                 ))}
