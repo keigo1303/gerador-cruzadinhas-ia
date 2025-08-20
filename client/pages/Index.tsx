@@ -24,11 +24,7 @@ interface CrosswordWord {
   number: number;
 }
 
-interface HeaderInfo {
-  name: string;
-  turma: string;
-  date: string;
-}
+// Header info is now just a boolean to control PDF display
 
 export default function Index() {
   const [word, setWord] = useState('');
