@@ -210,12 +210,27 @@ export default function Index() {
     pdf.text(crosswordTitle, (pageWidth - titleWidth) / 2, currentY);
     currentY += 15;
 
-    // Header info if enabled
+    // Header info if enabled - blank lines for student to fill
     if (showHeaderInfo) {
       pdf.setFontSize(12);
       pdf.setFont('helvetica', 'normal');
-      const headerText = `Nome: ${headerInfo.name || '_'.repeat(30)}    Turma: ${headerInfo.turma || '_'.repeat(15)}    Data: ${headerInfo.date || '_'.repeat(15)}`;
-      pdf.text(headerText, 20, currentY);
+
+      // Create underlines for students to fill in
+      const underlineLength = 40; // length of underline in mm
+      const spacing = 60; // spacing between fields
+
+      // Nome field
+      pdf.text('Nome:', 20, currentY);
+      pdf.line(35, currentY + 1, 35 + underlineLength, currentY + 1); // underline
+
+      // Turma field
+      pdf.text('Turma:', 20 + spacing + underlineLength, currentY);
+      pdf.line(35 + spacing + underlineLength + 15, currentY + 1, 35 + spacing + underlineLength + 15 + 25, currentY + 1); // underline
+
+      // Data field
+      pdf.text('Data:', 20 + (spacing + underlineLength) * 1.7, currentY);
+      pdf.line(35 + (spacing + underlineLength) * 1.7 + 15, currentY + 1, 35 + (spacing + underlineLength) * 1.7 + 15 + 25, currentY + 1); // underline
+
       currentY += 15;
     }
 
