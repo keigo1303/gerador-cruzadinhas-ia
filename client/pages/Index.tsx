@@ -53,16 +53,20 @@ export default function Index() {
     }
 
     try {
-      const generator = new CrosswordLayoutGenerator();
-      const words = wordClues.map(wc => wc.word);
-      const layout = generator.generateLayout(words);
+      // Convert to the format expected by the library
+      const inputJson = wordClues.map(wc => ({
+        clue: wc.clue,
+        answer: wc.word
+      }));
+
+      const layout = clg.generateLayout(inputJson);
 
       if (layout && layout.result && layout.result.length > 0) {
         // Map the layout result to our CrosswordWord format
         const crosswordWords: CrosswordWord[] = layout.result.map((item: any, index: number) => {
-          const wordClue = wordClues.find(wc => wc.word === item.word);
+          const wordClue = wordClues.find(wc => wc.word === item.answer);
           return {
-            word: item.word,
+            word: item.answer,
             clue: wordClue?.clue || '',
             x: item.startx,
             y: item.starty,
