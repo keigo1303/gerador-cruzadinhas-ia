@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import * as React from 'react';
 import clg from 'crossword-layout-generator';
 import jsPDF from 'jspdf';
 import { Button } from '@/components/ui/button';
@@ -147,7 +147,7 @@ export default function Index() {
           { word: 'GENOMA', clue: 'Conjunto completo de genes' }
         ],
         dificil: [
-          { word: 'MITOCONDRIA', clue: 'Organela responsável pela respiraç��o celular' },
+          { word: 'MITOCONDRIA', clue: 'Organela responsável pela respiração celular' },
           { word: 'RIBOSSOMO', clue: 'Organela que sintetiza proteínas' },
           { word: 'FOTOSSINTESE', clue: 'Processo de produção de glicose pelas plantas' },
           { word: 'MEIOSE', clue: 'Divisão celular que forma gametas' },
