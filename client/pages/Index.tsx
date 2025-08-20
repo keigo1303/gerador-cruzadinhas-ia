@@ -41,7 +41,7 @@ export default function Index() {
   const [aiDifficulty, setAiDifficulty] = useState('');
   const [aiWordCount, setAiWordCount] = useState(10);
   const [isGenerating, setIsGenerating] = useState(false);
-  const wordInputRef = useRef<HTMLInputElement>(null);
+  const wordInputRef = React.useRef<HTMLInputElement>(null);
 
   const addWordClue = () => {
     if (word.trim() && clue.trim()) {
