@@ -34,11 +34,6 @@ export default function Index() {
   const [crosswordGrid, setCrosswordGrid] = useState<CrosswordWord[]>([]);
   const [gridSize, setGridSize] = useState({ width: 0, height: 0 });
   const [showHeaderInfo, setShowHeaderInfo] = useState(false);
-  const [headerInfo, setHeaderInfo] = useState<HeaderInfo>({
-    name: '',
-    turma: '',
-    date: ''
-  });
 
   const addWordClue = () => {
     if (word.trim() && clue.trim()) {
