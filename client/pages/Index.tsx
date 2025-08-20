@@ -380,9 +380,9 @@ export default function Index() {
     const pdf = new jsPDF('landscape', 'mm', 'a4');
     const pageWidth = pdf.internal.pageSize.getWidth();
     const pageHeight = pdf.internal.pageSize.getHeight();
-    
+
     let currentY = 20;
-    
+
     // Title
     const crosswordTitle = title || 'Cruzadinha';
     pdf.setFontSize(24);
@@ -415,27 +415,37 @@ export default function Index() {
       currentY += 15;
     }
 
-    // Calculate grid scaling with larger minimum size
+    // Define maximum dimensions for crossword (left side of page)
+    const leftColumnWidth = pageWidth * 0.55; // 55% of page width for crossword
+    const rightColumnWidth = pageWidth * 0.40; // 40% for clues, 5% margin
+    const maxGridWidth = leftColumnWidth - 40; // margins
+    const maxGridHeight = pageHeight - currentY - 30; // available height
+
+    // Limit grid size to reasonable dimensions
+    const maxCellsWidth = Math.min(gridSize.width, 25);
+    const maxCellsHeight = Math.min(gridSize.height, 20);
+
+    // Calculate grid scaling with size constraints
     const cellSize = Math.min(
-      (pageWidth - 40) / gridSize.width,
-      (pageHeight - currentY - 120) / gridSize.height,
-      15 // Increased maximum cell size
+      maxGridWidth / maxCellsWidth,
+      maxGridHeight / maxCellsHeight,
+      12 // Maximum cell size
     );
 
     // Ensure minimum cell size for readability
-    const finalCellSize = Math.max(cellSize, 8);
-    
-    const gridWidth = gridSize.width * finalCellSize;
-    const gridHeight = gridSize.height * finalCellSize;
-    const startX = (pageWidth - gridWidth) / 2;
-    const startY = currentY + 10;
+    const finalCellSize = Math.max(cellSize, 6);
+
+    const gridWidth = Math.min(gridSize.width, maxCellsWidth) * finalCellSize;
+    const gridHeight = Math.min(gridSize.height, maxCellsHeight) * finalCellSize;
+    const gridStartX = 20; // Left margin
+    const gridStartY = currentY + 10;
 
     const grid: (string | null)[][] = Array(gridSize.height).fill(null).map(() => Array(gridSize.width).fill(null));
     const numbers: (number | null)[][] = Array(gridSize.height).fill(null).map(() => Array(gridSize.width).fill(null));
 
     crosswordGrid.forEach(cw => {
       numbers[cw.y][cw.x] = cw.number;
-      
+
       for (let i = 0; i < cw.word.length; i++) {
         if (cw.vertical) {
           grid[cw.y + i][cw.x] = cw.word[i];
@@ -445,74 +455,66 @@ export default function Index() {
       }
     });
 
-    // Draw the grid
+    // Draw the grid on the left side
     pdf.setLineWidth(0.5);
-    for (let y = 0; y < gridSize.height; y++) {
-      for (let x = 0; x < gridSize.width; x++) {
-        const cell = grid[y][x];
+    for (let y = 0; y < Math.min(gridSize.height, maxCellsHeight); y++) {
+      for (let x = 0; x < Math.min(gridSize.width, maxCellsWidth); x++) {
+        const cell = grid[y] && grid[y][x];
         if (cell) {
-          const cellX = startX + x * finalCellSize;
-          const cellY = startY + y * finalCellSize;
+          const cellX = gridStartX + x * finalCellSize;
+          const cellY = gridStartY + y * finalCellSize;
 
           pdf.rect(cellX, cellY, finalCellSize, finalCellSize);
 
           if (numbers[y][x]) {
-            pdf.setFontSize(Math.max(7, finalCellSize * 0.3));
+            pdf.setFontSize(Math.max(6, finalCellSize * 0.35));
             pdf.setFont('helvetica', 'bold');
-            pdf.text(numbers[y][x]!.toString(), cellX + 1, cellY + finalCellSize * 0.3);
+            pdf.text(numbers[y][x]!.toString(), cellX + 1, cellY + finalCellSize * 0.35);
           }
 
           if (withAnswers && cell) {
-            pdf.setFontSize(Math.max(9, finalCellSize * 0.6));
+            pdf.setFontSize(Math.max(7, finalCellSize * 0.55));
             pdf.setFont('helvetica', 'normal');
             const textWidth = pdf.getTextWidth(cell);
-            pdf.text(cell, cellX + (finalCellSize - textWidth) / 2, cellY + finalCellSize * 0.7);
+            pdf.text(cell, cellX + (finalCellSize - textWidth) / 2, cellY + finalCellSize * 0.75);
           }
         }
       }
     }
 
-    // Add clues below the grid
-    currentY = startY + gridHeight + 20;
-    
-    // Split clues into two columns
-    const horizontals = crosswordGrid.filter(cw => !cw.vertical);
-    const verticals = crosswordGrid.filter(cw => cw.vertical);
-    
-    const columnWidth = (pageWidth - 60) / 2;
-    
-    // Horizontals column
-    pdf.setFontSize(14);
-    pdf.setFont('helvetica', 'bold');
-    pdf.text('Horizontais:', 20, currentY);
-    
-    pdf.setFontSize(10);
-    pdf.setFont('helvetica', 'normal');
-    let horizontalY = currentY + 8;
-    
-    horizontals.forEach(cw => {
-      if (horizontalY > pageHeight - 20) return; // Prevent overflow
-      const clueText = `${cw.number}. ${cw.clue}`;
-      const lines = pdf.splitTextToSize(clueText, columnWidth);
-      pdf.text(lines, 20, horizontalY);
-      horizontalY += lines.length * 5;
+    // Add clues on the right side with sequential numbering
+    const cluesStartX = gridStartX + leftColumnWidth;
+    let cluesY = gridStartY;
+
+    // Create a map of crossword numbers to sequential numbers
+    const sortedCrosswordWords = [...crosswordGrid].sort((a, b) => a.number - b.number);
+    const numberMap = new Map();
+    sortedCrosswordWords.forEach((cw, index) => {
+      numberMap.set(cw.number, index + 1);
     });
-    
-    // Verticals column
+
     pdf.setFontSize(14);
     pdf.setFont('helvetica', 'bold');
-    pdf.text('Verticais:', 20 + columnWidth + 20, currentY);
-    
-    pdf.setFontSize(10);
+    pdf.text('Dicas:', cluesStartX, cluesY);
+    cluesY += 12;
+
+    pdf.setFontSize(9);
     pdf.setFont('helvetica', 'normal');
-    let verticalY = currentY + 8;
-    
-    verticals.forEach(cw => {
-      if (verticalY > pageHeight - 20) return; // Prevent overflow
-      const clueText = `${cw.number}. ${cw.clue}`;
-      const lines = pdf.splitTextToSize(clueText, columnWidth);
-      pdf.text(lines, 20 + columnWidth + 20, verticalY);
-      verticalY += lines.length * 5;
+
+    // List all clues sequentially
+    sortedCrosswordWords.forEach((cw, index) => {
+      if (cluesY > pageHeight - 15) return; // Prevent overflow
+
+      const sequentialNumber = index + 1;
+      const direction = cw.vertical ? '↓' : '→';
+      const clueText = `${sequentialNumber}. ${direction} ${cw.clue}`;
+
+      // Split text if too long
+      const maxWidth = rightColumnWidth - 10;
+      const lines = pdf.splitTextToSize(clueText, maxWidth);
+
+      pdf.text(lines, cluesStartX, cluesY);
+      cluesY += lines.length * 4.5; // Spacing between lines
     });
 
     const filename = `${crosswordTitle.toLowerCase().replace(/\s+/g, '-')}-${withAnswers ? 'gabarito' : 'em-branco'}.pdf`;
