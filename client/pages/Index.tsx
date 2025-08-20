@@ -7,7 +7,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
-import { Trash2, Download, FileText, FileCheck, Sparkles, Plus, X } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Trash2, Download, FileText, FileCheck, Sparkles, Plus, X, Bot, User } from 'lucide-react';
 
 interface WordClue {
   id: string;
@@ -34,6 +36,11 @@ export default function Index() {
   const [crosswordGrid, setCrosswordGrid] = useState<CrosswordWord[]>([]);
   const [gridSize, setGridSize] = useState({ width: 0, height: 0 });
   const [showHeaderInfo, setShowHeaderInfo] = useState(false);
+  const [isAIMode, setIsAIMode] = useState(false);
+  const [aiTheme, setAiTheme] = useState('');
+  const [aiDifficulty, setAiDifficulty] = useState('');
+  const [aiWordCount, setAiWordCount] = useState(10);
+  const [isGenerating, setIsGenerating] = useState(false);
   const wordInputRef = useRef<HTMLInputElement>(null);
 
   const addWordClue = () => {
@@ -63,6 +70,167 @@ export default function Index() {
     setWordClues([]);
     setCrosswordGrid([]);
     setGridSize({ width: 0, height: 0 });
+  };
+
+  // AI word generation function
+  const generateAIWords = () => {
+    if (!aiTheme || !aiDifficulty) {
+      alert('Por favor, informe o tema e a dificuldade.');
+      return;
+    }
+
+    setIsGenerating(true);
+
+    // Simulate AI generation with predefined word sets
+    const wordDatabase: Record<string, Record<string, Array<{word: string, clue: string}>>> = {
+      animais: {
+        facil: [
+          { word: 'GATO', clue: 'Felino doméstico que faz miau' },
+          { word: 'CACHORRO', clue: 'Melhor amigo do homem' },
+          { word: 'PEIXE', clue: 'Animal que vive na água' },
+          { word: 'PASSARO', clue: 'Animal que voa e tem penas' },
+          { word: 'CAVALO', clue: 'Animal usado para montaria' },
+          { word: 'VACA', clue: 'Animal que dá leite' },
+          { word: 'PORCO', clue: 'Animal que vive na lama' },
+          { word: 'GALINHA', clue: 'Ave que bota ovos' },
+          { word: 'COELHO', clue: 'Animal que pula e come cenoura' },
+          { word: 'RATO', clue: 'Pequeno roedor' }
+        ],
+        medio: [
+          { word: 'ELEFANTE', clue: 'Maior mamífero terrestre' },
+          { word: 'GIRAFA', clue: 'Animal mais alto do mundo' },
+          { word: 'LEOPARDO', clue: 'Felino com manchas' },
+          { word: 'RINOCERONTE', clue: 'Animal com chifre no nariz' },
+          { word: 'CROCODILO', clue: 'Réptil que vive em rios' },
+          { word: 'TUBARAO', clue: 'Predador dos oceanos' },
+          { word: 'AGUIA', clue: 'Ave de rapina majestosa' },
+          { word: 'FLAMINGO', clue: 'Ave rosa que vive em lagos' },
+          { word: 'HIPOPOTAMO', clue: 'Grande mamífero aquático' },
+          { word: 'CANGURU', clue: 'Animal que pula da Austrália' }
+        ],
+        dificil: [
+          { word: 'ORNITORRINCO', clue: 'Mamífero que bota ovos' },
+          { word: 'AXOLOTE', clue: 'Anfibio que regenera membros' },
+          { word: 'QUETZAL', clue: 'Ave sagrada dos maias' },
+          { word: 'NUMBAT', clue: 'Mamífero insetívoro australiano' },
+          { word: 'PANGOLIM', clue: 'Mamífero com escamas' },
+          { word: 'OKAPI', clue: 'Parente da girafa' },
+          { word: 'FOSSA', clue: 'Predador de Madagascar' },
+          { word: 'QUOLL', clue: 'Marsupial carniceiro' },
+          { word: 'BINTURONG', clue: 'Ursídeo asiático' },
+          { word: 'CAPIVARA', clue: 'Maior roedor do mundo' }
+        ]
+      },
+      ciencia: {
+        facil: [
+          { word: 'AGUA', clue: 'Líquido essencial à vida' },
+          { word: 'SOL', clue: 'Estrela do nosso sistema' },
+          { word: 'LUA', clue: 'Satélite natural da Terra' },
+          { word: 'AR', clue: 'Mistura de gases que respiramos' },
+          { word: 'FOGO', clue: 'Reação química com luz e calor' },
+          { word: 'TERRA', clue: 'Nosso planeta' },
+          { word: 'PLANTA', clue: 'Ser vivo que faz fotossíntese' },
+          { word: 'ROCHA', clue: 'Material sólido da crosta terrestre' },
+          { word: 'METAL', clue: 'Material condutor de eletricidade' },
+          { word: 'GAS', clue: 'Estado da matéria sem forma fixa' }
+        ],
+        medio: [
+          { word: 'MOLECULA', clue: 'Menor parte de uma substância' },
+          { word: 'ELETRON', clue: 'Partícula com carga negativa' },
+          { word: 'PROTON', clue: 'Partícula com carga positiva' },
+          { word: 'NEUTRON', clue: 'Partícula sem carga elétrica' },
+          { word: 'CROMOSSOMO', clue: 'Estrutura que contém genes' },
+          { word: 'BACTERIA', clue: 'Microorganismo unicelular' },
+          { word: 'VIRUS', clue: 'Agente infeccioso microscópico' },
+          { word: 'CELULA', clue: 'Unidade básica da vida' },
+          { word: 'ENZIMA', clue: 'Proteína que catalisa reações' },
+          { word: 'GENOMA', clue: 'Conjunto completo de genes' }
+        ],
+        dificil: [
+          { word: 'MITOCONDRIA', clue: 'Organela responsável pela respiraç��o celular' },
+          { word: 'RIBOSSOMO', clue: 'Organela que sintetiza proteínas' },
+          { word: 'FOTOSSINTESE', clue: 'Processo de produção de glicose pelas plantas' },
+          { word: 'MEIOSE', clue: 'Divisão celular que forma gametas' },
+          { word: 'ESPERMATOGENESE', clue: 'Formação de espermatozoides' },
+          { word: 'QUIMIOSSINTESE', clue: 'Síntese orgânica sem luz solar' },
+          { word: 'HOMEOSTASE', clue: 'Manutenção do equilíbrio interno' },
+          { word: 'ESTEQUIOMETRIA', clue: 'Cálculo de quantidades em reações químicas' },
+          { word: 'HIBRIDIZACAO', clue: 'Mistura de orbitais atômicos' },
+          { word: 'ELETROFORESE', clue: 'Separação de moléculas por carga elétrica' }
+        ]
+      },
+      geografia: {
+        facil: [
+          { word: 'BRASIL', clue: 'País onde vivemos' },
+          { word: 'RIO', clue: 'Curso de água doce' },
+          { word: 'MONTANHA', clue: 'Elevação natural do terreno' },
+          { word: 'OCEANO', clue: 'Grande massa de água salgada' },
+          { word: 'FLORESTA', clue: 'Área com muitas árvores' },
+          { word: 'DESERTO', clue: 'Região muito seca' },
+          { word: 'ILHA', clue: 'Terra cercada de água' },
+          { word: 'LAGO', clue: 'Corpo de água doce cercado de terra' },
+          { word: 'PRAIA', clue: 'Faixa de areia à beira-mar' },
+          { word: 'CIDADE', clue: 'Área urbana com muitos habitantes' }
+        ],
+        medio: [
+          { word: 'AMAZONIA', clue: 'Maior floresta tropical do mundo' },
+          { word: 'EQUADOR', clue: 'Linha imaginária que divide a Terra' },
+          { word: 'TROPICO', clue: 'Linha de latitude próxima ao equador' },
+          { word: 'MERIDIANO', clue: 'Linha imaginária de polo a polo' },
+          { word: 'LATITUDE', clue: 'Distância angular do equador' },
+          { word: 'LONGITUDE', clue: 'Distância angular do meridiano de Greenwich' },
+          { word: 'PLATEAU', clue: 'Planalto elevado' },
+          { word: 'PENINSULA', clue: 'Terra cercada de água em três lados' },
+          { word: 'ARQUIPELAGO', clue: 'Conjunto de ilhas' },
+          { word: 'TSUNAMI', clue: 'Onda gigante causada por terremoto' }
+        ],
+        dificil: [
+          { word: 'GEODESIA', clue: 'Ciência que estuda a forma da Terra' },
+          { word: 'TECTONISMO', clue: 'Movimento das placas terrestres' },
+          { word: 'ISOSTASIA', clue: 'Equilíbrio da crosta terrestre' },
+          { word: 'GEOMORFOLOGIA', clue: 'Estudo das formas do relevo' },
+          { word: 'PEDOGENESE', clue: 'Formação dos solos' },
+          { word: 'INTEMPERISMO', clue: 'Decomposição das rochas' },
+          { word: 'PLUVIOSIDADE', clue: 'Quantidade de chuva em uma região' },
+          { word: 'HIDROGRAFIA', clue: 'Estudo dos recursos hídricos' },
+          { word: 'CARTOGRAFIA', clue: 'Arte e ciência de fazer mapas' },
+          { word: 'TOPOGRAFIA', clue: 'Representação do relevo terrestre' }
+        ]
+      }
+    };
+
+    // Simulate API delay
+    setTimeout(() => {
+      const themeKey = aiTheme.toLowerCase();
+      const difficultyKey = aiDifficulty.toLowerCase();
+
+      if (wordDatabase[themeKey] && wordDatabase[themeKey][difficultyKey]) {
+        const availableWords = wordDatabase[themeKey][difficultyKey];
+        const shuffled = [...availableWords].sort(() => Math.random() - 0.5);
+        const selectedWords = shuffled.slice(0, aiWordCount);
+
+        const newWordClues: WordClue[] = selectedWords.map((item, index) => ({
+          id: `ai-${Date.now()}-${index}`,
+          word: item.word,
+          clue: item.clue
+        }));
+
+        setWordClues(newWordClues);
+      } else {
+        // Fallback for themes not in database
+        const fallbackWords: WordClue[] = [];
+        for (let i = 0; i < aiWordCount; i++) {
+          fallbackWords.push({
+            id: `ai-fallback-${Date.now()}-${i}`,
+            word: `PALAVRA${i + 1}`,
+            clue: `Dica relacionada a ${aiTheme} - nível ${aiDifficulty}`
+          });
+        }
+        setWordClues(fallbackWords);
+      }
+
+      setIsGenerating(false);
+    }, 2000); // 2 second delay to simulate API call
   };
 
   const generateCrossword = () => {
@@ -409,40 +577,125 @@ export default function Index() {
             </CardContent>
           </Card>
 
-          {/* Form Section */}
-          <Card className="shadow-xl border-0 bg-gradient-to-r from-white to-green-50 hover:shadow-2xl transition-shadow duration-300">
+          {/* Mode Switch */}
+          <Card className="shadow-xl border-0 bg-gradient-to-r from-white to-indigo-50 hover:shadow-2xl transition-shadow duration-300">
             <CardHeader>
-              <CardTitle className="text-green-700 flex items-center gap-2">
-                <Plus className="w-5 h-5" />
-                Adicionar Palavra
+              <CardTitle className="text-indigo-700 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  {isAIMode ? <Bot className="w-5 h-5" /> : <User className="w-5 h-5" />}
+                  {isAIMode ? 'Modo IA' : 'Modo Manual'}
+                </div>
+                <div className="flex items-center gap-3">
+                  <Label htmlFor="mode-switch" className="text-sm font-medium text-gray-600">
+                    {isAIMode ? 'IA' : 'Manual'}
+                  </Label>
+                  <Switch
+                    id="mode-switch"
+                    checked={isAIMode}
+                    onCheckedChange={setIsAIMode}
+                  />
+                </div>
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid md:grid-cols-3 gap-4">
-                <Input
-                  ref={wordInputRef}
-                  placeholder="Digite a palavra"
-                  value={word}
-                  onChange={(e) => setWord(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  className="uppercase border-2 border-green-200 focus:border-green-400 transition-colors duration-200"
-                />
-                <Input
-                  placeholder="Digite a dica"
-                  value={clue}
-                  onChange={(e) => setClue(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  className="border-2 border-green-200 focus:border-green-400 transition-colors duration-200"
-                />
-                <Button
-                  onClick={addWordClue}
-                  disabled={wordClues.length >= 20}
-                  className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
-                >
-                  <Plus className="w-4 h-4 mr-1" />
-                  Adicionar {wordClues.length >= 20 ? '(Limite: 20)' : ''}
-                </Button>
-              </div>
+              {!isAIMode ? (
+                // Manual Mode
+                <div className="grid md:grid-cols-3 gap-4">
+                  <Input
+                    ref={wordInputRef}
+                    placeholder="Digite a palavra"
+                    value={word}
+                    onChange={(e) => setWord(e.target.value)}
+                    onKeyPress={handleKeyPress}
+                    className="uppercase border-2 border-green-200 focus:border-green-400 transition-colors duration-200"
+                  />
+                  <Input
+                    placeholder="Digite a dica"
+                    value={clue}
+                    onChange={(e) => setClue(e.target.value)}
+                    onKeyPress={handleKeyPress}
+                    className="border-2 border-green-200 focus:border-green-400 transition-colors duration-200"
+                  />
+                  <Button
+                    onClick={addWordClue}
+                    disabled={wordClues.length >= 20}
+                    className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                  >
+                    <Plus className="w-4 h-4 mr-1" />
+                    Adicionar {wordClues.length >= 20 ? '(Limite: 20)' : ''}
+                  </Button>
+                </div>
+              ) : (
+                // AI Mode
+                <div className="space-y-4">
+                  <div className="grid md:grid-cols-3 gap-4">
+                    <div>
+                      <Label htmlFor="ai-theme" className="text-sm font-medium text-gray-700 mb-2 block">
+                        Tema
+                      </Label>
+                      <Select value={aiTheme} onValueChange={setAiTheme}>
+                        <SelectTrigger className="border-2 border-indigo-200 focus:border-indigo-400">
+                          <SelectValue placeholder="Selecione o tema" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="animais">Animais</SelectItem>
+                          <SelectItem value="ciencia">Ciência</SelectItem>
+                          <SelectItem value="geografia">Geografia</SelectItem>
+                          <SelectItem value="historia">História</SelectItem>
+                          <SelectItem value="matematica">Matemática</SelectItem>
+                          <SelectItem value="esportes">Esportes</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor="ai-difficulty" className="text-sm font-medium text-gray-700 mb-2 block">
+                        Dificuldade
+                      </Label>
+                      <Select value={aiDifficulty} onValueChange={setAiDifficulty}>
+                        <SelectTrigger className="border-2 border-indigo-200 focus:border-indigo-400">
+                          <SelectValue placeholder="Selecione a dificuldade" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="facil">Fácil</SelectItem>
+                          <SelectItem value="medio">Médio</SelectItem>
+                          <SelectItem value="dificil">Difícil</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor="ai-count" className="text-sm font-medium text-gray-700 mb-2 block">
+                        Quantidade (5-20)
+                      </Label>
+                      <Input
+                        id="ai-count"
+                        type="number"
+                        min="5"
+                        max="20"
+                        value={aiWordCount}
+                        onChange={(e) => setAiWordCount(Math.min(20, Math.max(5, parseInt(e.target.value) || 10)))}
+                        className="border-2 border-indigo-200 focus:border-indigo-400 transition-colors duration-200"
+                      />
+                    </div>
+                  </div>
+                  <Button
+                    onClick={generateAIWords}
+                    disabled={!aiTheme || !aiDifficulty || isGenerating}
+                    className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                  >
+                    {isGenerating ? (
+                      <>
+                        <Sparkles className="w-4 h-4 mr-2 animate-spin" />
+                        Gerando palavras...
+                      </>
+                    ) : (
+                      <>
+                        <Bot className="w-4 h-4 mr-2" />
+                        Gerar Palavras com IA
+                      </>
+                    )}
+                  </Button>
+                </div>
+              )}
             </CardContent>
           </Card>
 
