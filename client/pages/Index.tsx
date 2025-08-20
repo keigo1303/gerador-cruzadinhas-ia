@@ -29,18 +29,18 @@ interface CrosswordWord {
 // Header info is now just a boolean to control PDF display
 
 export default function Index() {
-  const [word, setWord] = useState('');
-  const [clue, setClue] = useState('');
-  const [title, setTitle] = useState('');
-  const [wordClues, setWordClues] = useState<WordClue[]>([]);
-  const [crosswordGrid, setCrosswordGrid] = useState<CrosswordWord[]>([]);
-  const [gridSize, setGridSize] = useState({ width: 0, height: 0 });
-  const [showHeaderInfo, setShowHeaderInfo] = useState(false);
-  const [isAIMode, setIsAIMode] = useState(false);
-  const [aiTheme, setAiTheme] = useState('');
-  const [aiDifficulty, setAiDifficulty] = useState('');
-  const [aiWordCount, setAiWordCount] = useState(10);
-  const [isGenerating, setIsGenerating] = useState(false);
+  const [word, setWord] = React.useState('');
+  const [clue, setClue] = React.useState('');
+  const [title, setTitle] = React.useState('');
+  const [wordClues, setWordClues] = React.useState<WordClue[]>([]);
+  const [crosswordGrid, setCrosswordGrid] = React.useState<CrosswordWord[]>([]);
+  const [gridSize, setGridSize] = React.useState({ width: 0, height: 0 });
+  const [showHeaderInfo, setShowHeaderInfo] = React.useState(false);
+  const [isAIMode, setIsAIMode] = React.useState(false);
+  const [aiTheme, setAiTheme] = React.useState('');
+  const [aiDifficulty, setAiDifficulty] = React.useState('');
+  const [aiWordCount, setAiWordCount] = React.useState(10);
+  const [isGenerating, setIsGenerating] = React.useState(false);
   const wordInputRef = React.useRef<HTMLInputElement>(null);
 
   const addWordClue = () => {
