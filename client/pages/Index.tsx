@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import clg from 'crossword-layout-generator';
 import jsPDF from 'jspdf';
 import { Button } from '@/components/ui/button';
@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
-import { Trash2, Download, FileText, FileCheck, Sparkles, Plus } from 'lucide-react';
+import { Trash2, Download, FileText, FileCheck, Sparkles, Plus, X } from 'lucide-react';
 
 interface WordClue {
   id: string;
@@ -34,6 +34,7 @@ export default function Index() {
   const [crosswordGrid, setCrosswordGrid] = useState<CrosswordWord[]>([]);
   const [gridSize, setGridSize] = useState({ width: 0, height: 0 });
   const [showHeaderInfo, setShowHeaderInfo] = useState(false);
+  const wordInputRef = useRef<HTMLInputElement>(null);
 
   const addWordClue = () => {
     if (word.trim() && clue.trim()) {
@@ -45,11 +46,19 @@ export default function Index() {
       setWordClues([...wordClues, newWordClue]);
       setWord('');
       setClue('');
+      // Return focus to word input
+      setTimeout(() => wordInputRef.current?.focus(), 100);
     }
   };
 
   const removeWordClue = (id: string) => {
     setWordClues(wordClues.filter(wc => wc.id !== id));
+  };
+
+  const clearAllWords = () => {
+    setWordClues([]);
+    setCrosswordGrid([]);
+    setGridSize({ width: 0, height: 0 });
   };
 
   const generateCrossword = () => {
@@ -124,7 +133,7 @@ export default function Index() {
     });
 
     return (
-      <div className="flex flex-col items-center gap-8 animate-in fade-in duration-500">
+      <div className="flex flex-col items-center gap-8">
         <div className="grid gap-1 p-6 bg-white border-2 border-blue-200 rounded-xl shadow-2xl transition-all duration-300 hover:shadow-3xl" 
              style={{ gridTemplateColumns: `repeat(${gridSize.width}, 1fr)` }}>
           {grid.map((row, y) => 
@@ -344,7 +353,7 @@ export default function Index() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       <div className="container mx-auto px-4 py-8">
-        <div className="text-center mb-12 animate-in slide-in-from-top duration-700">
+        <div className="text-center mb-12">
           <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 bg-clip-text text-transparent mb-4">
             Gerador de Cruzadinhas
           </h1>
@@ -358,7 +367,7 @@ export default function Index() {
 
         <div className="max-w-5xl mx-auto space-y-8">
           {/* Title and Header Info Section */}
-          <Card className="shadow-xl border-0 bg-gradient-to-r from-white to-blue-50 hover:shadow-2xl transition-all duration-300">
+          <Card className="shadow-xl border-0 bg-gradient-to-r from-white to-blue-50 hover:shadow-2xl transition-shadow duration-300">
             <CardHeader>
               <CardTitle className="text-blue-700 flex items-center gap-2">
                 <FileText className="w-5 h-5" />
@@ -394,7 +403,7 @@ export default function Index() {
           </Card>
 
           {/* Form Section */}
-          <Card className="shadow-xl border-0 bg-gradient-to-r from-white to-green-50 hover:shadow-2xl transition-all duration-300">
+          <Card className="shadow-xl border-0 bg-gradient-to-r from-white to-green-50 hover:shadow-2xl transition-shadow duration-300">
             <CardHeader>
               <CardTitle className="text-green-700 flex items-center gap-2">
                 <Plus className="w-5 h-5" />
@@ -404,6 +413,7 @@ export default function Index() {
             <CardContent>
               <div className="grid md:grid-cols-3 gap-4">
                 <Input
+                  ref={wordInputRef}
                   placeholder="Digite a palavra"
                   value={word}
                   onChange={(e) => setWord(e.target.value)}
@@ -430,22 +440,32 @@ export default function Index() {
 
           {/* Words List */}
           {wordClues.length > 0 && (
-            <Card className="shadow-xl border-0 bg-gradient-to-r from-white to-yellow-50 hover:shadow-2xl transition-all duration-300 animate-in slide-in-from-bottom duration-500">
+            <Card className="shadow-xl border-0 bg-gradient-to-r from-white to-yellow-50 hover:shadow-2xl transition-shadow duration-300">
               <CardHeader>
-                <CardTitle className="text-yellow-700 flex items-center gap-2">
-                  <Badge variant="secondary" className="bg-yellow-200 text-yellow-800">
-                    {wordClues.length}
-                  </Badge>
-                  Palavras Adicionadas
+                <CardTitle className="text-yellow-700 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Badge variant="secondary" className="bg-yellow-200 text-yellow-800">
+                      {wordClues.length}
+                    </Badge>
+                    Palavras Adicionadas
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={clearAllWords}
+                    className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200 hover:border-red-300"
+                  >
+                    <X className="w-4 h-4 mr-1" />
+                    Limpar Todas
+                  </Button>
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid gap-3 max-h-60 overflow-y-auto">
-                  {wordClues.map((wc, index) => (
-                    <div 
-                      key={wc.id} 
-                      className="flex items-center justify-between p-4 bg-gradient-to-r from-yellow-50 to-yellow-100 rounded-xl border border-yellow-200 hover:shadow-md transition-all duration-200 animate-in slide-in-from-left"
-                      style={{ animationDelay: `${index * 100}ms` }}
+                  {wordClues.map((wc) => (
+                    <div
+                      key={wc.id}
+                      className="flex items-center justify-between p-4 bg-gradient-to-r from-yellow-50 to-yellow-100 rounded-xl border border-yellow-200 hover:shadow-md transition-shadow duration-200"
                     >
                       <div className="flex-1">
                         <Badge variant="secondary" className="mr-3 bg-yellow-200 text-yellow-800 font-semibold">
@@ -480,7 +500,7 @@ export default function Index() {
 
           {/* Crossword Grid */}
           {crosswordGrid.length > 0 && (
-            <Card className="shadow-2xl border-0 bg-gradient-to-r from-white to-blue-50 hover:shadow-3xl transition-all duration-300">
+            <Card className="shadow-2xl border-0 bg-gradient-to-r from-white to-blue-50 hover:shadow-3xl transition-shadow duration-300">
               <CardHeader>
                 <CardTitle className="text-blue-700 flex items-center gap-2">
                   <Sparkles className="w-5 h-5" />
@@ -495,7 +515,7 @@ export default function Index() {
 
           {/* Export Buttons */}
           {crosswordGrid.length > 0 && (
-            <Card className="shadow-xl border-0 bg-gradient-to-r from-white to-purple-50 hover:shadow-2xl transition-all duration-300">
+            <Card className="shadow-xl border-0 bg-gradient-to-r from-white to-purple-50 hover:shadow-2xl transition-shadow duration-300">
               <CardHeader>
                 <CardTitle className="text-purple-700 flex items-center gap-2">
                   <Download className="w-5 h-5" />
