@@ -38,6 +38,10 @@ export default function Index() {
 
   const addWordClue = () => {
     if (word.trim() && clue.trim()) {
+      if (wordClues.length >= 20) {
+        alert('Limite máximo de 20 palavras por cruzadinha atingido.');
+        return;
+      }
       const newWordClue: WordClue = {
         id: Date.now().toString(),
         word: word.toUpperCase().trim(),
@@ -243,15 +247,18 @@ export default function Index() {
       currentY += 15;
     }
 
-    // Calculate grid scaling
+    // Calculate grid scaling with larger minimum size
     const cellSize = Math.min(
       (pageWidth - 40) / gridSize.width,
-      (pageHeight - currentY - 100) / gridSize.height,
-      12 // Maximum cell size
+      (pageHeight - currentY - 120) / gridSize.height,
+      15 // Increased maximum cell size
     );
+
+    // Ensure minimum cell size for readability
+    const finalCellSize = Math.max(cellSize, 8);
     
-    const gridWidth = gridSize.width * cellSize;
-    const gridHeight = gridSize.height * cellSize;
+    const gridWidth = gridSize.width * finalCellSize;
+    const gridHeight = gridSize.height * finalCellSize;
     const startX = (pageWidth - gridWidth) / 2;
     const startY = currentY + 10;
 
@@ -276,22 +283,22 @@ export default function Index() {
       for (let x = 0; x < gridSize.width; x++) {
         const cell = grid[y][x];
         if (cell) {
-          const cellX = startX + x * cellSize;
-          const cellY = startY + y * cellSize;
-          
-          pdf.rect(cellX, cellY, cellSize, cellSize);
-          
+          const cellX = startX + x * finalCellSize;
+          const cellY = startY + y * finalCellSize;
+
+          pdf.rect(cellX, cellY, finalCellSize, finalCellSize);
+
           if (numbers[y][x]) {
-            pdf.setFontSize(Math.max(6, cellSize * 0.3));
+            pdf.setFontSize(Math.max(7, finalCellSize * 0.3));
             pdf.setFont('helvetica', 'bold');
-            pdf.text(numbers[y][x]!.toString(), cellX + 1, cellY + cellSize * 0.3);
+            pdf.text(numbers[y][x]!.toString(), cellX + 1, cellY + finalCellSize * 0.3);
           }
-          
+
           if (withAnswers && cell) {
-            pdf.setFontSize(Math.max(8, cellSize * 0.6));
+            pdf.setFontSize(Math.max(9, finalCellSize * 0.6));
             pdf.setFont('helvetica', 'normal');
             const textWidth = pdf.getTextWidth(cell);
-            pdf.text(cell, cellX + (cellSize - textWidth) / 2, cellY + cellSize * 0.7);
+            pdf.text(cell, cellX + (finalCellSize - textWidth) / 2, cellY + finalCellSize * 0.7);
           }
         }
       }
@@ -427,12 +434,13 @@ export default function Index() {
                   onKeyPress={handleKeyPress}
                   className="border-2 border-green-200 focus:border-green-400 transition-colors duration-200"
                 />
-                <Button 
-                  onClick={addWordClue} 
-                  className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
+                <Button
+                  onClick={addWordClue}
+                  disabled={wordClues.length >= 20}
+                  className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                 >
                   <Plus className="w-4 h-4 mr-1" />
-                  Adicionar
+                  Adicionar {wordClues.length >= 20 ? '(Limite: 20)' : ''}
                 </Button>
               </div>
             </CardContent>
@@ -444,8 +452,8 @@ export default function Index() {
               <CardHeader>
                 <CardTitle className="text-yellow-700 flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Badge variant="secondary" className="bg-yellow-200 text-yellow-800">
-                      {wordClues.length}
+                    <Badge variant="secondary" className={`${wordClues.length >= 20 ? 'bg-red-200 text-red-800' : 'bg-yellow-200 text-yellow-800'}`}>
+                      {wordClues.length}/20
                     </Badge>
                     Palavras Adicionadas
                   </div>
@@ -461,7 +469,7 @@ export default function Index() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid gap-3 max-h-60 overflow-y-auto">
+                <div className="grid gap-3">
                   {wordClues.map((wc) => (
                     <div
                       key={wc.id}
