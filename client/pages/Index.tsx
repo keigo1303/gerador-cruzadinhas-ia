@@ -206,7 +206,17 @@ export default function Index() {
           { word: 'HOMEOSTASE', clue: 'Manutenção do equilíbrio interno' },
           { word: 'ESTEQUIOMETRIA', clue: 'Cálculo de quantidades em reações químicas' },
           { word: 'HIBRIDIZACAO', clue: 'Mistura de orbitais atômicos' },
-          { word: 'ELETROFORESE', clue: 'Separação de moléculas por carga elétrica' }
+          { word: 'ELETROFORESE', clue: 'Separação de moléculas por carga elétrica' },
+          { word: 'NUCLEOTIDEO', clue: 'Unidade básica do DNA' },
+          { word: 'TRANSCRICAO', clue: 'Síntese de RNA a partir do DNA' },
+          { word: 'TRADUCAO', clue: 'Síntese de proteínas' },
+          { word: 'METAMORFOSE', clue: 'Transformação completa na forma' },
+          { word: 'ECOSSISTEMA', clue: 'Sistema de seres vivos e ambiente' },
+          { word: 'BIODIVERSIDADE', clue: 'Variedade de vida na Terra' },
+          { word: 'TERMODINAMICA', clue: 'Estudo do calor e energia' },
+          { word: 'ELETROMAGNETISMO', clue: 'Interação entre eletricidade e magnetismo' },
+          { word: 'RADIOATIVIDADE', clue: 'Emissão de radiação nuclear' },
+          { word: 'ENTROPIA', clue: 'Medida da desordem' }
         ]
       },
       geografia: {
