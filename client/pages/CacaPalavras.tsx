@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { generateWordSearch } from '@sbj42/word-search-generator';
+import * as WordSearchGenerator from '@sbj42/word-search-generator';
 import jsPDF from 'jspdf';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -128,10 +128,25 @@ export default function CacaPalavras() {
       let result;
 
       try {
-        result = generateWordSearch(wordList, {
-          rows: gridSize,
-          cols: gridSize
-        });
+        // Try different ways to call the library
+        if (typeof WordSearchGenerator.generateWordSearch === 'function') {
+          result = WordSearchGenerator.generateWordSearch(wordList, {
+            rows: gridSize,
+            cols: gridSize
+          });
+        } else if (typeof WordSearchGenerator.default === 'function') {
+          result = WordSearchGenerator.default(wordList, {
+            rows: gridSize,
+            cols: gridSize
+          });
+        } else if (typeof WordSearchGenerator === 'function') {
+          result = WordSearchGenerator(wordList, {
+            rows: gridSize,
+            cols: gridSize
+          });
+        } else {
+          throw new Error('Library function not found');
+        }
       } catch (libError) {
         console.warn('Library error, using fallback:', libError);
         // Fallback: create a simple grid manually
