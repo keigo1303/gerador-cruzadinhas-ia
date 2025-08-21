@@ -222,12 +222,14 @@ export default function CacaPalavras() {
       console.log("Generated result:", result);
 
       if (result && result.grid) {
+        console.log('Generated word search result:', result);
         setWordSearchGrid(result);
       } else {
         console.error("No valid result from generateWordSearch");
         // Try fallback
         const fallbackResult = createSimpleWordSearch(wordList, gridSize);
         if (fallbackResult) {
+          console.log('Using fallback result:', fallbackResult);
           setWordSearchGrid(fallbackResult);
         } else {
           alert(
@@ -376,6 +378,7 @@ export default function CacaPalavras() {
       console.log(
         `Successfully placed ${solution.length} out of ${wordList.length} words`,
       );
+      console.log('Solution data:', solution);
 
       return {
         grid,
@@ -435,17 +438,56 @@ export default function CacaPalavras() {
     return cells.map(cell => wordSearchGrid.grid[cell.row][cell.col]).join('');
   };
 
-  // Helper function to check if a word matches any of the target words
-  const isValidWord = (word: string): string | null => {
-    const upperWord = word.toUpperCase();
-    const reverseWord = upperWord.split('').reverse().join('');
+  // Helper function to check if selected cells match any solution word
+  const isValidWord = (selectedCells: CellPosition[]): string | null => {
+    if (!wordSearchGrid || selectedCells.length < 2) return null;
 
-    for (const targetWord of words) {
-      if (targetWord.word === upperWord || targetWord.word === reverseWord) {
-        return targetWord.word;
+    // Check against each solution
+    for (const solution of wordSearchGrid.solution) {
+      const solutionCells = getSolutionCells(solution);
+
+      // Check if selected cells match solution (forward or backward)
+      if (cellsMatch(selectedCells, solutionCells) || cellsMatch(selectedCells, solutionCells.reverse())) {
+        return solution.word;
       }
     }
     return null;
+  };
+
+  // Helper function to get all cells for a solution word
+  const getSolutionCells = (solution: any): CellPosition[] => {
+    const cells: CellPosition[] = [];
+    const { startRow, startCol, endRow, endCol } = solution;
+
+    const deltaRow = endRow - startRow;
+    const deltaCol = endCol - startCol;
+    const steps = Math.max(Math.abs(deltaRow), Math.abs(deltaCol));
+
+    if (steps === 0) {
+      return [{ row: startRow, col: startCol }];
+    }
+
+    const stepRow = deltaRow / steps;
+    const stepCol = deltaCol / steps;
+
+    for (let i = 0; i <= steps; i++) {
+      cells.push({
+        row: startRow + Math.round(stepRow * i),
+        col: startCol + Math.round(stepCol * i)
+      });
+    }
+
+    return cells;
+  };
+
+  // Helper function to check if two cell arrays match
+  const cellsMatch = (cells1: CellPosition[], cells2: CellPosition[]): boolean => {
+    if (cells1.length !== cells2.length) return false;
+
+    return cells1.every((cell1, index) => {
+      const cell2 = cells2[index];
+      return cell1.row === cell2.row && cell1.col === cell2.col;
+    });
   };
 
   // Mouse handlers for word selection
@@ -464,15 +506,20 @@ export default function CacaPalavras() {
 
   const handleMouseUp = () => {
     if (isSelecting && selectedCells.length > 1) {
-      const word = getWordFromCells(selectedCells);
-      const validWord = isValidWord(word);
+      const validWord = isValidWord(selectedCells);
 
       if (validWord) {
         // Check if word is already found
         const alreadyFound = foundWords.some(fw => fw.word === validWord);
         if (!alreadyFound) {
+          console.log('Found word:', validWord, 'at cells:', selectedCells);
           setFoundWords(prev => [...prev, { word: validWord, cells: [...selectedCells] }]);
+        } else {
+          console.log('Word already found:', validWord);
         }
+      } else {
+        const selectedWord = getWordFromCells(selectedCells);
+        console.log('Invalid selection:', selectedWord, 'cells:', selectedCells);
       }
     }
 
