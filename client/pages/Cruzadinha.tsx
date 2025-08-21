@@ -1,17 +1,34 @@
-import * as React from 'react';
-import clg from 'crossword-layout-generator';
-import jsPDF from 'jspdf';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Trash2, Download, FileText, FileCheck, Sparkles, Plus, X, Bot, User, ArrowLeft } from 'lucide-react';
-import { wordDatabase } from '@shared/word-database';
-import { Link } from 'react-router-dom';
+import * as React from "react";
+import clg from "crossword-layout-generator";
+import jsPDF from "jspdf";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Trash2,
+  Download,
+  FileText,
+  FileCheck,
+  Sparkles,
+  Plus,
+  X,
+  Bot,
+  User,
+  ArrowLeft,
+} from "lucide-react";
+import { wordDatabase } from "@shared/word-database";
+import { Link } from "react-router-dom";
 
 interface WordClue {
   id: string;
@@ -29,16 +46,16 @@ interface CrosswordWord {
 }
 
 export default function Cruzadinha() {
-  const [word, setWord] = React.useState('');
-  const [clue, setClue] = React.useState('');
-  const [title, setTitle] = React.useState('');
+  const [word, setWord] = React.useState("");
+  const [clue, setClue] = React.useState("");
+  const [title, setTitle] = React.useState("");
   const [wordClues, setWordClues] = React.useState<WordClue[]>([]);
   const [crosswordGrid, setCrosswordGrid] = React.useState<CrosswordWord[]>([]);
   const [gridSize, setGridSize] = React.useState({ width: 0, height: 0 });
   const [showHeaderInfo, setShowHeaderInfo] = React.useState(false);
   const [isAIMode, setIsAIMode] = React.useState(false);
-  const [aiTheme, setAiTheme] = React.useState('');
-  const [aiDifficulty, setAiDifficulty] = React.useState('');
+  const [aiTheme, setAiTheme] = React.useState("");
+  const [aiDifficulty, setAiDifficulty] = React.useState("");
   const [aiWordCount, setAiWordCount] = React.useState(10);
   const [isGenerating, setIsGenerating] = React.useState(false);
   const wordInputRef = React.useRef<HTMLInputElement>(null);
@@ -46,23 +63,23 @@ export default function Cruzadinha() {
   const addWordClue = () => {
     if (word.trim() && clue.trim()) {
       if (wordClues.length >= 20) {
-        alert('Limite máximo de 20 palavras por cruzadinha atingido.');
+        alert("Limite máximo de 20 palavras por cruzadinha atingido.");
         return;
       }
       const newWordClue: WordClue = {
         id: Date.now().toString(),
         word: word.toUpperCase().trim(),
-        clue: clue.trim()
+        clue: clue.trim(),
       };
       setWordClues([...wordClues, newWordClue]);
-      setWord('');
-      setClue('');
+      setWord("");
+      setClue("");
       setTimeout(() => wordInputRef.current?.focus(), 100);
     }
   };
 
   const removeWordClue = (id: string) => {
-    setWordClues(wordClues.filter(wc => wc.id !== id));
+    setWordClues(wordClues.filter((wc) => wc.id !== id));
   };
 
   const clearAllWords = () => {
@@ -74,7 +91,7 @@ export default function Cruzadinha() {
   // AI word generation function
   const generateAIWords = () => {
     if (!aiTheme || !aiDifficulty) {
-      alert('Por favor, informe o tema e a dificuldade.');
+      alert("Por favor, informe o tema e a dificuldade.");
       return;
     }
 
@@ -93,7 +110,7 @@ export default function Cruzadinha() {
         const newWordClues: WordClue[] = selectedWords.map((item, index) => ({
           id: `ai-${Date.now()}-${index}`,
           word: item.word,
-          clue: item.clue
+          clue: item.clue,
         }));
 
         setWordClues(newWordClues);
@@ -104,7 +121,7 @@ export default function Cruzadinha() {
           fallbackWords.push({
             id: `ai-fallback-${Date.now()}-${i}`,
             word: `PALAVRA${i + 1}`,
-            clue: `Dica relacionada a ${aiTheme} - nível ${aiDifficulty}`
+            clue: `Dica relacionada a ${aiTheme} - nível ${aiDifficulty}`,
           });
         }
         setWordClues(fallbackWords);
@@ -116,36 +133,39 @@ export default function Cruzadinha() {
 
   const generateCrossword = () => {
     if (wordClues.length < 2) {
-      alert('Adicione pelo menos 2 palavras para gerar a cruzadinha');
+      alert("Adicione pelo menos 2 palavras para gerar a cruzadinha");
       return;
     }
 
     try {
       // Convert to the format expected by the library
-      const inputJson = wordClues.map(wc => ({
+      const inputJson = wordClues.map((wc) => ({
         clue: wc.clue,
-        answer: wc.word
+        answer: wc.word,
       }));
 
       const layout = clg.generateLayout(inputJson);
 
       if (layout && layout.result && layout.result.length > 0) {
         // Map the layout result to our CrosswordWord format
-        const crosswordWords: CrosswordWord[] = layout.result.map((item: any, index: number) => {
-          const wordClue = wordClues.find(wc => wc.word === item.answer);
-          return {
-            word: item.answer,
-            clue: wordClue?.clue || '',
-            x: item.startx,
-            y: item.starty,
-            vertical: item.orientation === 'down',
-            number: index + 1
-          };
-        });
+        const crosswordWords: CrosswordWord[] = layout.result.map(
+          (item: any, index: number) => {
+            const wordClue = wordClues.find((wc) => wc.word === item.answer);
+            return {
+              word: item.answer,
+              clue: wordClue?.clue || "",
+              x: item.startx,
+              y: item.starty,
+              vertical: item.orientation === "down",
+              number: index + 1,
+            };
+          },
+        );
 
         // Calculate grid dimensions
-        let maxX = 0, maxY = 0;
-        crosswordWords.forEach(cw => {
+        let maxX = 0,
+          maxY = 0;
+        crosswordWords.forEach((cw) => {
           if (cw.vertical) {
             maxX = Math.max(maxX, cw.x);
             maxY = Math.max(maxY, cw.y + cw.word.length - 1);
@@ -158,24 +178,30 @@ export default function Cruzadinha() {
         setCrosswordGrid(crosswordWords);
         setGridSize({ width: maxX + 1, height: maxY + 1 });
       } else {
-        alert('Não foi possível gerar a cruzadinha com essas palavras. Tente palavras diferentes.');
+        alert(
+          "Não foi possível gerar a cruzadinha com essas palavras. Tente palavras diferentes.",
+        );
       }
     } catch (error) {
-      console.error('Error generating crossword:', error);
-      alert('Erro ao gerar a cruzadinha. Tente palavras diferentes.');
+      console.error("Error generating crossword:", error);
+      alert("Erro ao gerar a cruzadinha. Tente palavras diferentes.");
     }
   };
 
   const renderGrid = () => {
     if (crosswordGrid.length === 0) return null;
 
-    const grid: (string | null)[][] = Array(gridSize.height).fill(null).map(() => Array(gridSize.width).fill(null));
-    const numbers: (number | null)[][] = Array(gridSize.height).fill(null).map(() => Array(gridSize.width).fill(null));
+    const grid: (string | null)[][] = Array(gridSize.height)
+      .fill(null)
+      .map(() => Array(gridSize.width).fill(null));
+    const numbers: (number | null)[][] = Array(gridSize.height)
+      .fill(null)
+      .map(() => Array(gridSize.width).fill(null));
 
     // Fill the grid with letters and numbers
-    crosswordGrid.forEach(cw => {
+    crosswordGrid.forEach((cw) => {
       numbers[cw.y][cw.x] = cw.number;
-      
+
       for (let i = 0; i < cw.word.length; i++) {
         if (cw.vertical) {
           grid[cw.y + i][cw.x] = cw.word[i];
@@ -187,14 +213,16 @@ export default function Cruzadinha() {
 
     return (
       <div className="flex flex-col items-center gap-8">
-        <div className="grid gap-1 p-6 bg-white border-2 border-blue-200 rounded-xl shadow-2xl transition-all duration-300 hover:shadow-3xl" 
-             style={{ gridTemplateColumns: `repeat(${gridSize.width}, 1fr)` }}>
-          {grid.map((row, y) => 
+        <div
+          className="grid gap-1 p-6 bg-white border-2 border-blue-200 rounded-xl shadow-2xl transition-all duration-300 hover:shadow-3xl"
+          style={{ gridTemplateColumns: `repeat(${gridSize.width}, 1fr)` }}
+        >
+          {grid.map((row, y) =>
             row.map((cell, x) => (
-              <div 
+              <div
                 key={`${x}-${y}`}
                 className={`w-10 h-10 border-2 border-gray-300 flex items-center justify-center relative text-sm font-bold transition-all duration-200 hover:scale-105 ${
-                  cell ? 'bg-white shadow-sm' : 'bg-gray-50'
+                  cell ? "bg-white shadow-sm" : "bg-gray-50"
                 }`}
               >
                 {numbers[y][x] && (
@@ -202,9 +230,11 @@ export default function Cruzadinha() {
                     {numbers[y][x]}
                   </span>
                 )}
-                {cell && <span className="text-gray-800 font-semibold">{cell}</span>}
+                {cell && (
+                  <span className="text-gray-800 font-semibold">{cell}</span>
+                )}
               </div>
-            ))
+            )),
           )}
         </div>
 
@@ -218,13 +248,22 @@ export default function Cruzadinha() {
             </CardHeader>
             <CardContent className="pt-6">
               <div className="grid md:grid-cols-2 gap-4">
-                {[...crosswordGrid].sort((a, b) => a.number - b.number).map((cw, index) => (
-                  <div key={cw.number} className="text-sm p-3 rounded-lg bg-purple-50 hover:bg-purple-100 transition-colors duration-200">
-                    <span className="font-bold text-purple-600 mr-2">{index + 1}.</span>
-                    <span className="text-xs text-gray-500 mr-2">{cw.vertical ? '↓' : '→'}</span>
-                    <span className="text-gray-700">{cw.clue}</span>
-                  </div>
-                ))}
+                {[...crosswordGrid]
+                  .sort((a, b) => a.number - b.number)
+                  .map((cw, index) => (
+                    <div
+                      key={cw.number}
+                      className="text-sm p-3 rounded-lg bg-purple-50 hover:bg-purple-100 transition-colors duration-200"
+                    >
+                      <span className="font-bold text-purple-600 mr-2">
+                        {index + 1}.
+                      </span>
+                      <span className="text-xs text-gray-500 mr-2">
+                        {cw.vertical ? "↓" : "→"}
+                      </span>
+                      <span className="text-gray-700">{cw.clue}</span>
+                    </div>
+                  ))}
               </div>
             </CardContent>
           </Card>
@@ -235,21 +274,21 @@ export default function Cruzadinha() {
 
   const exportToPDF = (withAnswers: boolean) => {
     if (crosswordGrid.length === 0) {
-      alert('Gere uma cruzadinha primeiro');
+      alert("Gere uma cruzadinha primeiro");
       return;
     }
 
     // Use landscape orientation and larger page size
-    const pdf = new jsPDF('landscape', 'mm', 'a4');
+    const pdf = new jsPDF("landscape", "mm", "a4");
     const pageWidth = pdf.internal.pageSize.getWidth();
     const pageHeight = pdf.internal.pageSize.getHeight();
 
     let currentY = 20;
 
     // Title
-    const crosswordTitle = title || 'Cruzadinha';
+    const crosswordTitle = title || "Cruzadinha";
     pdf.setFontSize(24);
-    pdf.setFont('helvetica', 'bold');
+    pdf.setFont("helvetica", "bold");
     const titleWidth = pdf.getTextWidth(crosswordTitle);
     pdf.text(crosswordTitle, (pageWidth - titleWidth) / 2, currentY);
     currentY += 15;
@@ -257,30 +296,40 @@ export default function Cruzadinha() {
     // Header info if enabled - blank lines for student to fill
     if (showHeaderInfo) {
       pdf.setFontSize(12);
-      pdf.setFont('helvetica', 'normal');
+      pdf.setFont("helvetica", "normal");
 
       // Create underlines for students to fill in
       const underlineLength = 40; // length of underline in mm
       const spacing = 60; // spacing between fields
 
       // Nome field
-      pdf.text('Nome:', 20, currentY);
+      pdf.text("Nome:", 20, currentY);
       pdf.line(35, currentY + 1, 35 + underlineLength, currentY + 1); // underline
 
       // Turma field
-      pdf.text('Turma:', 20 + spacing + underlineLength, currentY);
-      pdf.line(35 + spacing + underlineLength + 15, currentY + 1, 35 + spacing + underlineLength + 15 + 25, currentY + 1); // underline
+      pdf.text("Turma:", 20 + spacing + underlineLength, currentY);
+      pdf.line(
+        35 + spacing + underlineLength + 15,
+        currentY + 1,
+        35 + spacing + underlineLength + 15 + 25,
+        currentY + 1,
+      ); // underline
 
       // Data field
-      pdf.text('Data:', 20 + (spacing + underlineLength) * 1.7, currentY);
-      pdf.line(35 + (spacing + underlineLength) * 1.7 + 15, currentY + 1, 35 + (spacing + underlineLength) * 1.7 + 15 + 25, currentY + 1); // underline
+      pdf.text("Data:", 20 + (spacing + underlineLength) * 1.7, currentY);
+      pdf.line(
+        35 + (spacing + underlineLength) * 1.7 + 15,
+        currentY + 1,
+        35 + (spacing + underlineLength) * 1.7 + 15 + 25,
+        currentY + 1,
+      ); // underline
 
       currentY += 15;
     }
 
     // Define maximum dimensions for crossword (left side of page)
     const leftColumnWidth = pageWidth * 0.55; // 55% of page width for crossword
-    const rightColumnWidth = pageWidth * 0.40; // 40% for clues, 5% margin
+    const rightColumnWidth = pageWidth * 0.4; // 40% for clues, 5% margin
     const maxGridWidth = leftColumnWidth - 40; // margins
     const maxGridHeight = pageHeight - currentY - 30; // available height
 
@@ -292,21 +341,26 @@ export default function Cruzadinha() {
     const cellSize = Math.min(
       maxGridWidth / maxCellsWidth,
       maxGridHeight / maxCellsHeight,
-      12 // Maximum cell size
+      12, // Maximum cell size
     );
 
     // Ensure minimum cell size for readability
     const finalCellSize = Math.max(cellSize, 6);
 
     const gridWidth = Math.min(gridSize.width, maxCellsWidth) * finalCellSize;
-    const gridHeight = Math.min(gridSize.height, maxCellsHeight) * finalCellSize;
+    const gridHeight =
+      Math.min(gridSize.height, maxCellsHeight) * finalCellSize;
     const gridStartX = 20; // Left margin
     const gridStartY = currentY + 10;
 
-    const grid: (string | null)[][] = Array(gridSize.height).fill(null).map(() => Array(gridSize.width).fill(null));
-    const numbers: (number | null)[][] = Array(gridSize.height).fill(null).map(() => Array(gridSize.width).fill(null));
+    const grid: (string | null)[][] = Array(gridSize.height)
+      .fill(null)
+      .map(() => Array(gridSize.width).fill(null));
+    const numbers: (number | null)[][] = Array(gridSize.height)
+      .fill(null)
+      .map(() => Array(gridSize.width).fill(null));
 
-    crosswordGrid.forEach(cw => {
+    crosswordGrid.forEach((cw) => {
       numbers[cw.y][cw.x] = cw.number;
 
       for (let i = 0; i < cw.word.length; i++) {
@@ -331,15 +385,23 @@ export default function Cruzadinha() {
 
           if (numbers[y][x]) {
             pdf.setFontSize(Math.max(6, finalCellSize * 0.35));
-            pdf.setFont('helvetica', 'bold');
-            pdf.text(numbers[y][x]!.toString(), cellX + 1, cellY + finalCellSize * 0.35);
+            pdf.setFont("helvetica", "bold");
+            pdf.text(
+              numbers[y][x]!.toString(),
+              cellX + 1,
+              cellY + finalCellSize * 0.35,
+            );
           }
 
           if (withAnswers && cell) {
             pdf.setFontSize(Math.max(7, finalCellSize * 0.55));
-            pdf.setFont('helvetica', 'normal');
+            pdf.setFont("helvetica", "normal");
             const textWidth = pdf.getTextWidth(cell);
-            pdf.text(cell, cellX + (finalCellSize - textWidth) / 2, cellY + finalCellSize * 0.75);
+            pdf.text(
+              cell,
+              cellX + (finalCellSize - textWidth) / 2,
+              cellY + finalCellSize * 0.75,
+            );
           }
         }
       }
@@ -350,26 +412,28 @@ export default function Cruzadinha() {
     let cluesY = gridStartY;
 
     // Create a map of crossword numbers to sequential numbers
-    const sortedCrosswordWords = [...crosswordGrid].sort((a, b) => a.number - b.number);
+    const sortedCrosswordWords = [...crosswordGrid].sort(
+      (a, b) => a.number - b.number,
+    );
     const numberMap = new Map();
     sortedCrosswordWords.forEach((cw, index) => {
       numberMap.set(cw.number, index + 1);
     });
 
     pdf.setFontSize(14);
-    pdf.setFont('helvetica', 'bold');
-    pdf.text('Dicas:', cluesStartX, cluesY);
+    pdf.setFont("helvetica", "bold");
+    pdf.text("Dicas:", cluesStartX, cluesY);
     cluesY += 12;
 
     pdf.setFontSize(9);
-    pdf.setFont('helvetica', 'normal');
+    pdf.setFont("helvetica", "normal");
 
     // List all clues sequentially
     sortedCrosswordWords.forEach((cw, index) => {
       if (cluesY > pageHeight - 15) return; // Prevent overflow
 
       const sequentialNumber = index + 1;
-      const direction = cw.vertical ? '↓' : '→';
+      const direction = cw.vertical ? "↓" : "→";
       const clueText = `${sequentialNumber}. ${direction} ${cw.clue}`;
 
       // Split text if too long
@@ -380,12 +444,12 @@ export default function Cruzadinha() {
       cluesY += lines.length * 4.5; // Spacing between lines
     });
 
-    const filename = `${crosswordTitle.toLowerCase().replace(/\s+/g, '-')}-${withAnswers ? 'gabarito' : 'em-branco'}.pdf`;
+    const filename = `${crosswordTitle.toLowerCase().replace(/\s+/g, "-")}-${withAnswers ? "gabarito" : "em-branco"}.pdf`;
     pdf.save(filename);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       addWordClue();
     }
   };
@@ -395,7 +459,7 @@ export default function Cruzadinha() {
       <div className="container mx-auto px-4 py-8">
         <div className="text-center mb-12">
           <div className="flex justify-center items-center gap-4 mb-6">
-            <Link 
+            <Link
               to="/"
               className="inline-flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-800 bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-200"
             >
@@ -403,7 +467,7 @@ export default function Cruzadinha() {
               Voltar
             </Link>
           </div>
-          
+
           <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 bg-clip-text text-transparent mb-4">
             Gerador de Cruzadinhas
           </h1>
@@ -426,7 +490,10 @@ export default function Cruzadinha() {
             </CardHeader>
             <CardContent className="space-y-6">
               <div>
-                <Label htmlFor="title" className="text-sm font-medium text-gray-700 mb-2 block">
+                <Label
+                  htmlFor="title"
+                  className="text-sm font-medium text-gray-700 mb-2 block"
+                >
                   Título da Cruzadinha
                 </Label>
                 <Input
@@ -437,7 +504,7 @@ export default function Cruzadinha() {
                   className="border-2 border-blue-200 focus:border-blue-400 transition-colors duration-200"
                 />
               </div>
-              
+
               <div className="flex items-center space-x-2">
                 <Checkbox
                   id="header-info"
@@ -445,8 +512,12 @@ export default function Cruzadinha() {
                   onCheckedChange={setShowHeaderInfo}
                   className="border-2 border-blue-300"
                 />
-                <Label htmlFor="header-info" className="text-sm font-medium text-gray-700">
-                  Incluir campos para Nome, Turma e Data no PDF (linhas em branco para o aluno preencher)
+                <Label
+                  htmlFor="header-info"
+                  className="text-sm font-medium text-gray-700"
+                >
+                  Incluir campos para Nome, Turma e Data no PDF (linhas em
+                  branco para o aluno preencher)
                 </Label>
               </div>
             </CardContent>
@@ -457,12 +528,19 @@ export default function Cruzadinha() {
             <CardHeader>
               <CardTitle className="text-indigo-700 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  {isAIMode ? <Bot className="w-5 h-5" /> : <User className="w-5 h-5" />}
-                  {isAIMode ? 'Modo IA' : 'Modo Manual'}
+                  {isAIMode ? (
+                    <Bot className="w-5 h-5" />
+                  ) : (
+                    <User className="w-5 h-5" />
+                  )}
+                  {isAIMode ? "Modo IA" : "Modo Manual"}
                 </div>
                 <div className="flex items-center gap-3">
-                  <Label htmlFor="mode-switch" className="text-sm font-medium text-gray-600">
-                    {isAIMode ? 'IA' : 'Manual'}
+                  <Label
+                    htmlFor="mode-switch"
+                    className="text-sm font-medium text-gray-600"
+                  >
+                    {isAIMode ? "IA" : "Manual"}
                   </Label>
                   <Switch
                     id="mode-switch"
@@ -497,7 +575,7 @@ export default function Cruzadinha() {
                     className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                   >
                     <Plus className="w-4 h-4 mr-1" />
-                    Adicionar {wordClues.length >= 20 ? '(Limite: 20)' : ''}
+                    Adicionar {wordClues.length >= 20 ? "(Limite: 20)" : ""}
                   </Button>
                 </div>
               ) : (
@@ -505,7 +583,10 @@ export default function Cruzadinha() {
                 <div className="space-y-4">
                   <div className="grid md:grid-cols-3 gap-4">
                     <div>
-                      <Label htmlFor="ai-theme" className="text-sm font-medium text-gray-700 mb-2 block">
+                      <Label
+                        htmlFor="ai-theme"
+                        className="text-sm font-medium text-gray-700 mb-2 block"
+                      >
                         Tema
                       </Label>
                       <Select value={aiTheme} onValueChange={setAiTheme}>
@@ -523,10 +604,16 @@ export default function Cruzadinha() {
                       </Select>
                     </div>
                     <div>
-                      <Label htmlFor="ai-difficulty" className="text-sm font-medium text-gray-700 mb-2 block">
+                      <Label
+                        htmlFor="ai-difficulty"
+                        className="text-sm font-medium text-gray-700 mb-2 block"
+                      >
                         Dificuldade
                       </Label>
-                      <Select value={aiDifficulty} onValueChange={setAiDifficulty}>
+                      <Select
+                        value={aiDifficulty}
+                        onValueChange={setAiDifficulty}
+                      >
                         <SelectTrigger className="border-2 border-indigo-200 focus:border-indigo-400">
                           <SelectValue placeholder="Selecione a dificuldade" />
                         </SelectTrigger>
@@ -538,7 +625,10 @@ export default function Cruzadinha() {
                       </Select>
                     </div>
                     <div>
-                      <Label htmlFor="ai-count" className="text-sm font-medium text-gray-700 mb-2 block">
+                      <Label
+                        htmlFor="ai-count"
+                        className="text-sm font-medium text-gray-700 mb-2 block"
+                      >
                         Quantidade (5-20)
                       </Label>
                       <Input
@@ -547,7 +637,14 @@ export default function Cruzadinha() {
                         min="5"
                         max="20"
                         value={aiWordCount}
-                        onChange={(e) => setAiWordCount(Math.min(20, Math.max(5, parseInt(e.target.value) || 10)))}
+                        onChange={(e) =>
+                          setAiWordCount(
+                            Math.min(
+                              20,
+                              Math.max(5, parseInt(e.target.value) || 10),
+                            ),
+                          )
+                        }
                         className="border-2 border-indigo-200 focus:border-indigo-400 transition-colors duration-200"
                       />
                     </div>
@@ -580,7 +677,10 @@ export default function Cruzadinha() {
               <CardHeader>
                 <CardTitle className="text-yellow-700 flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Badge variant="secondary" className={`${wordClues.length >= 20 ? 'bg-red-200 text-red-800' : 'bg-yellow-200 text-yellow-800'}`}>
+                    <Badge
+                      variant="secondary"
+                      className={`${wordClues.length >= 20 ? "bg-red-200 text-red-800" : "bg-yellow-200 text-yellow-800"}`}
+                    >
                       {wordClues.length}/20
                     </Badge>
                     Palavras Adicionadas
@@ -604,7 +704,10 @@ export default function Cruzadinha() {
                       className="flex items-center justify-between p-4 bg-gradient-to-r from-yellow-50 to-yellow-100 rounded-xl border border-yellow-200 hover:shadow-md transition-shadow duration-200"
                     >
                       <div className="flex-1">
-                        <Badge variant="secondary" className="mr-3 bg-yellow-200 text-yellow-800 font-semibold">
+                        <Badge
+                          variant="secondary"
+                          className="mr-3 bg-yellow-200 text-yellow-800 font-semibold"
+                        >
                           {wc.word}
                         </Badge>
                         <span className="text-gray-700">{wc.clue}</span>
@@ -621,7 +724,7 @@ export default function Cruzadinha() {
                   ))}
                 </div>
                 <div className="mt-6">
-                  <Button 
+                  <Button
                     onClick={generateCrossword}
                     className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
                     disabled={wordClues.length < 2}
@@ -640,12 +743,10 @@ export default function Cruzadinha() {
               <CardHeader>
                 <CardTitle className="text-blue-700 flex items-center gap-2">
                   <Sparkles className="w-5 h-5" />
-                  {title || 'Cruzadinha Gerada'}
+                  {title || "Cruzadinha Gerada"}
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                {renderGrid()}
-              </CardContent>
+              <CardContent>{renderGrid()}</CardContent>
             </Card>
           )}
 
