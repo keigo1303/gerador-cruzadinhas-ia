@@ -111,7 +111,7 @@ export default function CacaPalavras() {
     }, 2000);
   };
 
-  const generateWordSearch = () => {
+  const generateWordSearchGrid = () => {
     if (words.length < 3) {
       alert('Adicione pelo menos 3 palavras para gerar o caça-palavras');
       return;
@@ -119,7 +119,7 @@ export default function CacaPalavras() {
 
     try {
       const wordList = words.map(w => w.word);
-      
+
       // Generate word search using the library
       const result = generateWordSearch(wordList, {
         rows: Math.max(15, Math.min(25, wordList.length + 5)),
@@ -547,8 +547,8 @@ export default function CacaPalavras() {
                   ))}
                 </div>
                 <div className="mt-6">
-                  <Button 
-                    onClick={generateWordSearch}
+                  <Button
+                    onClick={generateWordSearchGrid}
                     className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
                     disabled={words.length < 3}
                   >
