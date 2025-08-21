@@ -1,5 +1,5 @@
 import * as React from "react";
-import * as WordSearchGenerator from "@sbj42/word-search-generator";
+import WordSearch from "@blex41/word-search";
 import jsPDF from "jspdf";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
