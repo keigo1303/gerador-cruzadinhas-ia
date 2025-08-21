@@ -38,12 +38,11 @@ interface Word {
 
 interface WordSearchResult {
   grid: string[][];
-  solution: Array<{
+  words: Array<{
     word: string;
-    startRow: number;
-    startCol: number;
-    endRow: number;
-    endCol: number;
+    x: number;
+    y: number;
+    direction: string;
   }>;
   size: {
     rows: number;
