@@ -395,7 +395,7 @@ export default function CacaPalavras() {
   // Helper function to get all cells for a solution word
   const getSolutionCells = (wordInfo: any): CellPosition[] => {
     const cells: CellPosition[] = [];
-    const { word, x, y, orientation, endx, endy } = wordInfo;
+    const { word, x, y, endx, endy } = wordInfo;
 
     // Calculate direction based on start and end points
     const deltaX = endx - x;
