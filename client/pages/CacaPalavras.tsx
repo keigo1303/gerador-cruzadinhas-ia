@@ -146,6 +146,150 @@ export default function CacaPalavras() {
     }, 2000);
   };
 
+  // Custom word search generator that works reliably in the browser
+  const createCustomWordSearch = (wordList: string[], size: number): WordSearchResult => {
+    // Create empty grid
+    const grid: string[][] = Array(size)
+      .fill(null)
+      .map(() => Array(size).fill(""));
+
+    const words: Array<{
+      word: string;
+      x: number;
+      y: number;
+      orientation: string;
+      startx: number;
+      starty: number;
+      endx: number;
+      endy: number;
+    }> = [];
+
+    // Directions: horizontal, vertical, diagonal (8 directions)
+    const directions = [
+      { dx: 1, dy: 0, name: 'horizontal' },      // horizontal right
+      { dx: -1, dy: 0, name: 'horizontalBack' }, // horizontal left
+      { dx: 0, dy: 1, name: 'vertical' },        // vertical down
+      { dx: 0, dy: -1, name: 'verticalUp' },     // vertical up
+      { dx: 1, dy: 1, name: 'diagonal' },        // diagonal down-right
+      { dx: -1, dy: 1, name: 'diagonalUpBack' }, // diagonal down-left
+      { dx: 1, dy: -1, name: 'diagonalUp' },     // diagonal up-right
+      { dx: -1, dy: -1, name: 'diagonalBack' },  // diagonal up-left
+    ];
+
+    // Shuffle words to randomize placement order
+    const shuffledWords = [...wordList].sort(() => Math.random() - 0.5);
+
+    // Function to check if a word can be placed at a position
+    const canPlaceWord = (
+      word: string,
+      x: number,
+      y: number,
+      direction: { dx: number; dy: number; name: string },
+    ): boolean => {
+      for (let i = 0; i < word.length; i++) {
+        const newX = x + direction.dx * i;
+        const newY = y + direction.dy * i;
+
+        // Check bounds
+        if (newY < 0 || newY >= size || newX < 0 || newX >= size) {
+          return false;
+        }
+
+        // Check if cell is empty or has the same letter
+        if (grid[newY][newX] !== "" && grid[newY][newX] !== word[i].toUpperCase()) {
+          return false;
+        }
+      }
+      return true;
+    };
+
+    // Function to place a word at a position
+    const placeWord = (
+      word: string,
+      x: number,
+      y: number,
+      direction: { dx: number; dy: number; name: string },
+    ): void => {
+      const endX = x + direction.dx * (word.length - 1);
+      const endY = y + direction.dy * (word.length - 1);
+
+      for (let i = 0; i < word.length; i++) {
+        const newX = x + direction.dx * i;
+        const newY = y + direction.dy * i;
+        grid[newY][newX] = word[i].toUpperCase();
+      }
+
+      words.push({
+        word: word.toUpperCase(),
+        x: x,
+        y: y,
+        orientation: direction.name,
+        startx: x,
+        starty: y,
+        endx: endX,
+        endy: endY,
+      });
+    };
+
+    // Try to place each word
+    for (const word of shuffledWords) {
+      let placed = false;
+      let attempts = 0;
+      const maxAttempts = 100;
+
+      while (!placed && attempts < maxAttempts) {
+        // Random position and direction
+        const x = Math.floor(Math.random() * size);
+        const y = Math.floor(Math.random() * size);
+        const direction = directions[Math.floor(Math.random() * directions.length)];
+
+        if (canPlaceWord(word, x, y, direction)) {
+          placeWord(word, x, y, direction);
+          placed = true;
+        }
+        attempts++;
+      }
+
+      // If couldn't place randomly, try systematically
+      if (!placed) {
+        outerLoop: for (let y = 0; y < size; y++) {
+          for (let x = 0; x < size; x++) {
+            for (const direction of directions) {
+              if (canPlaceWord(word, x, y, direction)) {
+                placeWord(word, x, y, direction);
+                placed = true;
+                break outerLoop;
+              }
+            }
+          }
+        }
+      }
+
+      if (!placed) {
+        console.warn(`Could not place word: ${word}`);
+      }
+    }
+
+    // Fill empty cells with random letters
+    const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    for (let y = 0; y < size; y++) {
+      for (let x = 0; x < size; x++) {
+        if (!grid[y][x]) {
+          grid[y][x] = letters[Math.floor(Math.random() * letters.length)];
+        }
+      }
+    }
+
+    console.log(`Successfully placed ${words.length} out of ${wordList.length} words`);
+    console.log('Placed words:', words);
+
+    return {
+      grid,
+      words,
+      size: { rows: size, cols: size },
+    };
+  };
+
   const generateWordSearchGrid = () => {
     if (words.length < 3) {
       alert("Adicione pelo menos 3 palavras para gerar o caça-palavras");
