@@ -261,38 +261,41 @@ export default function CacaPalavras() {
   const isValidWord = (selectedCells: CellPosition[]): string | null => {
     if (!wordSearchGrid || selectedCells.length < 2) return null;
 
-    // Check against each solution
-    for (const solution of wordSearchGrid.solution) {
-      const solutionCells = getSolutionCells(solution);
+    // Check against each word position
+    for (const wordInfo of wordSearchGrid.words) {
+      const solutionCells = getSolutionCells(wordInfo);
 
       // Check if selected cells match solution (forward or backward)
       if (cellsMatch(selectedCells, solutionCells) || cellsMatch(selectedCells, solutionCells.reverse())) {
-        return solution.word;
+        return wordInfo.word;
       }
     }
     return null;
   };
 
   // Helper function to get all cells for a solution word
-  const getSolutionCells = (solution: any): CellPosition[] => {
+  const getSolutionCells = (wordInfo: any): CellPosition[] => {
     const cells: CellPosition[] = [];
-    const { startRow, startCol, endRow, endCol } = solution;
+    const { word, x, y, direction } = wordInfo;
 
-    const deltaRow = endRow - startRow;
-    const deltaCol = endCol - startCol;
-    const steps = Math.max(Math.abs(deltaRow), Math.abs(deltaCol));
+    // Direction mappings for @blex41/word-search
+    const directionMap: { [key: string]: { dx: number; dy: number } } = {
+      'E': { dx: 1, dy: 0 },   // East (horizontal right)
+      'W': { dx: -1, dy: 0 },  // West (horizontal left)
+      'S': { dx: 0, dy: 1 },   // South (vertical down)
+      'N': { dx: 0, dy: -1 },  // North (vertical up)
+      'SE': { dx: 1, dy: 1 },  // Southeast (diagonal down-right)
+      'SW': { dx: -1, dy: 1 }, // Southwest (diagonal down-left)
+      'NE': { dx: 1, dy: -1 }, // Northeast (diagonal up-right)
+      'NW': { dx: -1, dy: -1 } // Northwest (diagonal up-left)
+    };
 
-    if (steps === 0) {
-      return [{ row: startRow, col: startCol }];
-    }
+    const dir = directionMap[direction] || { dx: 1, dy: 0 };
 
-    const stepRow = deltaRow / steps;
-    const stepCol = deltaCol / steps;
-
-    for (let i = 0; i <= steps; i++) {
+    for (let i = 0; i < word.length; i++) {
       cells.push({
-        row: startRow + Math.round(stepRow * i),
-        col: startCol + Math.round(stepCol * i)
+        row: y + (dir.dy * i),
+        col: x + (dir.dx * i)
       });
     }
 
