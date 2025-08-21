@@ -94,7 +94,17 @@ export default function Index() {
           { word: 'PORCO', clue: 'Animal que vive na lama' },
           { word: 'GALINHA', clue: 'Ave que bota ovos' },
           { word: 'COELHO', clue: 'Animal que pula e come cenoura' },
-          { word: 'RATO', clue: 'Pequeno roedor' }
+          { word: 'RATO', clue: 'Pequeno roedor' },
+          { word: 'OVELHA', clue: 'Animal que fornece lã' },
+          { word: 'PATO', clue: 'Ave aquática que nada' },
+          { word: 'GALO', clue: 'Macho da galinha' },
+          { word: 'BURRO', clue: 'Animal de carga parecido com cavalo' },
+          { word: 'CABRA', clue: 'Animal que come de tudo' },
+          { word: 'ARANHA', clue: 'Animal de oito patas' },
+          { word: 'ABELHA', clue: 'Inseto que faz mel' },
+          { word: 'FORMIGA', clue: 'Inseto que trabalha em equipe' },
+          { word: 'BORBOLETA', clue: 'Inseto colorido que voa' },
+          { word: 'JOANINHA', clue: 'Inseto vermelho com pintinhas' }
         ],
         medio: [
           { word: 'ELEFANTE', clue: 'Maior mamífero terrestre' },
@@ -311,7 +321,7 @@ export default function Index() {
           { word: 'PARALELO', clue: 'Retas que nunca se encontram' }
         ],
         dificil: [
-          { word: 'LOGARITMO', clue: 'Operação inversa da exponenciação' },
+          { word: 'LOGARITMO', clue: 'Operação inversa da exponenciaç��o' },
           { word: 'SENO', clue: 'Função trigonométrica básica' },
           { word: 'COSSENO', clue: 'Função trigonométrica complementar' },
           { word: 'TANGENTE', clue: 'Razão entre seno e cosseno' },
