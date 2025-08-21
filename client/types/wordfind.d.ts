@@ -16,11 +16,14 @@ declare module 'wordfind' {
     endy?: number;
   }
 
+  interface SolutionResult {
+    found: WordPosition[];
+    notFound: string[];
+  }
+
   type Puzzle = string[][];
 
   export function newPuzzle(words: string[], options: PuzzleOptions): Puzzle | null;
-  
-  export const finder: {
-    find(puzzle: Puzzle, words: string[]): WordPosition[];
-  };
+  export function solve(puzzle: Puzzle, words: string[]): SolutionResult;
+  export function print(puzzle: Puzzle): void;
 }
