@@ -2,6 +2,7 @@ import * as React from 'react';
 import clg from 'crossword-layout-generator';
 import jsPDF from 'jspdf';
 import { Button } from '@/components/ui/button';
+import { wordDatabase } from '@shared/word-database';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -322,7 +323,7 @@ export default function Index() {
           { word: 'MONARQUIA', clue: 'Governo do rei' },
           { word: 'REVOLUCAO', clue: 'Mudança radical no governo' },
           { word: 'DESCOBRIMENTO', clue: 'Chegada dos portugueses ao Brasil' },
-          { word: 'COLONIZACAO', clue: 'Ocupação de terras por outros povos' },
+          { word: 'COLONIZACAO', clue: 'Ocupaç��o de terras por outros povos' },
           { word: 'INDEPENDENCIA', clue: 'Libertação do domínio estrangeiro' },
           { word: 'ABOLICAO', clue: 'Fim da escravidão' },
           { word: 'PROCLAMACAO', clue: 'Anúncio oficial importante' },
