@@ -537,33 +537,9 @@ export default function CacaPalavras() {
 
         // Highlight found words if showing answers
         if (withAnswers) {
-          const isPartOfWord = wordSearchGrid.solution.some((solution) => {
-            const { startRow, startCol, endRow, endCol } = solution;
-            const minRow = Math.min(startRow, endRow);
-            const maxRow = Math.max(startRow, endRow);
-            const minCol = Math.min(startCol, endCol);
-            const maxCol = Math.max(startCol, endCol);
-
-            // Check if current cell is on the line between start and end
-            if (startRow === endRow) {
-              return y === startRow && x >= minCol && x <= maxCol;
-            } else if (startCol === endCol) {
-              return x === startCol && y >= minRow && y <= maxRow;
-            } else {
-              // Diagonal
-              const deltaRow = endRow - startRow;
-              const deltaCol = endCol - startCol;
-              const currentDeltaRow = y - startRow;
-              const currentDeltaCol = x - startCol;
-
-              return (
-                currentDeltaRow / deltaRow === currentDeltaCol / deltaCol &&
-                currentDeltaRow >= 0 &&
-                currentDeltaRow <= Math.abs(deltaRow) &&
-                currentDeltaCol >= 0 &&
-                currentDeltaCol <= Math.abs(deltaCol)
-              );
-            }
+          const isPartOfWord = wordSearchGrid.words.some((wordInfo) => {
+            const solutionCells = getSolutionCells(wordInfo);
+            return solutionCells.some(cell => cell.row === y && cell.col === x);
           });
 
           if (isPartOfWord) {
