@@ -122,8 +122,11 @@ export default function CacaPalavras() {
 
       console.log('Generating word search with words:', wordList);
 
-      // Try to generate word search using the library
-      const gridSize = Math.max(15, Math.min(25, Math.max(...wordList.map(w => w.length)) + 8));
+      // Calculate appropriate grid size based on word count and length
+      const longestWord = Math.max(...wordList.map(w => w.length));
+      const wordCount = wordList.length;
+      // Make grid larger to accommodate more words in different directions
+      const gridSize = Math.max(20, Math.min(30, longestWord + Math.ceil(Math.sqrt(wordCount)) + 5));
 
       let result;
 
