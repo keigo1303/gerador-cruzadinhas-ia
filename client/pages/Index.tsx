@@ -274,7 +274,17 @@ export default function Index() {
           { word: 'PLUVIOSIDADE', clue: 'Quantidade de chuva em uma região' },
           { word: 'HIDROGRAFIA', clue: 'Estudo dos recursos hídricos' },
           { word: 'CARTOGRAFIA', clue: 'Arte e ciência de fazer mapas' },
-          { word: 'TOPOGRAFIA', clue: 'Representação do relevo terrestre' }
+          { word: 'TOPOGRAFIA', clue: 'Representação do relevo terrestre' },
+          { word: 'BATIMETRIA', clue: 'Medição da profundidade oceânica' },
+          { word: 'LITOSFERA', clue: 'Camada sólida externa da Terra' },
+          { word: 'ASTENOSFERA', clue: 'Camada plástica do manto' },
+          { word: 'VULCANISMO', clue: 'Atividade dos vulcões' },
+          { word: 'OROGENIA', clue: 'Formação de montanhas' },
+          { word: 'EPEIROGENIA', clue: 'Movimento vertical da crosta' },
+          { word: 'SUBSIDENCIA', clue: 'Afundamento gradual do terreno' },
+          { word: 'SOERGUIMENTO', clue: 'Elevação do terreno' },
+          { word: 'ESCARPAMENTO', clue: 'Declive abrupto no terreno' },
+          { word: 'PLANICIE', clue: 'Área plana de baixa altitude' }
         ]
       },
       historia: {
