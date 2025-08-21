@@ -230,7 +230,17 @@ export default function Index() {
           { word: 'ILHA', clue: 'Terra cercada de água' },
           { word: 'LAGO', clue: 'Corpo de água doce cercado de terra' },
           { word: 'PRAIA', clue: 'Faixa de areia à beira-mar' },
-          { word: 'CIDADE', clue: 'Área urbana com muitos habitantes' }
+          { word: 'CIDADE', clue: 'Área urbana com muitos habitantes' },
+          { word: 'CAMPO', clue: 'Área rural com plantações' },
+          { word: 'VALE', clue: 'Terreno baixo entre montanhas' },
+          { word: 'PONTE', clue: 'Construção para atravessar rios' },
+          { word: 'ESTRADA', clue: 'Caminho para veículos' },
+          { word: 'PORTO', clue: 'Local onde param os navios' },
+          { word: 'FAROL', clue: 'Torre que guia navegadores' },
+          { word: 'MAPA', clue: 'Representação da Terra no papel' },
+          { word: 'BUSSOLA', clue: 'Instrumento que aponta o norte' },
+          { word: 'NORTE', clue: 'Ponto cardeal oposto ao sul' },
+          { word: 'SUL', clue: 'Ponto cardeal onde fica a Antártida' }
         ],
         medio: [
           { word: 'AMAZONIA', clue: 'Maior floresta tropical do mundo' },
@@ -286,7 +296,7 @@ export default function Index() {
           { word: 'MUMIA', clue: 'Corpo preservado dos egípcios' },
           { word: 'GLADIADOR', clue: 'Lutador da arena romana' },
           { word: 'COLISEU', clue: 'Anfiteatro romano famoso' },
-          { word: 'IMPERIO', clue: 'Grande território governado por imperador' },
+          { word: 'IMPERIO', clue: 'Grande territ��rio governado por imperador' },
           { word: 'REPUBLICA', clue: 'Governo eleito pelo povo' },
           { word: 'DEMOCRACIA', clue: 'Governo do povo' },
           { word: 'MONARQUIA', clue: 'Governo do rei' },
