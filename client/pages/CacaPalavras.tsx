@@ -186,9 +186,10 @@ export default function CacaPalavras() {
 
       console.log('Generated puzzle:', puzzle);
 
-      // Find word positions
-      const foundWords = wordfind.finder.find(puzzle, wordList);
-      console.log('Found word positions:', foundWords);
+      // Find word positions using solve method
+      const solution = wordfind.solve(puzzle, wordList);
+      console.log('Solution:', solution);
+      const foundWords = solution.found || [];
 
       // Convert to uppercase for display
       const uppercaseGrid = puzzle.map(row =>
