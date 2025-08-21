@@ -51,6 +51,16 @@ interface WordSearchResult {
   };
 }
 
+interface CellPosition {
+  row: number;
+  col: number;
+}
+
+interface FoundWord {
+  word: string;
+  cells: CellPosition[];
+}
+
 export default function CacaPalavras() {
   const [word, setWord] = React.useState("");
   const [title, setTitle] = React.useState("");
@@ -63,6 +73,10 @@ export default function CacaPalavras() {
   const [aiDifficulty, setAiDifficulty] = React.useState("");
   const [aiWordCount, setAiWordCount] = React.useState(10);
   const [isGenerating, setIsGenerating] = React.useState(false);
+  const [foundWords, setFoundWords] = React.useState<FoundWord[]>([]);
+  const [selectedCells, setSelectedCells] = React.useState<CellPosition[]>([]);
+  const [isSelecting, setIsSelecting] = React.useState(false);
+  const [startCell, setStartCell] = React.useState<CellPosition | null>(null);
   const wordInputRef = React.useRef<HTMLInputElement>(null);
 
   const addWord = () => {
@@ -135,6 +149,12 @@ export default function CacaPalavras() {
       alert("Adicione pelo menos 3 palavras para gerar o caça-palavras");
       return;
     }
+
+    // Reset found words when generating new grid
+    setFoundWords([]);
+    setSelectedCells([]);
+    setIsSelecting(false);
+    setStartCell(null);
 
     try {
       const wordList = words.map((w) => w.word);
@@ -368,48 +388,191 @@ export default function CacaPalavras() {
     }
   };
 
+  // Helper function to check if a cell is part of a found word
+  const isCellFound = (row: number, col: number): boolean => {
+    return foundWords.some(foundWord =>
+      foundWord.cells.some(cell => cell.row === row && cell.col === col)
+    );
+  };
+
+  // Helper function to check if a cell is currently selected
+  const isCellSelected = (row: number, col: number): boolean => {
+    return selectedCells.some(cell => cell.row === row && cell.col === col);
+  };
+
+  // Helper function to get cells between two points (for word selection)
+  const getCellsBetween = (start: CellPosition, end: CellPosition): CellPosition[] => {
+    const cells: CellPosition[] = [];
+    const deltaRow = end.row - start.row;
+    const deltaCol = end.col - start.col;
+
+    // Check if it's a valid direction (horizontal, vertical, or diagonal)
+    const isHorizontal = deltaRow === 0;
+    const isVertical = deltaCol === 0;
+    const isDiagonal = Math.abs(deltaRow) === Math.abs(deltaCol);
+
+    if (!isHorizontal && !isVertical && !isDiagonal) {
+      return [];
+    }
+
+    const steps = Math.max(Math.abs(deltaRow), Math.abs(deltaCol));
+    const stepRow = steps === 0 ? 0 : deltaRow / steps;
+    const stepCol = steps === 0 ? 0 : deltaCol / steps;
+
+    for (let i = 0; i <= steps; i++) {
+      cells.push({
+        row: start.row + Math.round(stepRow * i),
+        col: start.col + Math.round(stepCol * i)
+      });
+    }
+
+    return cells;
+  };
+
+  // Helper function to get the word formed by selected cells
+  const getWordFromCells = (cells: CellPosition[]): string => {
+    if (!wordSearchGrid) return '';
+    return cells.map(cell => wordSearchGrid.grid[cell.row][cell.col]).join('');
+  };
+
+  // Helper function to check if a word matches any of the target words
+  const isValidWord = (word: string): string | null => {
+    const upperWord = word.toUpperCase();
+    const reverseWord = upperWord.split('').reverse().join('');
+
+    for (const targetWord of words) {
+      if (targetWord.word === upperWord || targetWord.word === reverseWord) {
+        return targetWord.word;
+      }
+    }
+    return null;
+  };
+
+  // Mouse handlers for word selection
+  const handleMouseDown = (row: number, col: number) => {
+    setIsSelecting(true);
+    setStartCell({ row, col });
+    setSelectedCells([{ row, col }]);
+  };
+
+  const handleMouseEnter = (row: number, col: number) => {
+    if (isSelecting && startCell) {
+      const cells = getCellsBetween(startCell, { row, col });
+      setSelectedCells(cells);
+    }
+  };
+
+  const handleMouseUp = () => {
+    if (isSelecting && selectedCells.length > 1) {
+      const word = getWordFromCells(selectedCells);
+      const validWord = isValidWord(word);
+
+      if (validWord) {
+        // Check if word is already found
+        const alreadyFound = foundWords.some(fw => fw.word === validWord);
+        if (!alreadyFound) {
+          setFoundWords(prev => [...prev, { word: validWord, cells: [...selectedCells] }]);
+        }
+      }
+    }
+
+    setIsSelecting(false);
+    setStartCell(null);
+    setSelectedCells([]);
+  };
+
   const renderGrid = () => {
     if (!wordSearchGrid) return null;
 
     return (
       <div className="flex flex-col items-center gap-8">
         <div
-          className="grid gap-1 p-6 bg-white border-2 border-green-200 rounded-xl shadow-2xl transition-all duration-300 hover:shadow-3xl"
+          className="grid gap-1 p-6 bg-white border-2 border-green-200 rounded-xl shadow-2xl transition-all duration-300 hover:shadow-3xl select-none"
           style={{
             gridTemplateColumns: `repeat(${wordSearchGrid.size.cols}, 1fr)`,
           }}
+          onMouseLeave={() => {
+            if (isSelecting) {
+              setIsSelecting(false);
+              setStartCell(null);
+              setSelectedCells([]);
+            }
+          }}
         >
           {wordSearchGrid.grid.map((row, y) =>
-            row.map((cell, x) => (
-              <div
-                key={`${x}-${y}`}
-                className="w-8 h-8 border border-gray-300 flex items-center justify-center text-sm font-bold bg-white hover:bg-green-50 transition-colors duration-200"
-              >
-                <span className="text-gray-800">{cell}</span>
-              </div>
-            )),
+            row.map((cell, x) => {
+              const isFound = isCellFound(y, x);
+              const isSelected = isCellSelected(y, x);
+
+              return (
+                <div
+                  key={`${x}-${y}`}
+                  className={`w-8 h-8 border border-gray-300 flex items-center justify-center text-sm font-bold cursor-pointer transition-all duration-200 ${
+                    isFound
+                      ? 'bg-green-200 border-green-400 text-green-800'
+                      : isSelected
+                        ? 'bg-blue-200 border-blue-400 text-blue-800'
+                        : 'bg-white hover:bg-green-50'
+                  }`}
+                  onMouseDown={() => handleMouseDown(y, x)}
+                  onMouseEnter={() => handleMouseEnter(y, x)}
+                  onMouseUp={handleMouseUp}
+                >
+                  <span className={isFound ? 'font-bold' : 'text-gray-800'}>{cell}</span>
+                </div>
+              );
+            }),
           )}
         </div>
 
         <div className="w-full max-w-4xl">
           <Card className="border-l-4 border-l-green-500 shadow-lg hover:shadow-xl transition-all duration-300">
             <CardHeader className="bg-gradient-to-r from-green-50 to-green-100">
-              <CardTitle className="text-green-700 flex items-center gap-2">
-                <Search className="w-5 h-5" />
-                Palavras para Encontrar
+              <CardTitle className="text-green-700 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Search className="w-5 h-5" />
+                  Palavras para Encontrar
+                </div>
+                <Badge
+                  variant="secondary"
+                  className={`${foundWords.length === words.length ? 'bg-green-200 text-green-800' : 'bg-blue-200 text-blue-800'}`}
+                >
+                  {foundWords.length}/{words.length} encontradas
+                </Badge>
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-6">
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                {words.map((w, index) => (
-                  <div
-                    key={w.id}
-                    className="text-sm p-3 rounded-lg bg-green-50 hover:bg-green-100 transition-colors duration-200 text-center"
-                  >
-                    <span className="font-bold text-green-600">{w.word}</span>
-                  </div>
-                ))}
+                {words.map((w, index) => {
+                  const isFound = foundWords.some(fw => fw.word === w.word);
+                  return (
+                    <div
+                      key={w.id}
+                      className={`text-sm p-3 rounded-lg transition-all duration-200 text-center ${
+                        isFound
+                          ? 'bg-green-200 border border-green-400 text-green-800 shadow-md'
+                          : 'bg-green-50 hover:bg-green-100 text-green-600'
+                      }`}
+                    >
+                      <div className="flex items-center justify-center gap-2">
+                        <span className="font-bold">{w.word}</span>
+                        {isFound && (
+                          <FileCheck className="w-4 h-4 text-green-600" />
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
+
+              {foundWords.length === words.length && (
+                <div className="mt-6 p-4 bg-gradient-to-r from-green-100 to-emerald-100 rounded-lg border border-green-300">
+                  <div className="flex items-center justify-center gap-2 text-green-800">
+                    <FileCheck className="w-6 h-6" />
+                    <span className="text-lg font-bold">Parabéns! Você encontrou todas as palavras! 🎉</span>
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
