@@ -147,7 +147,10 @@ export default function CacaPalavras() {
   };
 
   // Custom word search generator that works reliably in the browser
-  const createCustomWordSearch = (wordList: string[], size: number): WordSearchResult => {
+  const createCustomWordSearch = (
+    wordList: string[],
+    size: number,
+  ): WordSearchResult => {
     // Create empty grid
     const grid: string[][] = Array(size)
       .fill(null)
@@ -166,14 +169,14 @@ export default function CacaPalavras() {
 
     // Directions: horizontal, vertical, diagonal (8 directions)
     const directions = [
-      { dx: 1, dy: 0, name: 'horizontal' },      // horizontal right
-      { dx: -1, dy: 0, name: 'horizontalBack' }, // horizontal left
-      { dx: 0, dy: 1, name: 'vertical' },        // vertical down
-      { dx: 0, dy: -1, name: 'verticalUp' },     // vertical up
-      { dx: 1, dy: 1, name: 'diagonal' },        // diagonal down-right
-      { dx: -1, dy: 1, name: 'diagonalUpBack' }, // diagonal down-left
-      { dx: 1, dy: -1, name: 'diagonalUp' },     // diagonal up-right
-      { dx: -1, dy: -1, name: 'diagonalBack' },  // diagonal up-left
+      { dx: 1, dy: 0, name: "horizontal" }, // horizontal right
+      { dx: -1, dy: 0, name: "horizontalBack" }, // horizontal left
+      { dx: 0, dy: 1, name: "vertical" }, // vertical down
+      { dx: 0, dy: -1, name: "verticalUp" }, // vertical up
+      { dx: 1, dy: 1, name: "diagonal" }, // diagonal down-right
+      { dx: -1, dy: 1, name: "diagonalUpBack" }, // diagonal down-left
+      { dx: 1, dy: -1, name: "diagonalUp" }, // diagonal up-right
+      { dx: -1, dy: -1, name: "diagonalBack" }, // diagonal up-left
     ];
 
     // Shuffle words to randomize placement order
@@ -196,7 +199,10 @@ export default function CacaPalavras() {
         }
 
         // Check if cell is empty or has the same letter
-        if (grid[newY][newX] !== "" && grid[newY][newX] !== word[i].toUpperCase()) {
+        if (
+          grid[newY][newX] !== "" &&
+          grid[newY][newX] !== word[i].toUpperCase()
+        ) {
           return false;
         }
       }
@@ -241,7 +247,8 @@ export default function CacaPalavras() {
         // Random position and direction
         const x = Math.floor(Math.random() * size);
         const y = Math.floor(Math.random() * size);
-        const direction = directions[Math.floor(Math.random() * directions.length)];
+        const direction =
+          directions[Math.floor(Math.random() * directions.length)];
 
         if (canPlaceWord(word, x, y, direction)) {
           placeWord(word, x, y, direction);
@@ -280,8 +287,10 @@ export default function CacaPalavras() {
       }
     }
 
-    console.log(`Successfully placed ${words.length} out of ${wordList.length} words`);
-    console.log('Placed words:', words);
+    console.log(
+      `Successfully placed ${words.length} out of ${wordList.length} words`,
+    );
+    console.log("Placed words:", words);
 
     return {
       grid,
@@ -329,30 +338,31 @@ export default function CacaPalavras() {
       // Create word search using custom generator
       const result = createCustomWordSearch(wordList, gridSize);
 
-      console.log('Final result:', result);
+      console.log("Final result:", result);
       setWordSearchGrid(result);
-
     } catch (error) {
       console.error("Error generating word search:", error);
       alert("Erro ao gerar o caça-palavras. Tente palavras diferentes.");
     }
   };
 
-
   // Helper function to check if a cell is part of a found word
   const isCellFound = (row: number, col: number): boolean => {
-    return foundWords.some(foundWord =>
-      foundWord.cells.some(cell => cell.row === row && cell.col === col)
+    return foundWords.some((foundWord) =>
+      foundWord.cells.some((cell) => cell.row === row && cell.col === col),
     );
   };
 
   // Helper function to check if a cell is currently selected
   const isCellSelected = (row: number, col: number): boolean => {
-    return selectedCells.some(cell => cell.row === row && cell.col === col);
+    return selectedCells.some((cell) => cell.row === row && cell.col === col);
   };
 
   // Helper function to get cells between two points (for word selection)
-  const getCellsBetween = (start: CellPosition, end: CellPosition): CellPosition[] => {
+  const getCellsBetween = (
+    start: CellPosition,
+    end: CellPosition,
+  ): CellPosition[] => {
     const cells: CellPosition[] = [];
     const deltaRow = end.row - start.row;
     const deltaCol = end.col - start.col;
@@ -373,7 +383,7 @@ export default function CacaPalavras() {
     for (let i = 0; i <= steps; i++) {
       cells.push({
         row: start.row + Math.round(stepRow * i),
-        col: start.col + Math.round(stepCol * i)
+        col: start.col + Math.round(stepCol * i),
       });
     }
 
@@ -382,8 +392,10 @@ export default function CacaPalavras() {
 
   // Helper function to get the word formed by selected cells
   const getWordFromCells = (cells: CellPosition[]): string => {
-    if (!wordSearchGrid) return '';
-    return cells.map(cell => wordSearchGrid.grid[cell.row][cell.col]).join('');
+    if (!wordSearchGrid) return "";
+    return cells
+      .map((cell) => wordSearchGrid.grid[cell.row][cell.col])
+      .join("");
   };
 
   // Helper function to check if selected cells match any solution word
@@ -395,7 +407,10 @@ export default function CacaPalavras() {
       const solutionCells = getSolutionCells(wordInfo);
 
       // Check if selected cells match solution (forward or backward)
-      if (cellsMatch(selectedCells, solutionCells) || cellsMatch(selectedCells, solutionCells.reverse())) {
+      if (
+        cellsMatch(selectedCells, solutionCells) ||
+        cellsMatch(selectedCells, solutionCells.reverse())
+      ) {
         return wordInfo.word;
       }
     }
@@ -422,7 +437,7 @@ export default function CacaPalavras() {
     for (let i = 0; i < word.length; i++) {
       cells.push({
         row: y + Math.round(stepY * i),
-        col: x + Math.round(stepX * i)
+        col: x + Math.round(stepX * i),
       });
     }
 
@@ -430,7 +445,10 @@ export default function CacaPalavras() {
   };
 
   // Helper function to check if two cell arrays match
-  const cellsMatch = (cells1: CellPosition[], cells2: CellPosition[]): boolean => {
+  const cellsMatch = (
+    cells1: CellPosition[],
+    cells2: CellPosition[],
+  ): boolean => {
     if (cells1.length !== cells2.length) return false;
 
     return cells1.every((cell1, index) => {
@@ -459,16 +477,24 @@ export default function CacaPalavras() {
 
       if (validWord) {
         // Check if word is already found
-        const alreadyFound = foundWords.some(fw => fw.word === validWord);
+        const alreadyFound = foundWords.some((fw) => fw.word === validWord);
         if (!alreadyFound) {
-          console.log('Found word:', validWord, 'at cells:', selectedCells);
-          setFoundWords(prev => [...prev, { word: validWord, cells: [...selectedCells] }]);
+          console.log("Found word:", validWord, "at cells:", selectedCells);
+          setFoundWords((prev) => [
+            ...prev,
+            { word: validWord, cells: [...selectedCells] },
+          ]);
         } else {
-          console.log('Word already found:', validWord);
+          console.log("Word already found:", validWord);
         }
       } else {
         const selectedWord = getWordFromCells(selectedCells);
-        console.log('Invalid selection:', selectedWord, 'cells:', selectedCells);
+        console.log(
+          "Invalid selection:",
+          selectedWord,
+          "cells:",
+          selectedCells,
+        );
       }
     }
 
@@ -505,16 +531,18 @@ export default function CacaPalavras() {
                   key={`${x}-${y}`}
                   className={`w-8 h-8 border border-gray-300 flex items-center justify-center text-sm font-bold cursor-pointer transition-all duration-200 ${
                     isFound
-                      ? 'bg-green-200 border-green-400 text-green-800'
+                      ? "bg-green-200 border-green-400 text-green-800"
                       : isSelected
-                        ? 'bg-blue-200 border-blue-400 text-blue-800'
-                        : 'bg-white hover:bg-green-50'
+                        ? "bg-blue-200 border-blue-400 text-blue-800"
+                        : "bg-white hover:bg-green-50"
                   }`}
                   onMouseDown={() => handleMouseDown(y, x)}
                   onMouseEnter={() => handleMouseEnter(y, x)}
                   onMouseUp={handleMouseUp}
                 >
-                  <span className={isFound ? 'font-bold' : 'text-gray-800'}>{cell}</span>
+                  <span className={isFound ? "font-bold" : "text-gray-800"}>
+                    {cell}
+                  </span>
                 </div>
               );
             }),
@@ -531,7 +559,7 @@ export default function CacaPalavras() {
                 </div>
                 <Badge
                   variant="secondary"
-                  className={`${foundWords.length === words.length ? 'bg-green-200 text-green-800' : 'bg-blue-200 text-blue-800'}`}
+                  className={`${foundWords.length === words.length ? "bg-green-200 text-green-800" : "bg-blue-200 text-blue-800"}`}
                 >
                   {foundWords.length}/{words.length} encontradas
                 </Badge>
@@ -540,14 +568,14 @@ export default function CacaPalavras() {
             <CardContent className="pt-6">
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                 {words.map((w, index) => {
-                  const isFound = foundWords.some(fw => fw.word === w.word);
+                  const isFound = foundWords.some((fw) => fw.word === w.word);
                   return (
                     <div
                       key={w.id}
                       className={`text-sm p-3 rounded-lg transition-all duration-200 text-center ${
                         isFound
-                          ? 'bg-green-200 border border-green-400 text-green-800 shadow-md'
-                          : 'bg-green-50 hover:bg-green-100 text-green-600'
+                          ? "bg-green-200 border border-green-400 text-green-800 shadow-md"
+                          : "bg-green-50 hover:bg-green-100 text-green-600"
                       }`}
                     >
                       <div className="flex items-center justify-center gap-2">
@@ -565,7 +593,9 @@ export default function CacaPalavras() {
                 <div className="mt-6 p-4 bg-gradient-to-r from-green-100 to-emerald-100 rounded-lg border border-green-300">
                   <div className="flex items-center justify-center gap-2 text-green-800">
                     <FileCheck className="w-6 h-6" />
-                    <span className="text-lg font-bold">Parabéns! Você encontrou todas as palavras! 🎉</span>
+                    <span className="text-lg font-bold">
+                      Parabéns! Você encontrou todas as palavras! 🎉
+                    </span>
                   </div>
                 </div>
               )}
@@ -666,7 +696,9 @@ export default function CacaPalavras() {
         if (withAnswers) {
           const isPartOfWord = wordSearchGrid.words.some((wordInfo) => {
             const solutionCells = getSolutionCells(wordInfo);
-            return solutionCells.some(cell => cell.row === y && cell.col === x);
+            return solutionCells.some(
+              (cell) => cell.row === y && cell.col === x,
+            );
           });
 
           if (isPartOfWord) {

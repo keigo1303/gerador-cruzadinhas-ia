@@ -24,7 +24,7 @@ export default defineConfig(({ mode }) => ({
     },
   },
   define: {
-    global: 'globalThis',
+    global: "globalThis",
   },
 }));
 
