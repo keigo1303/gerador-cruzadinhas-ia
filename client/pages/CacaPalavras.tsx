@@ -173,7 +173,7 @@ export default function CacaPalavras() {
     }
   };
 
-  // Fallback function to create a simple word search manually
+  // Improved fallback function to create a proper word search manually
   const createSimpleWordSearch = (wordList: string[], size: number): WordSearchResult | null => {
     try {
       // Create empty grid
@@ -186,24 +186,96 @@ export default function CacaPalavras() {
         endCol: number;
       }> = [];
 
-      // Try to place words horizontally
-      let row = 1;
-      for (const word of wordList) {
-        if (row >= size - 1) break;
-        if (word.length <= size - 2) {
-          const startCol = 1;
-          // Place word horizontally
-          for (let i = 0; i < word.length; i++) {
-            grid[row][startCol + i] = word[i];
+      // Directions: horizontal, vertical, diagonal (8 directions)
+      const directions = [
+        { dr: 0, dc: 1 },   // horizontal right
+        { dr: 0, dc: -1 },  // horizontal left
+        { dr: 1, dc: 0 },   // vertical down
+        { dr: -1, dc: 0 },  // vertical up
+        { dr: 1, dc: 1 },   // diagonal down-right
+        { dr: 1, dc: -1 },  // diagonal down-left
+        { dr: -1, dc: 1 },  // diagonal up-right
+        { dr: -1, dc: -1 }  // diagonal up-left
+      ];
+
+      // Shuffle words to randomize placement order
+      const shuffledWords = [...wordList].sort(() => Math.random() - 0.5);
+
+      // Function to check if a word can be placed at a position
+      const canPlaceWord = (word: string, row: number, col: number, direction: {dr: number, dc: number}): boolean => {
+        for (let i = 0; i < word.length; i++) {
+          const newRow = row + (direction.dr * i);
+          const newCol = col + (direction.dc * i);
+
+          // Check bounds
+          if (newRow < 0 || newRow >= size || newCol < 0 || newCol >= size) {
+            return false;
           }
-          solution.push({
-            word,
-            startRow: row,
-            startCol: startCol,
-            endRow: row,
-            endCol: startCol + word.length - 1
-          });
-          row += 2; // Skip a row
+
+          // Check if cell is empty or has the same letter
+          if (grid[newRow][newCol] !== '' && grid[newRow][newCol] !== word[i]) {
+            return false;
+          }
+        }
+        return true;
+      };
+
+      // Function to place a word at a position
+      const placeWord = (word: string, row: number, col: number, direction: {dr: number, dc: number}): void => {
+        const endRow = row + (direction.dr * (word.length - 1));
+        const endCol = col + (direction.dc * (word.length - 1));
+
+        for (let i = 0; i < word.length; i++) {
+          const newRow = row + (direction.dr * i);
+          const newCol = col + (direction.dc * i);
+          grid[newRow][newCol] = word[i];
+        }
+
+        solution.push({
+          word,
+          startRow: row,
+          startCol: col,
+          endRow: endRow,
+          endCol: endCol
+        });
+      };
+
+      // Try to place each word
+      for (const word of shuffledWords) {
+        let placed = false;
+        let attempts = 0;
+        const maxAttempts = 100;
+
+        while (!placed && attempts < maxAttempts) {
+          // Random position and direction
+          const row = Math.floor(Math.random() * size);
+          const col = Math.floor(Math.random() * size);
+          const direction = directions[Math.floor(Math.random() * directions.length)];
+
+          if (canPlaceWord(word, row, col, direction)) {
+            placeWord(word, row, col, direction);
+            placed = true;
+          }
+          attempts++;
+        }
+
+        // If couldn't place randomly, try systematically
+        if (!placed) {
+          outerLoop: for (let r = 0; r < size; r++) {
+            for (let c = 0; c < size; c++) {
+              for (const direction of directions) {
+                if (canPlaceWord(word, r, c, direction)) {
+                  placeWord(word, r, c, direction);
+                  placed = true;
+                  break outerLoop;
+                }
+              }
+            }
+          }
+        }
+
+        if (!placed) {
+          console.warn(`Could not place word: ${word}`);
         }
       }
 
@@ -216,6 +288,8 @@ export default function CacaPalavras() {
           }
         }
       }
+
+      console.log(`Successfully placed ${solution.length} out of ${wordList.length} words`);
 
       return {
         grid,
