@@ -291,8 +291,8 @@ export default function CacaPalavras() {
   };
 
   const generateWordSearchGrid = () => {
-    if (words.length < 3) {
-      alert("Adicione pelo menos 3 palavras para gerar o caça-palavras");
+    if (words.length < 5) {
+      alert("Adicione pelo menos 5 palavras para gerar o caça-palavras");
       return;
     }
 
