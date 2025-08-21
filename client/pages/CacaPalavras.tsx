@@ -1,5 +1,5 @@
 import * as React from "react";
-import WordSearch from "@blex41/word-search";
+import * as wordfind from "wordfind";
 import jsPDF from "jspdf";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -42,7 +42,11 @@ interface WordSearchResult {
     word: string;
     x: number;
     y: number;
-    direction: string;
+    orientation: string;
+    startx: number;
+    starty: number;
+    endx: number;
+    endy: number;
   }>;
   size: {
     rows: number;
@@ -169,31 +173,43 @@ export default function CacaPalavras() {
         Math.min(25, longestWord + Math.ceil(Math.sqrt(wordCount)) + 3),
       );
 
-      // Create word search using the new library
-      const ws = new WordSearch({
-        cols: gridSize,
-        rows: gridSize,
-        dictionary: wordList
+      // Create word search using wordfind library
+      const puzzle = wordfind.newPuzzle(wordList, {
+        width: gridSize,
+        height: gridSize,
+        orientations: ['horizontal', 'vertical', 'diagonal', 'horizontalBack', 'verticalUp', 'diagonalUp', 'diagonalUpBack']
       });
 
-      console.log('WordSearch instance:', ws);
-      console.log('Generated grid:', ws.grid);
-      console.log('Found words positions:', ws.words);
+      if (!puzzle) {
+        throw new Error('Failed to generate word search puzzle');
+      }
+
+      console.log('Generated puzzle:', puzzle);
+
+      // Find word positions
+      const foundWords = wordfind.finder.find(puzzle, wordList);
+      console.log('Found word positions:', foundWords);
 
       // Convert to uppercase for display
-      const uppercaseGrid = ws.grid.map(row =>
+      const uppercaseGrid = puzzle.map(row =>
         row.map(cell => cell.toUpperCase())
       );
 
-      // Convert words to uppercase and adjust coordinate system if needed
-      const uppercaseWords = ws.words.map(wordInfo => ({
-        ...wordInfo,
-        word: wordInfo.word.toUpperCase()
+      // Convert found words to our format
+      const wordsWithPositions = foundWords.map(wordInfo => ({
+        word: wordInfo.word.toUpperCase(),
+        x: wordInfo.x,
+        y: wordInfo.y,
+        orientation: wordInfo.orientation,
+        startx: wordInfo.x,
+        starty: wordInfo.y,
+        endx: wordInfo.endx || wordInfo.x,
+        endy: wordInfo.endy || wordInfo.y
       }));
 
       const result: WordSearchResult = {
         grid: uppercaseGrid,
-        words: uppercaseWords,
+        words: wordsWithPositions,
         size: {
           rows: gridSize,
           cols: gridSize
@@ -276,26 +292,24 @@ export default function CacaPalavras() {
   // Helper function to get all cells for a solution word
   const getSolutionCells = (wordInfo: any): CellPosition[] => {
     const cells: CellPosition[] = [];
-    const { word, x, y, direction } = wordInfo;
+    const { word, x, y, orientation, endx, endy } = wordInfo;
 
-    // Direction mappings for @blex41/word-search
-    const directionMap: { [key: string]: { dx: number; dy: number } } = {
-      'E': { dx: 1, dy: 0 },   // East (horizontal right)
-      'W': { dx: -1, dy: 0 },  // West (horizontal left)
-      'S': { dx: 0, dy: 1 },   // South (vertical down)
-      'N': { dx: 0, dy: -1 },  // North (vertical up)
-      'SE': { dx: 1, dy: 1 },  // Southeast (diagonal down-right)
-      'SW': { dx: -1, dy: 1 }, // Southwest (diagonal down-left)
-      'NE': { dx: 1, dy: -1 }, // Northeast (diagonal up-right)
-      'NW': { dx: -1, dy: -1 } // Northwest (diagonal up-left)
-    };
+    // Calculate direction based on start and end points
+    const deltaX = endx - x;
+    const deltaY = endy - y;
+    const steps = Math.max(Math.abs(deltaX), Math.abs(deltaY));
 
-    const dir = directionMap[direction] || { dx: 1, dy: 0 };
+    if (steps === 0) {
+      return [{ row: y, col: x }];
+    }
+
+    const stepX = steps === 0 ? 0 : deltaX / steps;
+    const stepY = steps === 0 ? 0 : deltaY / steps;
 
     for (let i = 0; i < word.length; i++) {
       cells.push({
-        row: y + (dir.dy * i),
-        col: x + (dir.dx * i)
+        row: y + Math.round(stepY * i),
+        col: x + Math.round(stepX * i)
       });
     }
 
