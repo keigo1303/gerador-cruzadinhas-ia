@@ -197,15 +197,16 @@ export default function CacaPalavras() {
       );
 
       // Convert found words to our format
-      const wordsWithPositions = foundWords.map(wordInfo => ({
-        word: wordInfo.word.toUpperCase(),
-        x: wordInfo.x,
-        y: wordInfo.y,
-        orientation: wordInfo.orientation,
-        startx: wordInfo.x,
-        starty: wordInfo.y,
-        endx: wordInfo.endx || wordInfo.x,
-        endy: wordInfo.endy || wordInfo.y
+      // For now, create a simple mapping - we'll improve this once the basic generation works
+      const wordsWithPositions = foundWords.map((wordInfo, index) => ({
+        word: (wordInfo.word || wordList[index] || '').toUpperCase(),
+        x: wordInfo.x || 0,
+        y: wordInfo.y || 0,
+        orientation: wordInfo.orientation || 'horizontal',
+        startx: wordInfo.x || 0,
+        starty: wordInfo.y || 0,
+        endx: wordInfo.endx || (wordInfo.x || 0),
+        endy: wordInfo.endy || (wordInfo.y || 0)
       }));
 
       const result: WordSearchResult = {
