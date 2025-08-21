@@ -122,14 +122,21 @@ export default function CacaPalavras() {
 
       console.log('Generating word search with words:', wordList);
 
-      // Generate word search using the library
-      const gridSize = Math.max(15, Math.min(25, Math.max(...wordList.map(w => w.length)) + 5));
+      // Try to generate word search using the library
+      const gridSize = Math.max(15, Math.min(25, Math.max(...wordList.map(w => w.length)) + 8));
 
-      const result = generateWordSearch(wordList, {
-        rows: gridSize,
-        cols: gridSize,
-        dictionary: wordList
-      });
+      let result;
+
+      try {
+        result = generateWordSearch(wordList, {
+          rows: gridSize,
+          cols: gridSize
+        });
+      } catch (libError) {
+        console.warn('Library error, using fallback:', libError);
+        // Fallback: create a simple grid manually
+        result = createSimpleWordSearch(wordList, gridSize);
+      }
 
       console.log('Generated result:', result);
 
@@ -137,11 +144,72 @@ export default function CacaPalavras() {
         setWordSearchGrid(result);
       } else {
         console.error('No valid result from generateWordSearch');
-        alert('Não foi possível gerar o caça-palavras com essas palavras. Tente palavras diferentes.');
+        // Try fallback
+        const fallbackResult = createSimpleWordSearch(wordList, gridSize);
+        if (fallbackResult) {
+          setWordSearchGrid(fallbackResult);
+        } else {
+          alert('Não foi possível gerar o caça-palavras com essas palavras. Tente palavras diferentes.');
+        }
       }
     } catch (error) {
       console.error('Error generating word search:', error);
       alert('Erro ao gerar o caça-palavras. Tente palavras diferentes.');
+    }
+  };
+
+  // Fallback function to create a simple word search manually
+  const createSimpleWordSearch = (wordList: string[], size: number): WordSearchResult | null => {
+    try {
+      // Create empty grid
+      const grid: string[][] = Array(size).fill(null).map(() => Array(size).fill(''));
+      const solution: Array<{
+        word: string;
+        startRow: number;
+        startCol: number;
+        endRow: number;
+        endCol: number;
+      }> = [];
+
+      // Try to place words horizontally
+      let row = 1;
+      for (const word of wordList) {
+        if (row >= size - 1) break;
+        if (word.length <= size - 2) {
+          const startCol = 1;
+          // Place word horizontally
+          for (let i = 0; i < word.length; i++) {
+            grid[row][startCol + i] = word[i];
+          }
+          solution.push({
+            word,
+            startRow: row,
+            startCol: startCol,
+            endRow: row,
+            endCol: startCol + word.length - 1
+          });
+          row += 2; // Skip a row
+        }
+      }
+
+      // Fill empty cells with random letters
+      const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+      for (let r = 0; r < size; r++) {
+        for (let c = 0; c < size; c++) {
+          if (!grid[r][c]) {
+            grid[r][c] = letters[Math.floor(Math.random() * letters.length)];
+          }
+        }
+      }
+
+      return {
+        grid,
+        solution,
+        size: { rows: size, cols: size }
+      };
+    } catch (error) {
+      console.error('Error in fallback word search generation:', error);
+      return null;
     }
   };
 
