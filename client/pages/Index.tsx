@@ -252,7 +252,17 @@ export default function Index() {
           { word: 'PLATEAU', clue: 'Planalto elevado' },
           { word: 'PENINSULA', clue: 'Terra cercada de água em três lados' },
           { word: 'ARQUIPELAGO', clue: 'Conjunto de ilhas' },
-          { word: 'TSUNAMI', clue: 'Onda gigante causada por terremoto' }
+          { word: 'TSUNAMI', clue: 'Onda gigante causada por terremoto' },
+          { word: 'DELTA', clue: 'Foz de rio em formato triangular' },
+          { word: 'FJORDE', clue: 'Vale glacial inundado pelo mar' },
+          { word: 'CORDILHEIRA', clue: 'Cadeia de montanhas' },
+          { word: 'PANTANAL', clue: 'Maior planície alagável do mundo' },
+          { word: 'CAATINGA', clue: 'Vegetação do sertão nordestino' },
+          { word: 'CERRADO', clue: 'Savana brasileira' },
+          { word: 'PAMPAS', clue: 'Planície do sul do Brasil' },
+          { word: 'MANGUE', clue: 'Vegetação dos litorais' },
+          { word: 'TUNDRA', clue: 'Vegetação das regiões polares' },
+          { word: 'TAIGA', clue: 'Floresta de coníferas' }
         ],
         dificil: [
           { word: 'GEODESIA', clue: 'Ciência que estuda a forma da Terra' },
@@ -296,7 +306,7 @@ export default function Index() {
           { word: 'MUMIA', clue: 'Corpo preservado dos egípcios' },
           { word: 'GLADIADOR', clue: 'Lutador da arena romana' },
           { word: 'COLISEU', clue: 'Anfiteatro romano famoso' },
-          { word: 'IMPERIO', clue: 'Grande territ��rio governado por imperador' },
+          { word: 'IMPERIO', clue: 'Grande território governado por imperador' },
           { word: 'REPUBLICA', clue: 'Governo eleito pelo povo' },
           { word: 'DEMOCRACIA', clue: 'Governo do povo' },
           { word: 'MONARQUIA', clue: 'Governo do rei' },
