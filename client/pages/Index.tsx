@@ -184,7 +184,17 @@ export default function Index() {
           { word: 'VIRUS', clue: 'Agente infeccioso microscópico' },
           { word: 'CELULA', clue: 'Unidade básica da vida' },
           { word: 'ENZIMA', clue: 'Proteína que catalisa reações' },
-          { word: 'GENOMA', clue: 'Conjunto completo de genes' }
+          { word: 'GENOMA', clue: 'Conjunto completo de genes' },
+          { word: 'CARBONO', clue: 'Elemento base da vida' },
+          { word: 'HIDROGENIO', clue: 'Elemento mais simples' },
+          { word: 'NITROGENIO', clue: 'Gás abundante na atmosfera' },
+          { word: 'CALCIO', clue: 'Mineral dos ossos' },
+          { word: 'CLORO', clue: 'Elemento do sal de cozinha' },
+          { word: 'PLASMA', clue: 'Quarto estado da matéria' },
+          { word: 'ANTIBIOTICO', clue: 'Remédio contra bactérias' },
+          { word: 'PROTEINA', clue: 'Macromolécula construtora' },
+          { word: 'CARBOIDRATO', clue: 'Fonte de energia rápida' },
+          { word: 'LIPIDIO', clue: 'Gordura do organismo' }
         ],
         dificil: [
           { word: 'MITOCONDRIA', clue: 'Organela responsável pela respiração celular' },
@@ -254,7 +264,7 @@ export default function Index() {
           { word: 'BATALHA', clue: 'Combate entre exércitos' },
           { word: 'VITORIA', clue: 'Sucesso na guerra' },
           { word: 'HEROI', clue: 'Pessoa corajosa' },
-          { word: 'LENDA', clue: 'Hist��ria antiga transmitida oralmente' },
+          { word: 'LENDA', clue: 'História antiga transmitida oralmente' },
           { word: 'MITO', clue: 'História fantástica antiga' },
           { word: 'TESOURO', clue: 'Riquezas escondidas' },
           { word: 'PIRATA', clue: 'Ladrão dos mares' },
