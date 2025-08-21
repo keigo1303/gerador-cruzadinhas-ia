@@ -172,50 +172,8 @@ export default function CacaPalavras() {
         Math.min(25, longestWord + Math.ceil(Math.sqrt(wordCount)) + 3),
       );
 
-      // Create word search using wordfind library
-      const puzzle = wordfind.newPuzzle(wordList, {
-        width: gridSize,
-        height: gridSize,
-        orientations: ['horizontal', 'vertical', 'diagonal', 'horizontalBack', 'verticalUp', 'diagonalUp', 'diagonalUpBack']
-      });
-
-      if (!puzzle) {
-        throw new Error('Failed to generate word search puzzle');
-      }
-
-      console.log('Generated puzzle:', puzzle);
-
-      // Find word positions using solve method
-      const solution = wordfind.solve(puzzle, wordList);
-      console.log('Solution:', solution);
-      const foundWords = solution.found || [];
-
-      // Convert to uppercase for display
-      const uppercaseGrid = puzzle.map(row =>
-        row.map(cell => cell.toUpperCase())
-      );
-
-      // Convert found words to our format
-      // For now, create a simple mapping - we'll improve this once the basic generation works
-      const wordsWithPositions = foundWords.map((wordInfo, index) => ({
-        word: (wordInfo.word || wordList[index] || '').toUpperCase(),
-        x: wordInfo.x || 0,
-        y: wordInfo.y || 0,
-        orientation: wordInfo.orientation || 'horizontal',
-        startx: wordInfo.x || 0,
-        starty: wordInfo.y || 0,
-        endx: wordInfo.endx || (wordInfo.x || 0),
-        endy: wordInfo.endy || (wordInfo.y || 0)
-      }));
-
-      const result: WordSearchResult = {
-        grid: uppercaseGrid,
-        words: wordsWithPositions,
-        size: {
-          rows: gridSize,
-          cols: gridSize
-        }
-      };
+      // Create word search using custom generator
+      const result = createCustomWordSearch(wordList, gridSize);
 
       console.log('Final result:', result);
       setWordSearchGrid(result);
