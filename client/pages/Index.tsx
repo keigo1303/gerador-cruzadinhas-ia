@@ -138,7 +138,17 @@ export default function Index() {
           { word: 'FOSSA', clue: 'Predador de Madagascar' },
           { word: 'QUOLL', clue: 'Marsupial carniceiro' },
           { word: 'BINTURONG', clue: 'Ursídeo asiático' },
-          { word: 'CAPIVARA', clue: 'Maior roedor do mundo' }
+          { word: 'CAPIVARA', clue: 'Maior roedor do mundo' },
+          { word: 'TAPIR', clue: 'Mamífero com tromba curta' },
+          { word: 'QUATI', clue: 'Parente do guaxinim' },
+          { word: 'TAMANDUA', clue: 'Mamífero que come formigas' },
+          { word: 'PREGUICA', clue: 'Animal muito lento das árvores' },
+          { word: 'MORCEGO', clue: 'Único mamífero que voa' },
+          { word: 'OURICO', clue: 'Animal coberto de espinhos' },
+          { word: 'TATU', clue: 'Mamífero com carapaça' },
+          { word: 'LONTRA', clue: 'Mamífero aquático brincalhão' },
+          { word: 'CHINCHILA', clue: 'Roedor de pelo muito macio' },
+          { word: 'SURICATA', clue: 'Animal que faz guarda em pé' }
         ]
       },
       ciencia: {
