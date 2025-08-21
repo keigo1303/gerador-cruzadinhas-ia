@@ -1,6 +1,4 @@
 import * as React from "react";
-// @ts-ignore
-const wordfind = require('wordfind');
 import jsPDF from "jspdf";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
