@@ -116,7 +116,17 @@ export default function Index() {
           { word: 'AGUIA', clue: 'Ave de rapina majestosa' },
           { word: 'FLAMINGO', clue: 'Ave rosa que vive em lagos' },
           { word: 'HIPOPOTAMO', clue: 'Grande mamífero aquático' },
-          { word: 'CANGURU', clue: 'Animal que pula da Austrália' }
+          { word: 'CANGURU', clue: 'Animal que pula da Austrália' },
+          { word: 'ZEBRA', clue: 'Cavalo com listras' },
+          { word: 'LEAO', clue: 'Rei da selva' },
+          { word: 'TIGRE', clue: 'Felino com listras' },
+          { word: 'URSO', clue: 'Grande mamífero peludo' },
+          { word: 'LOBO', clue: 'Ancestral selvagem do cão' },
+          { word: 'RAPOSA', clue: 'Animal astuto de cauda peluda' },
+          { word: 'VEADO', clue: 'Animal com chifres ramificados' },
+          { word: 'JACARE', clue: 'Réptil brasileiro parente do crocodilo' },
+          { word: 'PINGUIM', clue: 'Ave que não voa mas nada muito bem' },
+          { word: 'CORUJA', clue: 'Ave noturna símbolo da sabedoria' }
         ],
         dificil: [
           { word: 'ORNITORRINCO', clue: 'Mamífero que bota ovos' },
@@ -321,7 +331,7 @@ export default function Index() {
           { word: 'PARALELO', clue: 'Retas que nunca se encontram' }
         ],
         dificil: [
-          { word: 'LOGARITMO', clue: 'Operação inversa da exponenciaç��o' },
+          { word: 'LOGARITMO', clue: 'Operação inversa da exponenciação' },
           { word: 'SENO', clue: 'Função trigonométrica básica' },
           { word: 'COSSENO', clue: 'Função trigonométrica complementar' },
           { word: 'TANGENTE', clue: 'Razão entre seno e cosseno' },
