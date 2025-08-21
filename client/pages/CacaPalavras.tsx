@@ -11,6 +11,7 @@ import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Trash2, Download, FileText, FileCheck, Sparkles, Plus, X, Bot, User, Search, ArrowLeft } from 'lucide-react';
 import { wordDatabase } from '@shared/word-database';
+import { Link } from 'react-router-dom';
 
 interface Word {
   id: string;
