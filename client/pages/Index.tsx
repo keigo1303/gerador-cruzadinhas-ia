@@ -162,7 +162,17 @@ export default function Index() {
           { word: 'PLANTA', clue: 'Ser vivo que faz fotossíntese' },
           { word: 'ROCHA', clue: 'Material sólido da crosta terrestre' },
           { word: 'METAL', clue: 'Material condutor de eletricidade' },
-          { word: 'GAS', clue: 'Estado da matéria sem forma fixa' }
+          { word: 'GAS', clue: 'Estado da matéria sem forma fixa' },
+          { word: 'OXIGENIO', clue: 'Gás que respiramos' },
+          { word: 'CHUVA', clue: 'Água que cai do céu' },
+          { word: 'VENTO', clue: 'Movimento do ar' },
+          { word: 'GELO', clue: 'Água no estado sólido' },
+          { word: 'VAPOR', clue: 'Água no estado gasoso' },
+          { word: 'FERRO', clue: 'Metal que enferruja' },
+          { word: 'OURO', clue: 'Metal precioso amarelo' },
+          { word: 'CRISTAL', clue: 'Mineral transparente' },
+          { word: 'ACIDO', clue: 'Substância que corrói' },
+          { word: 'MAGNETISMO', clue: 'Força que atrai metais' }
         ],
         medio: [
           { word: 'MOLECULA', clue: 'Menor parte de uma substância' },
@@ -244,7 +254,7 @@ export default function Index() {
           { word: 'BATALHA', clue: 'Combate entre exércitos' },
           { word: 'VITORIA', clue: 'Sucesso na guerra' },
           { word: 'HEROI', clue: 'Pessoa corajosa' },
-          { word: 'LENDA', clue: 'História antiga transmitida oralmente' },
+          { word: 'LENDA', clue: 'Hist��ria antiga transmitida oralmente' },
           { word: 'MITO', clue: 'História fantástica antiga' },
           { word: 'TESOURO', clue: 'Riquezas escondidas' },
           { word: 'PIRATA', clue: 'Ladrão dos mares' },
