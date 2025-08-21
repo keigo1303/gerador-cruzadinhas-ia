@@ -13,7 +13,7 @@ import {
   BookOpen,
 } from "lucide-react";
 
-export default function Index() {
+export default function Home() {
   const activities = [
     {
       id: "cruzadinha",
