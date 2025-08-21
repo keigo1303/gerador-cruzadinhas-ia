@@ -307,14 +307,24 @@ export default function CacaPalavras() {
 
       console.log("Generating word search with words:", wordList);
 
-      // Calculate appropriate grid size based on word count and length
-      const longestWord = Math.max(...wordList.map((w) => w.length));
+      // Calculate grid size based on word count
       const wordCount = wordList.length;
-      // Make grid larger to accommodate more words in different directions
-      const gridSize = Math.max(
-        15,
-        Math.min(25, longestWord + Math.ceil(Math.sqrt(wordCount)) + 3),
-      );
+      let gridSize: number;
+
+      if (wordCount >= 5 && wordCount <= 10) {
+        gridSize = 10;
+        console.log(`Grid size: 10x10 for ${wordCount} words`);
+      } else if (wordCount >= 11 && wordCount <= 20) {
+        gridSize = 20;
+        console.log(`Grid size: 20x20 for ${wordCount} words`);
+      } else if (wordCount > 20) {
+        gridSize = 25;
+        console.log(`Grid size: 25x25 for ${wordCount} words`);
+      } else {
+        // For less than 5 words, use 10x10 as default
+        gridSize = 10;
+        console.log(`Grid size: 10x10 (default) for ${wordCount} words`);
+      }
 
       // Create word search using custom generator
       const result = createCustomWordSearch(wordList, gridSize);
