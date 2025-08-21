@@ -128,28 +128,43 @@ export default function CacaPalavras() {
       let result;
 
       try {
+        console.log('Available WordSearchGenerator methods:', Object.keys(WordSearchGenerator));
+
         // Try different ways to call the library
         if (typeof WordSearchGenerator.generateWordSearch === 'function') {
+          console.log('Using WordSearchGenerator.generateWordSearch');
           result = WordSearchGenerator.generateWordSearch(wordList, {
             rows: gridSize,
-            cols: gridSize
+            cols: gridSize,
+            allowBackwards: true,
+            allowVertical: true,
+            allowDiagonal: true
           });
         } else if (typeof WordSearchGenerator.default === 'function') {
+          console.log('Using WordSearchGenerator.default');
           result = WordSearchGenerator.default(wordList, {
             rows: gridSize,
-            cols: gridSize
+            cols: gridSize,
+            allowBackwards: true,
+            allowVertical: true,
+            allowDiagonal: true
           });
         } else if (typeof WordSearchGenerator === 'function') {
+          console.log('Using WordSearchGenerator directly');
           result = WordSearchGenerator(wordList, {
             rows: gridSize,
-            cols: gridSize
+            cols: gridSize,
+            allowBackwards: true,
+            allowVertical: true,
+            allowDiagonal: true
           });
         } else {
+          console.log('No library function found, available:', WordSearchGenerator);
           throw new Error('Library function not found');
         }
       } catch (libError) {
-        console.warn('Library error, using fallback:', libError);
-        // Fallback: create a simple grid manually
+        console.warn('Library error, using enhanced fallback:', libError);
+        // Fallback: create an improved grid manually
         result = createSimpleWordSearch(wordList, gridSize);
       }
 
