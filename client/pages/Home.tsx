@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Sparkles, Search, Grid3x3, FileText, Zap, Users, BookOpen } from 'lucide-react';
 
-export default function Index() {
+export default function Home() {
   const activities = [
     {
       id: 'cruzadinha',
