@@ -156,7 +156,7 @@ export default function CacaPalavras() {
     setStartCell(null);
 
     try {
-      const wordList = words.map((w) => w.word);
+      const wordList = words.map((w) => w.word.toLowerCase());
 
       console.log("Generating word search with words:", wordList);
 
@@ -165,77 +165,44 @@ export default function CacaPalavras() {
       const wordCount = wordList.length;
       // Make grid larger to accommodate more words in different directions
       const gridSize = Math.max(
-        20,
-        Math.min(30, longestWord + Math.ceil(Math.sqrt(wordCount)) + 5),
+        15,
+        Math.min(25, longestWord + Math.ceil(Math.sqrt(wordCount)) + 3),
       );
 
-      let result;
+      // Create word search using the new library
+      const ws = new WordSearch({
+        cols: gridSize,
+        rows: gridSize,
+        dictionary: wordList
+      });
 
-      try {
-        console.log(
-          "Available WordSearchGenerator methods:",
-          Object.keys(WordSearchGenerator),
-        );
+      console.log('WordSearch instance:', ws);
+      console.log('Generated grid:', ws.grid);
+      console.log('Found words positions:', ws.words);
 
-        // Try different ways to call the library
-        if (typeof WordSearchGenerator.generateWordSearch === "function") {
-          console.log("Using WordSearchGenerator.generateWordSearch");
-          result = WordSearchGenerator.generateWordSearch(wordList, {
-            rows: gridSize,
-            cols: gridSize,
-            allowBackwards: true,
-            allowVertical: true,
-            allowDiagonal: true,
-          });
-        } else if (typeof WordSearchGenerator.default === "function") {
-          console.log("Using WordSearchGenerator.default");
-          result = WordSearchGenerator.default(wordList, {
-            rows: gridSize,
-            cols: gridSize,
-            allowBackwards: true,
-            allowVertical: true,
-            allowDiagonal: true,
-          });
-        } else if (typeof WordSearchGenerator === "function") {
-          console.log("Using WordSearchGenerator directly");
-          result = WordSearchGenerator(wordList, {
-            rows: gridSize,
-            cols: gridSize,
-            allowBackwards: true,
-            allowVertical: true,
-            allowDiagonal: true,
-          });
-        } else {
-          console.log(
-            "No library function found, available:",
-            WordSearchGenerator,
-          );
-          throw new Error("Library function not found");
+      // Convert to uppercase for display
+      const uppercaseGrid = ws.grid.map(row =>
+        row.map(cell => cell.toUpperCase())
+      );
+
+      // Convert words to uppercase and adjust coordinate system if needed
+      const uppercaseWords = ws.words.map(wordInfo => ({
+        ...wordInfo,
+        word: wordInfo.word.toUpperCase()
+      }));
+
+      const result: WordSearchResult = {
+        grid: uppercaseGrid,
+        words: uppercaseWords,
+        size: {
+          rows: gridSize,
+          cols: gridSize
         }
-      } catch (libError) {
-        console.warn("Library error, using enhanced fallback:", libError);
-        // Fallback: create an improved grid manually
-        result = createSimpleWordSearch(wordList, gridSize);
-      }
+      };
 
-      console.log("Generated result:", result);
+      console.log('Final result:', result);
+      setWordSearchGrid(result);
 
-      if (result && result.grid) {
-        console.log('Generated word search result:', result);
-        setWordSearchGrid(result);
-      } else {
-        console.error("No valid result from generateWordSearch");
-        // Try fallback
-        const fallbackResult = createSimpleWordSearch(wordList, gridSize);
-        if (fallbackResult) {
-          console.log('Using fallback result:', fallbackResult);
-          setWordSearchGrid(fallbackResult);
-        } else {
-          alert(
-            "Não foi possível gerar o caça-palavras com essas palavras. Tente palavras diferentes.",
-          );
-        }
-      }
     } catch (error) {
       console.error("Error generating word search:", error);
       alert("Erro ao gerar o caça-palavras. Tente palavras diferentes.");
