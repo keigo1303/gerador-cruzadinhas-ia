@@ -120,17 +120,23 @@ export default function CacaPalavras() {
     try {
       const wordList = words.map(w => w.word);
 
+      console.log('Generating word search with words:', wordList);
+
       // Generate word search using the library
+      const gridSize = Math.max(15, Math.min(25, Math.max(...wordList.map(w => w.length)) + 5));
+
       const result = generateWordSearch(wordList, {
-        rows: Math.max(15, Math.min(25, wordList.length + 5)),
-        cols: Math.max(15, Math.min(25, wordList.length + 5)),
-        disabledDirections: [], // Allow all directions
+        rows: gridSize,
+        cols: gridSize,
         dictionary: wordList
       });
 
-      if (result) {
+      console.log('Generated result:', result);
+
+      if (result && result.grid) {
         setWordSearchGrid(result);
       } else {
+        console.error('No valid result from generateWordSearch');
         alert('Não foi possível gerar o caça-palavras com essas palavras. Tente palavras diferentes.');
       }
     } catch (error) {
