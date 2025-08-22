@@ -51,6 +51,7 @@ export default function BingoPalavras() {
   const [isAIMode, setIsAIMode] = React.useState(false);
   const [aiTheme, setAiTheme] = React.useState("");
   const [isGenerating, setIsGenerating] = React.useState(false);
+  const [currentCardIndex, setCurrentCardIndex] = React.useState(0);
   const wordInputRef = React.useRef<HTMLInputElement>(null);
   const cardsRef = React.useRef<HTMLDivElement>(null);
 
