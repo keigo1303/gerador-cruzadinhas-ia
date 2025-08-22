@@ -1,5 +1,4 @@
 import * as React from "react";
-import * as WordSearchGenerator from "@sbj42/word-search-generator";
 import jsPDF from "jspdf";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -36,20 +35,34 @@ interface Word {
   word: string;
 }
 
+interface WordPosition {
+  word: string;
+  startRow: number;
+  startCol: number;
+  endRow: number;
+  endCol: number;
+  direction: 'horizontal' | 'vertical' | 'diagonal-down' | 'diagonal-up';
+  cells: Array<{row: number, col: number, letter: string}>;
+}
+
 interface WordSearchResult {
   grid: string[][];
-  solution: Array<{
-    word: string;
-    startRow: number;
-    startCol: number;
-    endRow: number;
-    endCol: number;
-  }>;
+  solutions: WordPosition[];
   size: {
     rows: number;
     cols: number;
   };
+  placedWords: string[];
+  unplacedWords: string[];
 }
+
+// Directions for word placement
+const DIRECTIONS = [
+  { name: 'horizontal', dr: 0, dc: 1 },      // →
+  { name: 'vertical', dr: 1, dc: 0 },        // ↓
+  { name: 'diagonal-down', dr: 1, dc: 1 },   // ↘
+  { name: 'diagonal-up', dr: -1, dc: 1 },    // ↗
+] as const;
 
 export default function CacaPalavras() {
   const [word, setWord] = React.useState("");
@@ -130,241 +143,167 @@ export default function CacaPalavras() {
     }, 2000);
   };
 
+  // Enhanced word search generator with precise positioning
+  const generateEnhancedWordSearch = (wordList: string[]): WordSearchResult | null => {
+    if (wordList.length === 0) return null;
+
+    // Calculate optimal grid size
+    const longestWord = Math.max(...wordList.map(w => w.length));
+    const wordCount = wordList.length;
+    const baseSize = Math.max(15, longestWord + 3);
+    const gridSize = Math.min(30, baseSize + Math.ceil(Math.sqrt(wordCount)) * 2);
+
+    console.log(`Generating ${gridSize}x${gridSize} grid for ${wordCount} words`);
+
+    // Initialize empty grid
+    const grid: string[][] = Array(gridSize)
+      .fill(null)
+      .map(() => Array(gridSize).fill(''));
+
+    const solutions: WordPosition[] = [];
+    const placedWords: string[] = [];
+    const unplacedWords: string[] = [];
+
+    // Sort words by length (longest first) for better placement
+    const sortedWords = [...wordList].sort((a, b) => b.length - a.length);
+
+    // Try to place each word
+    for (const word of sortedWords) {
+      let placed = false;
+      let attempts = 0;
+      const maxAttempts = 1000;
+
+      while (!placed && attempts < maxAttempts) {
+        // Random starting position
+        const startRow = Math.floor(Math.random() * gridSize);
+        const startCol = Math.floor(Math.random() * gridSize);
+        
+        // Random direction
+        const direction = DIRECTIONS[Math.floor(Math.random() * DIRECTIONS.length)];
+        
+        if (canPlaceWord(grid, word, startRow, startCol, direction, gridSize)) {
+          const wordPosition = placeWord(grid, word, startRow, startCol, direction);
+          solutions.push(wordPosition);
+          placedWords.push(word);
+          placed = true;
+          console.log(`Placed "${word}" at (${startRow},${startCol}) direction: ${direction.name}`);
+        }
+        
+        attempts++;
+      }
+
+      if (!placed) {
+        console.warn(`Could not place word: ${word} after ${maxAttempts} attempts`);
+        unplacedWords.push(word);
+      }
+    }
+
+    // Fill empty cells with random letters
+    fillEmptyCells(grid, gridSize);
+
+    console.log(`Successfully placed ${placedWords.length}/${wordList.length} words`);
+
+    return {
+      grid,
+      solutions,
+      size: { rows: gridSize, cols: gridSize },
+      placedWords,
+      unplacedWords
+    };
+  };
+
+  // Check if a word can be placed at the given position and direction
+  const canPlaceWord = (
+    grid: string[][],
+    word: string,
+    startRow: number,
+    startCol: number,
+    direction: typeof DIRECTIONS[number],
+    gridSize: number
+  ): boolean => {
+    for (let i = 0; i < word.length; i++) {
+      const row = startRow + direction.dr * i;
+      const col = startCol + direction.dc * i;
+
+      // Check bounds
+      if (row < 0 || row >= gridSize || col < 0 || col >= gridSize) {
+        return false;
+      }
+
+      // Check if cell is empty or contains the same letter
+      const currentCell = grid[row][col];
+      if (currentCell !== '' && currentCell !== word[i]) {
+        return false;
+      }
+    }
+    return true;
+  };
+
+  // Place a word in the grid and return position information
+  const placeWord = (
+    grid: string[][],
+    word: string,
+    startRow: number,
+    startCol: number,
+    direction: typeof DIRECTIONS[number]
+  ): WordPosition => {
+    const cells: Array<{row: number, col: number, letter: string}> = [];
+    
+    for (let i = 0; i < word.length; i++) {
+      const row = startRow + direction.dr * i;
+      const col = startCol + direction.dc * i;
+      grid[row][col] = word[i];
+      cells.push({ row, col, letter: word[i] });
+    }
+
+    const endRow = startRow + direction.dr * (word.length - 1);
+    const endCol = startCol + direction.dc * (word.length - 1);
+
+    return {
+      word,
+      startRow,
+      startCol,
+      endRow,
+      endCol,
+      direction: direction.name as WordPosition['direction'],
+      cells
+    };
+  };
+
+  // Fill empty cells with random letters
+  const fillEmptyCells = (grid: string[][], gridSize: number) => {
+    const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    for (let row = 0; row < gridSize; row++) {
+      for (let col = 0; col < gridSize; col++) {
+        if (grid[row][col] === '') {
+          grid[row][col] = letters[Math.floor(Math.random() * letters.length)];
+        }
+      }
+    }
+  };
+
   const generateWordSearchGrid = () => {
     if (words.length < 3) {
       alert("Adicione pelo menos 3 palavras para gerar o caça-palavras");
       return;
     }
 
-    try {
-      const wordList = words.map((w) => w.word);
+    const wordList = words.map(w => w.word);
+    console.log("Generating word search with words:", wordList);
 
-      console.log("Generating word search with words:", wordList);
-
-      // Calculate appropriate grid size based on word count and length
-      const longestWord = Math.max(...wordList.map((w) => w.length));
-      const wordCount = wordList.length;
-      // Make grid larger to accommodate more words in different directions
-      const gridSize = Math.max(
-        20,
-        Math.min(30, longestWord + Math.ceil(Math.sqrt(wordCount)) + 5),
-      );
-
-      let result;
-
-      try {
-        console.log(
-          "Available WordSearchGenerator methods:",
-          Object.keys(WordSearchGenerator),
+    const result = generateEnhancedWordSearch(wordList);
+    
+    if (result) {
+      setWordSearchGrid(result);
+      
+      if (result.unplacedWords.length > 0) {
+        alert(
+          `Aviso: ${result.unplacedWords.length} palavra(s) não puderam ser colocadas na grade: ${result.unplacedWords.join(', ')}. ` +
+          'Tente usar palavras menores ou reduza a quantidade de palavras.'
         );
-
-        // Try different ways to call the library
-        if (typeof WordSearchGenerator.generateWordSearch === "function") {
-          console.log("Using WordSearchGenerator.generateWordSearch");
-          result = WordSearchGenerator.generateWordSearch(wordList, {
-            rows: gridSize,
-            cols: gridSize,
-            allowBackwards: true,
-            allowVertical: true,
-            allowDiagonal: true,
-          });
-        } else if (typeof WordSearchGenerator.default === "function") {
-          console.log("Using WordSearchGenerator.default");
-          result = WordSearchGenerator.default(wordList, {
-            rows: gridSize,
-            cols: gridSize,
-            allowBackwards: true,
-            allowVertical: true,
-            allowDiagonal: true,
-          });
-        } else if (typeof WordSearchGenerator === "function") {
-          console.log("Using WordSearchGenerator directly");
-          result = WordSearchGenerator(wordList, {
-            rows: gridSize,
-            cols: gridSize,
-            allowBackwards: true,
-            allowVertical: true,
-            allowDiagonal: true,
-          });
-        } else {
-          console.log(
-            "No library function found, available:",
-            WordSearchGenerator,
-          );
-          throw new Error("Library function not found");
-        }
-      } catch (libError) {
-        console.warn("Library error, using enhanced fallback:", libError);
-        // Fallback: create an improved grid manually
-        result = createSimpleWordSearch(wordList, gridSize);
       }
-
-      console.log("Generated result:", result);
-
-      if (result && result.grid) {
-        setWordSearchGrid(result);
-      } else {
-        console.error("No valid result from generateWordSearch");
-        // Try fallback
-        const fallbackResult = createSimpleWordSearch(wordList, gridSize);
-        if (fallbackResult) {
-          setWordSearchGrid(fallbackResult);
-        } else {
-          alert(
-            "Não foi possível gerar o caça-palavras com essas palavras. Tente palavras diferentes.",
-          );
-        }
-      }
-    } catch (error) {
-      console.error("Error generating word search:", error);
-      alert("Erro ao gerar o caça-palavras. Tente palavras diferentes.");
-    }
-  };
-
-  // Improved fallback function to create a proper word search manually
-  const createSimpleWordSearch = (
-    wordList: string[],
-    size: number,
-  ): WordSearchResult | null => {
-    try {
-      // Create empty grid
-      const grid: string[][] = Array(size)
-        .fill(null)
-        .map(() => Array(size).fill(""));
-      const solution: Array<{
-        word: string;
-        startRow: number;
-        startCol: number;
-        endRow: number;
-        endCol: number;
-      }> = [];
-
-      // Directions: horizontal, vertical, diagonal (8 directions)
-      const directions = [
-        { dr: 0, dc: 1 }, // horizontal right
-        { dr: 0, dc: -1 }, // horizontal left
-        { dr: 1, dc: 0 }, // vertical down
-        { dr: -1, dc: 0 }, // vertical up
-        { dr: 1, dc: 1 }, // diagonal down-right
-        { dr: 1, dc: -1 }, // diagonal down-left
-        { dr: -1, dc: 1 }, // diagonal up-right
-        { dr: -1, dc: -1 }, // diagonal up-left
-      ];
-
-      // Shuffle words to randomize placement order
-      const shuffledWords = [...wordList].sort(() => Math.random() - 0.5);
-
-      // Function to check if a word can be placed at a position
-      const canPlaceWord = (
-        word: string,
-        row: number,
-        col: number,
-        direction: { dr: number; dc: number },
-      ): boolean => {
-        for (let i = 0; i < word.length; i++) {
-          const newRow = row + direction.dr * i;
-          const newCol = col + direction.dc * i;
-
-          // Check bounds
-          if (newRow < 0 || newRow >= size || newCol < 0 || newCol >= size) {
-            return false;
-          }
-
-          // Check if cell is empty or has the same letter
-          if (grid[newRow][newCol] !== "" && grid[newRow][newCol] !== word[i]) {
-            return false;
-          }
-        }
-        return true;
-      };
-
-      // Function to place a word at a position
-      const placeWord = (
-        word: string,
-        row: number,
-        col: number,
-        direction: { dr: number; dc: number },
-      ): void => {
-        const endRow = row + direction.dr * (word.length - 1);
-        const endCol = col + direction.dc * (word.length - 1);
-
-        for (let i = 0; i < word.length; i++) {
-          const newRow = row + direction.dr * i;
-          const newCol = col + direction.dc * i;
-          grid[newRow][newCol] = word[i];
-        }
-
-        solution.push({
-          word,
-          startRow: row,
-          startCol: col,
-          endRow: endRow,
-          endCol: endCol,
-        });
-      };
-
-      // Try to place each word
-      for (const word of shuffledWords) {
-        let placed = false;
-        let attempts = 0;
-        const maxAttempts = 100;
-
-        while (!placed && attempts < maxAttempts) {
-          // Random position and direction
-          const row = Math.floor(Math.random() * size);
-          const col = Math.floor(Math.random() * size);
-          const direction =
-            directions[Math.floor(Math.random() * directions.length)];
-
-          if (canPlaceWord(word, row, col, direction)) {
-            placeWord(word, row, col, direction);
-            placed = true;
-          }
-          attempts++;
-        }
-
-        // If couldn't place randomly, try systematically
-        if (!placed) {
-          outerLoop: for (let r = 0; r < size; r++) {
-            for (let c = 0; c < size; c++) {
-              for (const direction of directions) {
-                if (canPlaceWord(word, r, c, direction)) {
-                  placeWord(word, r, c, direction);
-                  placed = true;
-                  break outerLoop;
-                }
-              }
-            }
-          }
-        }
-
-        if (!placed) {
-          console.warn(`Could not place word: ${word}`);
-        }
-      }
-
-      // Fill empty cells with random letters
-      const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-      for (let r = 0; r < size; r++) {
-        for (let c = 0; c < size; c++) {
-          if (!grid[r][c]) {
-            grid[r][c] = letters[Math.floor(Math.random() * letters.length)];
-          }
-        }
-      }
-
-      console.log(
-        `Successfully placed ${solution.length} out of ${wordList.length} words`,
-      );
-
-      return {
-        grid,
-        solution,
-        size: { rows: size, cols: size },
-      };
-    } catch (error) {
-      console.error("Error in fallback word search generation:", error);
-      return null;
+    } else {
+      alert("Erro ao gerar o caça-palavras. Tente com palavras diferentes.");
     }
   };
 
@@ -401,15 +340,22 @@ export default function CacaPalavras() {
             </CardHeader>
             <CardContent className="pt-6">
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                {words.map((w, index) => (
+                {wordSearchGrid.placedWords.map((word, index) => (
                   <div
-                    key={w.id}
+                    key={index}
                     className="text-sm p-3 rounded-lg bg-green-50 hover:bg-green-100 transition-colors duration-200 text-center"
                   >
-                    <span className="font-bold text-green-600">{w.word}</span>
+                    <span className="font-bold text-green-600">{word}</span>
                   </div>
                 ))}
               </div>
+              {wordSearchGrid.unplacedWords.length > 0 && (
+                <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                  <p className="text-sm text-yellow-700">
+                    <strong>Palavras não colocadas:</strong> {wordSearchGrid.unplacedWords.join(', ')}
+                  </p>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
@@ -483,6 +429,16 @@ export default function CacaPalavras() {
     const gridStartX = (pageWidth - gridWidth) / 2;
     const gridStartY = currentY + 10;
 
+    // Create a set of solution cells for fast lookup
+    const solutionCells = new Set<string>();
+    if (withAnswers) {
+      wordSearchGrid.solutions.forEach(solution => {
+        solution.cells.forEach(cell => {
+          solutionCells.add(`${cell.row}-${cell.col}`);
+        });
+      });
+    }
+
     // Draw the grid
     pdf.setLineWidth(0.3);
     pdf.setFontSize(Math.max(6, finalCellSize * 0.6));
@@ -493,55 +449,27 @@ export default function CacaPalavras() {
         const cellX = gridStartX + x * finalCellSize;
         const cellY = gridStartY + y * finalCellSize;
 
+        // Draw cell border
+        pdf.setDrawColor(0, 0, 0);
+        pdf.setLineWidth(0.3);
         pdf.rect(cellX, cellY, finalCellSize, finalCellSize);
 
+        // Highlight cell if it's part of a solution
+        if (withAnswers && solutionCells.has(`${y}-${x}`)) {
+          pdf.setFillColor(255, 255, 0); // Yellow highlight
+          pdf.rect(cellX, cellY, finalCellSize, finalCellSize, 'F');
+          pdf.rect(cellX, cellY, finalCellSize, finalCellSize); // Redraw border
+        }
+
+        // Draw letter
         const letter = wordSearchGrid.grid[y][x];
         const textWidth = pdf.getTextWidth(letter);
+        pdf.setTextColor(0, 0, 0);
         pdf.text(
           letter,
           cellX + (finalCellSize - textWidth) / 2,
           cellY + finalCellSize * 0.7,
         );
-
-        // Highlight found words if showing answers
-        if (withAnswers) {
-          const isPartOfWord = wordSearchGrid.solution.some((solution) => {
-            const { startRow, startCol, endRow, endCol } = solution;
-            const minRow = Math.min(startRow, endRow);
-            const maxRow = Math.max(startRow, endRow);
-            const minCol = Math.min(startCol, endCol);
-            const maxCol = Math.max(startCol, endCol);
-
-            // Check if current cell is on the line between start and end
-            if (startRow === endRow) {
-              return y === startRow && x >= minCol && x <= maxCol;
-            } else if (startCol === endCol) {
-              return x === startCol && y >= minRow && y <= maxRow;
-            } else {
-              // Diagonal
-              const deltaRow = endRow - startRow;
-              const deltaCol = endCol - startCol;
-              const currentDeltaRow = y - startRow;
-              const currentDeltaCol = x - startCol;
-
-              return (
-                currentDeltaRow / deltaRow === currentDeltaCol / deltaCol &&
-                currentDeltaRow >= 0 &&
-                currentDeltaRow <= Math.abs(deltaRow) &&
-                currentDeltaCol >= 0 &&
-                currentDeltaCol <= Math.abs(deltaCol)
-              );
-            }
-          });
-
-          if (isPartOfWord) {
-            pdf.setDrawColor(255, 0, 0);
-            pdf.setLineWidth(1);
-            pdf.rect(cellX, cellY, finalCellSize, finalCellSize);
-            pdf.setDrawColor(0, 0, 0);
-            pdf.setLineWidth(0.3);
-          }
-        }
       }
     }
 
@@ -554,19 +482,43 @@ export default function CacaPalavras() {
     pdf.setFontSize(10);
     pdf.setFont("helvetica", "normal");
 
-    const wordsPerColumn = Math.ceil(words.length / 3);
+    const wordsToShow = wordSearchGrid.placedWords;
+    const wordsPerColumn = Math.ceil(wordsToShow.length / 3);
     const columnWidth = (pageWidth - 40) / 3;
 
-    words.forEach((w, index) => {
+    wordsToShow.forEach((word, index) => {
       const column = Math.floor(index / wordsPerColumn);
       const row = index % wordsPerColumn;
       const x = 20 + column * columnWidth;
       const y = wordsStartY + 10 + row * 6;
 
       if (y < pageHeight - 10) {
-        pdf.text(`• ${w.word}`, x, y);
+        pdf.text(`• ${word}`, x, y);
       }
     });
+
+    // Add solution info if showing answers
+    if (withAnswers && wordSearchGrid.solutions.length > 0) {
+      pdf.addPage();
+      pdf.setFontSize(16);
+      pdf.setFont("helvetica", "bold");
+      pdf.text("Posições das Palavras", 20, 20);
+      
+      pdf.setFontSize(10);
+      pdf.setFont("helvetica", "normal");
+      
+      let yPos = 35;
+      wordSearchGrid.solutions.forEach((solution, index) => {
+        const positionText = `${solution.word}: (${solution.startRow + 1},${solution.startCol + 1}) → (${solution.endRow + 1},${solution.endCol + 1}) [${solution.direction}]`;
+        pdf.text(positionText, 20, yPos);
+        yPos += 6;
+        
+        if (yPos > pageHeight - 20) {
+          pdf.addPage();
+          yPos = 20;
+        }
+      });
+    }
 
     const filename = `${searchTitle.toLowerCase().replace(/\s+/g, "-")}-${withAnswers ? "gabarito" : "em-branco"}.pdf`;
     pdf.save(filename);
@@ -596,7 +548,7 @@ export default function CacaPalavras() {
             Gerador de Caça-Palavras
           </h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Crie caça-palavras personalizados de forma fácil e rápida
+            Crie caça-palavras personalizados com posicionamento preciso das respostas
           </p>
           <div className="flex justify-center mt-4">
             <Search className="w-6 h-6 text-emerald-500 animate-pulse" />
