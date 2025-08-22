@@ -267,9 +267,6 @@ export default function Cruzadinha() {
                       <span className="font-bold text-purple-600 mr-2">
                         {index + 1}.
                       </span>
-                      <span className="text-xs text-gray-500 mr-2">
-                        {cw.vertical ? "↓" : "→"}
-                      </span>
                       <span className="text-gray-700">{cw.clue}</span>
                     </div>
                   ))}
@@ -442,8 +439,7 @@ export default function Cruzadinha() {
       if (cluesY > pageHeight - 15) return; // Prevent overflow
 
       const sequentialNumber = index + 1;
-      const direction = cw.vertical ? "↓" : "→";
-      const clueText = `${sequentialNumber}. ${direction} ${cw.clue}`;
+      const clueText = `${sequentialNumber}. ${cw.clue}`;
 
       // Split text if too long
       const maxWidth = rightColumnWidth - 10;
