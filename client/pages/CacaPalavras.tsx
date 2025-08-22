@@ -478,27 +478,48 @@ export default function CacaPalavras() {
       pdf.setFontSize(12);
       pdf.setFont("helvetica", "normal");
 
-      // Ajustar tamanhos e posições dos campos
-      const nomeLength = 60;    // Campo nome maior
-      const turmaLength = 35;   // Campo turma
-      const dataLength = 30;    // Campo data
+      // Calcular espaçamento baseado na largura da página
+      const margin = 20;
+      const availableWidth = pageWidth - (margin * 2); // Largura disponível
+      const fieldSpacing = 8; // Espaçamento entre campos
 
-      // Posições calculadas para caber na página
-      const nomeX = 20;
-      const turmaX = nomeX + 30 + nomeLength + 10; // Nome + espaço + campo + margem
-      const dataX = turmaX + 35 + turmaLength + 10; // Turma + espaço + campo + margem
+      // Larguras dos textos dos labels
+      const nomeTextWidth = pdf.getTextWidth("Nome:");
+      const turmaTextWidth = pdf.getTextWidth("Turma:");
+      const dataTextWidth = pdf.getTextWidth("Data:");
+
+      // Calcular largura disponível para as linhas dividida proporcionalmente
+      const totalLabelWidth = nomeTextWidth + turmaTextWidth + dataTextWidth + (fieldSpacing * 6);
+      const lineWidth = (availableWidth - totalLabelWidth) / 3;
+
+      // Posições dos campos
+      let currentX = margin;
 
       // Campo Nome
-      pdf.text("Nome:", nomeX, currentY);
-      pdf.line(nomeX + 30, currentY + 1, nomeX + 30 + nomeLength, currentY + 1);
+      pdf.text("Nome:", currentX, currentY);
+      currentX += nomeTextWidth + fieldSpacing;
+      pdf.line(currentX, currentY + 1, currentX + lineWidth, currentY + 1);
+      currentX += lineWidth + fieldSpacing;
 
       // Campo Turma
-      pdf.text("Turma:", turmaX, currentY);
-      pdf.line(turmaX + 35, currentY + 1, turmaX + 35 + turmaLength, currentY + 1);
+      pdf.text("Turma:", currentX, currentY);
+      currentX += turmaTextWidth + fieldSpacing;
+      pdf.line(currentX, currentY + 1, currentX + lineWidth, currentY + 1);
+      currentX += lineWidth + fieldSpacing;
 
-      // Campo Data
-      pdf.text("Data:", dataX, currentY);
-      pdf.line(dataX + 30, currentY + 1, dataX + 30 + dataLength, currentY + 1);
+      // Campo Data (verificar se cabe na página)
+      if (currentX + dataTextWidth + fieldSpacing + lineWidth <= pageWidth - margin) {
+        pdf.text("Data:", currentX, currentY);
+        currentX += dataTextWidth + fieldSpacing;
+        pdf.line(currentX, currentY + 1, currentX + lineWidth, currentY + 1);
+      } else {
+        // Se não cabe, colocar em uma nova linha
+        currentY += 8;
+        currentX = margin;
+        pdf.text("Data:", currentX, currentY);
+        currentX += dataTextWidth + fieldSpacing;
+        pdf.line(currentX, currentY + 1, currentX + (lineWidth * 1.5), currentY + 1);
+      }
 
       currentY += 15;
     }
