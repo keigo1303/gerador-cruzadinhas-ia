@@ -446,38 +446,101 @@ export default function BingoPalavras() {
                 </CardContent>
               </Card>
 
-              {/* Word Input Section */}
+              {/* Mode Switch */}
               <Card className="shadow-xl border-0 bg-gradient-to-r from-white to-pink-50 hover:shadow-2xl transition-shadow duration-300">
                 <CardHeader>
-                  <CardTitle className="text-pink-700 flex items-center gap-2">
-                    <Plus className="w-5 h-5" />
-                    Adicionar Palavras
+                  <CardTitle className="text-pink-700 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      {isAIMode ? (
+                        <Bot className="w-5 h-5" />
+                      ) : (
+                        <User className="w-5 h-5" />
+                      )}
+                      {isAIMode ? "Modo IA" : "Modo Manual"}
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Label
+                        htmlFor="mode-switch"
+                        className="text-sm font-medium text-gray-600"
+                      >
+                        {isAIMode ? "IA" : "Manual"}
+                      </Label>
+                      <Switch
+                        id="mode-switch"
+                        checked={isAIMode}
+                        onCheckedChange={setIsAIMode}
+                      />
+                    </div>
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <Input
-                    ref={wordInputRef}
-                    placeholder="Digite a palavra"
-                    value={word}
-                    onChange={(e) => setWord(e.target.value)}
-                    onKeyPress={handleKeyPress}
-                    className="uppercase border-2 border-pink-200 focus:border-pink-400 transition-colors duration-200"
-                  />
-                  <Input
-                    id="definition-input"
-                    placeholder="Digite a definição"
-                    value={definition}
-                    onChange={(e) => setDefinition(e.target.value)}
-                    onKeyPress={handleKeyPress}
-                    className="border-2 border-pink-200 focus:border-pink-400 transition-colors duration-200"
-                  />
-                  <Button
-                    onClick={addWordDefinition}
-                    className="w-full bg-gradient-to-r from-pink-600 to-pink-700 hover:from-pink-700 hover:to-pink-800 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
-                  >
-                    <Plus className="w-4 h-4 mr-1" />
-                    Adicionar Palavra
-                  </Button>
+                <CardContent>
+                  {!isAIMode ? (
+                    // Manual Mode
+                    <div className="space-y-4">
+                      <Input
+                        ref={wordInputRef}
+                        placeholder="Digite a palavra"
+                        value={word}
+                        onChange={(e) => setWord(e.target.value)}
+                        onKeyPress={handleKeyPress}
+                        className="uppercase border-2 border-pink-200 focus:border-pink-400 transition-colors duration-200"
+                      />
+                      <Input
+                        id="definition-input"
+                        placeholder="Digite a definição"
+                        value={definition}
+                        onChange={(e) => setDefinition(e.target.value)}
+                        onKeyPress={handleKeyPress}
+                        className="border-2 border-pink-200 focus:border-pink-400 transition-colors duration-200"
+                      />
+                      <Button
+                        onClick={addWordDefinition}
+                        className="w-full bg-gradient-to-r from-pink-600 to-pink-700 hover:from-pink-700 hover:to-pink-800 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
+                      >
+                        <Plus className="w-4 h-4 mr-1" />
+                        Adicionar Palavra
+                      </Button>
+                    </div>
+                  ) : (
+                    // AI Mode
+                    <div className="space-y-4">
+                      <div>
+                        <Label
+                          htmlFor="ai-theme"
+                          className="text-sm font-medium text-gray-700 mb-2 block"
+                        >
+                          Tema
+                        </Label>
+                        <Select value={aiTheme} onValueChange={setAiTheme}>
+                          <SelectTrigger className="border-2 border-pink-200 focus:border-pink-400">
+                            <SelectValue placeholder="Selecione o tema" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="gramatica-portuguesa">
+                              Gramática Portuguesa
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <Button
+                        onClick={generateAIWords}
+                        disabled={!aiTheme || isGenerating}
+                        className="w-full bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                      >
+                        {isGenerating ? (
+                          <>
+                            <Sparkles className="w-4 h-4 mr-2 animate-spin" />
+                            Gerando palavras...
+                          </>
+                        ) : (
+                          <>
+                            <Bot className="w-4 h-4 mr-2" />
+                            Gerar Palavras com IA
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </div>
