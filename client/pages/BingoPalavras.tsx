@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -726,7 +727,7 @@ export default function BingoPalavras() {
                     Baixar Cartelas em PDF
                   </Button>
                   <p className="text-sm text-gray-500 mt-2 text-center">
-                    2 cartelas por página + página com definições
+                    2 cartelas por página + página com defini��ões
                   </p>
                 </CardContent>
               </Card>
