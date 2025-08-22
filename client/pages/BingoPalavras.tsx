@@ -498,7 +498,7 @@ export default function BingoPalavras() {
                       htmlFor="show-student-info"
                       className="text-sm font-medium text-gray-700 cursor-pointer"
                     >
-                      Exibir campos para nome, turma e data
+                      Incluir campos para Nome, Turma e Data no PDF
                     </Label>
                   </div>
                 </CardContent>
@@ -727,7 +727,7 @@ export default function BingoPalavras() {
                     Baixar Cartelas em PDF
                   </Button>
                   <p className="text-sm text-gray-500 mt-2 text-center">
-                    2 cartelas por página + página com defini��ões
+                    2 cartelas por página + página com definições
                   </p>
                 </CardContent>
               </Card>
