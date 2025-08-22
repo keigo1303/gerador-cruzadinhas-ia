@@ -79,8 +79,8 @@ export default function Header() {
                     <Grid3x3 className="w-4 h-4" />
                     Atividades
                   </NavigationMenuTrigger>
-                  <NavigationMenuContent>
-                    <div className="grid gap-3 p-6 w-[400px]">
+                  <NavigationMenuContent className="right-0">
+                    <div className="grid gap-3 p-6 w-[350px] md:w-[400px]">
                       {activities.map((activity) => {
                         const Icon = activity.icon;
                         return (
