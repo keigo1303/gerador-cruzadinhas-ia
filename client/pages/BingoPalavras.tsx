@@ -559,7 +559,8 @@ export default function BingoPalavras() {
                             : "bg-yellow-200 text-yellow-800"
                         }`}
                       >
-                        {wordDefinitions.length}/{minWords}
+                        {wordDefinitions.length} palavra{wordDefinitions.length !== 1 ? 's' : ''}
+                        {wordDefinitions.length >= minWords ? ' ✓' : ` (mín: ${minWords})`}
                       </Badge>
                       Palavras Adicionadas
                     </div>
