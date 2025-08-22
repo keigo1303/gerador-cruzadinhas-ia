@@ -76,6 +76,8 @@ export default function CacaPalavras() {
   const [aiDifficulty, setAiDifficulty] = React.useState("");
   const [aiWordCount, setAiWordCount] = React.useState(10);
   const [isGenerating, setIsGenerating] = React.useState(false);
+  const [directionMode, setDirectionMode] = React.useState("horizontal-vertical");
+  const [allowMirrored, setAllowMirrored] = React.useState(false);
   const wordInputRef = React.useRef<HTMLInputElement>(null);
   const gridRef = React.useRef<HTMLDivElement>(null);
 
