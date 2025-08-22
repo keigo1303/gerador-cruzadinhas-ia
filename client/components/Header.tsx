@@ -13,7 +13,7 @@ import {
   Grid3x3,
   Search,
   Sparkles,
-  ChevronDown
+  ChevronDown,
 } from "lucide-react";
 
 export default function Header() {
@@ -48,8 +48,8 @@ export default function Header() {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link 
-            to="/" 
+          <Link
+            to="/"
             className="flex items-center gap-2 text-xl font-bold text-gray-800 hover:text-gray-600 transition-colors"
           >
             <BookOpen className="w-6 h-6 text-blue-600" />
@@ -62,7 +62,7 @@ export default function Header() {
           <div className="flex items-center gap-6">
             {/* Home Button */}
             <Link to="/">
-              <Button 
+              <Button
                 variant={location.pathname === "/" ? "default" : "ghost"}
                 className="flex items-center gap-2"
               >
@@ -80,7 +80,10 @@ export default function Header() {
                   <ChevronDown className="w-4 h-4" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-[320px] md:w-[380px]">
+              <DropdownMenuContent
+                align="end"
+                className="w-[320px] md:w-[380px]"
+              >
                 {activities.map((activity) => {
                   const Icon = activity.icon;
                   return (
