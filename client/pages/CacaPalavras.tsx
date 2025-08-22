@@ -25,10 +25,8 @@ import {
   Bot,
   User,
   Search,
-  ArrowLeft,
 } from "lucide-react";
 import { wordDatabase } from "@shared/word-database";
-import { Link } from "react-router-dom";
 
 interface Word {
   id: string;
@@ -730,15 +728,6 @@ export default function CacaPalavras() {
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50">
       <div className="container mx-auto px-4 py-8">
         <div className="text-center mb-12">
-          <div className="flex justify-center items-center gap-4 mb-6">
-            <Link
-              to="/"
-              className="inline-flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-800 bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-200"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Voltar
-            </Link>
-          </div>
 
           <h1 className="text-5xl font-bold bg-gradient-to-r from-green-600 via-emerald-600 to-teal-800 bg-clip-text text-transparent mb-4">
             Gerador de Caça-Palavras
