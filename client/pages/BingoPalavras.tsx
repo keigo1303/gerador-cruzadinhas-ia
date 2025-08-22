@@ -23,6 +23,8 @@ import {
   Grid3x3,
   Bot,
   User,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { bingoDatabase } from "@shared/bingo-database";
