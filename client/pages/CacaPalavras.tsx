@@ -152,6 +152,11 @@ export default function CacaPalavras() {
   ): WordSearchResult | null => {
     if (wordList.length === 0) return null;
 
+    // Filter directions based on selected mode
+    const availableDirections = directionMode === "horizontal-vertical"
+      ? DIRECTIONS.filter(d => d.name === "horizontal" || d.name === "vertical")
+      : DIRECTIONS;
+
     // Calculate optimal grid size
     const longestWord = Math.max(...wordList.map((w) => w.length));
     const wordCount = wordList.length;
@@ -174,6 +179,15 @@ export default function CacaPalavras() {
     const placedWords: string[] = [];
     const unplacedWords: string[] = [];
 
+    // Prepare word list with mirrored options if enabled
+    const wordsToPlace: Array<{word: string, reversed: boolean}> = [];
+    wordList.forEach(word => {
+      wordsToPlace.push({word, reversed: false});
+      if (allowMirrored) {
+        wordsToPlace.push({word: word.split('').reverse().join(''), reversed: true});
+      }
+    });
+
     // Sort words by length (longest first) for better placement
     const sortedWords = [...wordList].sort((a, b) => b.length - a.length);
 
@@ -188,24 +202,48 @@ export default function CacaPalavras() {
         const startRow = Math.floor(Math.random() * gridSize);
         const startCol = Math.floor(Math.random() * gridSize);
 
-        // Random direction
+        // Random direction from available directions
         const direction =
-          DIRECTIONS[Math.floor(Math.random() * DIRECTIONS.length)];
+          availableDirections[Math.floor(Math.random() * availableDirections.length)];
 
-        if (canPlaceWord(grid, word, startRow, startCol, direction, gridSize)) {
+        // Try normal word
+        let wordToUse = word;
+        let isReversed = false;
+
+        if (canPlaceWord(grid, wordToUse, startRow, startCol, direction, gridSize)) {
           const wordPosition = placeWord(
             grid,
-            word,
+            wordToUse,
             startRow,
             startCol,
             direction,
           );
           solutions.push(wordPosition);
-          placedWords.push(word);
+          placedWords.push(word); // Always store original word
           placed = true;
           console.log(
-            `Placed "${word}" at (${startRow},${startCol}) direction: ${direction.name}`,
+            `Placed "${wordToUse}" at (${startRow},${startCol}) direction: ${direction.name}`,
           );
+        } else if (allowMirrored) {
+          // Try reversed word if mirroring is allowed
+          wordToUse = word.split('').reverse().join('');
+          isReversed = true;
+
+          if (canPlaceWord(grid, wordToUse, startRow, startCol, direction, gridSize)) {
+            const wordPosition = placeWord(
+              grid,
+              wordToUse,
+              startRow,
+              startCol,
+              direction,
+            );
+            solutions.push(wordPosition);
+            placedWords.push(word); // Always store original word
+            placed = true;
+            console.log(
+              `Placed "${wordToUse}" (reversed) at (${startRow},${startCol}) direction: ${direction.name}`,
+            );
+          }
         }
 
         attempts++;
