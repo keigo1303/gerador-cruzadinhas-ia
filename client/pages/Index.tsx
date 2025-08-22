@@ -46,7 +46,7 @@ export default function Index() {
         "Palavras em todas direções",
         "Grade customizável",
         "Banco de palavras IA",
-        "Até 25 palavras",
+        "Até 20 palavras",
       ],
     },
   ];
