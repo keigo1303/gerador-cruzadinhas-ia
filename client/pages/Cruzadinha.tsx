@@ -182,8 +182,8 @@ export default function Cruzadinha() {
         // Scroll automático para mostrar a cruzadinha gerada
         setTimeout(() => {
           crosswordRef.current?.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start'
+            behavior: "smooth",
+            block: "start",
           });
         }, 100);
       } else {
@@ -609,9 +609,13 @@ export default function Cruzadinha() {
                             <SelectContent>
                               <SelectItem value="animais">Animais</SelectItem>
                               <SelectItem value="ciencia">Ciência</SelectItem>
-                              <SelectItem value="geografia">Geografia</SelectItem>
+                              <SelectItem value="geografia">
+                                Geografia
+                              </SelectItem>
                               <SelectItem value="historia">História</SelectItem>
-                              <SelectItem value="matematica">Matemática</SelectItem>
+                              <SelectItem value="matematica">
+                                Matemática
+                              </SelectItem>
                               <SelectItem value="esportes">Esportes</SelectItem>
                             </SelectContent>
                           </Select>
@@ -756,7 +760,10 @@ export default function Cruzadinha() {
 
           {/* Crossword Grid */}
           {crosswordGrid.length > 0 && (
-            <Card ref={crosswordRef} className="shadow-2xl border-0 bg-gradient-to-r from-white to-blue-50 hover:shadow-3xl transition-shadow duration-300">
+            <Card
+              ref={crosswordRef}
+              className="shadow-2xl border-0 bg-gradient-to-r from-white to-blue-50 hover:shadow-3xl transition-shadow duration-300"
+            >
               <CardHeader>
                 <CardTitle className="text-blue-700 flex items-center gap-2">
                   <Sparkles className="w-5 h-5" />

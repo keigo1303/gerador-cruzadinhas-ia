@@ -41,8 +41,8 @@ interface WordPosition {
   startCol: number;
   endRow: number;
   endCol: number;
-  direction: 'horizontal' | 'vertical' | 'diagonal-down' | 'diagonal-up';
-  cells: Array<{row: number, col: number, letter: string}>;
+  direction: "horizontal" | "vertical" | "diagonal-down" | "diagonal-up";
+  cells: Array<{ row: number; col: number; letter: string }>;
 }
 
 interface WordSearchResult {
@@ -58,10 +58,10 @@ interface WordSearchResult {
 
 // Directions for word placement
 const DIRECTIONS = [
-  { name: 'horizontal', dr: 0, dc: 1 },      // →
-  { name: 'vertical', dr: 1, dc: 0 },        // ↓
-  { name: 'diagonal-down', dr: 1, dc: 1 },   // ↘
-  { name: 'diagonal-up', dr: -1, dc: 1 },    // ↗
+  { name: "horizontal", dr: 0, dc: 1 }, // →
+  { name: "vertical", dr: 1, dc: 0 }, // ↓
+  { name: "diagonal-down", dr: 1, dc: 1 }, // ↘
+  { name: "diagonal-up", dr: -1, dc: 1 }, // ↗
 ] as const;
 
 export default function CacaPalavras() {
@@ -145,21 +145,28 @@ export default function CacaPalavras() {
   };
 
   // Enhanced word search generator with precise positioning
-  const generateEnhancedWordSearch = (wordList: string[]): WordSearchResult | null => {
+  const generateEnhancedWordSearch = (
+    wordList: string[],
+  ): WordSearchResult | null => {
     if (wordList.length === 0) return null;
 
     // Calculate optimal grid size
-    const longestWord = Math.max(...wordList.map(w => w.length));
+    const longestWord = Math.max(...wordList.map((w) => w.length));
     const wordCount = wordList.length;
     const baseSize = Math.max(15, longestWord + 3);
-    const gridSize = Math.min(30, baseSize + Math.ceil(Math.sqrt(wordCount)) * 2);
+    const gridSize = Math.min(
+      30,
+      baseSize + Math.ceil(Math.sqrt(wordCount)) * 2,
+    );
 
-    console.log(`Generating ${gridSize}x${gridSize} grid for ${wordCount} words`);
+    console.log(
+      `Generating ${gridSize}x${gridSize} grid for ${wordCount} words`,
+    );
 
     // Initialize empty grid
     const grid: string[][] = Array(gridSize)
       .fill(null)
-      .map(() => Array(gridSize).fill(''));
+      .map(() => Array(gridSize).fill(""));
 
     const solutions: WordPosition[] = [];
     const placedWords: string[] = [];
@@ -178,23 +185,34 @@ export default function CacaPalavras() {
         // Random starting position
         const startRow = Math.floor(Math.random() * gridSize);
         const startCol = Math.floor(Math.random() * gridSize);
-        
+
         // Random direction
-        const direction = DIRECTIONS[Math.floor(Math.random() * DIRECTIONS.length)];
-        
+        const direction =
+          DIRECTIONS[Math.floor(Math.random() * DIRECTIONS.length)];
+
         if (canPlaceWord(grid, word, startRow, startCol, direction, gridSize)) {
-          const wordPosition = placeWord(grid, word, startRow, startCol, direction);
+          const wordPosition = placeWord(
+            grid,
+            word,
+            startRow,
+            startCol,
+            direction,
+          );
           solutions.push(wordPosition);
           placedWords.push(word);
           placed = true;
-          console.log(`Placed "${word}" at (${startRow},${startCol}) direction: ${direction.name}`);
+          console.log(
+            `Placed "${word}" at (${startRow},${startCol}) direction: ${direction.name}`,
+          );
         }
-        
+
         attempts++;
       }
 
       if (!placed) {
-        console.warn(`Could not place word: ${word} after ${maxAttempts} attempts`);
+        console.warn(
+          `Could not place word: ${word} after ${maxAttempts} attempts`,
+        );
         unplacedWords.push(word);
       }
     }
@@ -202,14 +220,16 @@ export default function CacaPalavras() {
     // Fill empty cells with random letters
     fillEmptyCells(grid, gridSize);
 
-    console.log(`Successfully placed ${placedWords.length}/${wordList.length} words`);
+    console.log(
+      `Successfully placed ${placedWords.length}/${wordList.length} words`,
+    );
 
     return {
       grid,
       solutions,
       size: { rows: gridSize, cols: gridSize },
       placedWords,
-      unplacedWords
+      unplacedWords,
     };
   };
 
@@ -219,8 +239,8 @@ export default function CacaPalavras() {
     word: string,
     startRow: number,
     startCol: number,
-    direction: typeof DIRECTIONS[number],
-    gridSize: number
+    direction: (typeof DIRECTIONS)[number],
+    gridSize: number,
   ): boolean => {
     for (let i = 0; i < word.length; i++) {
       const row = startRow + direction.dr * i;
@@ -233,7 +253,7 @@ export default function CacaPalavras() {
 
       // Check if cell is empty or contains the same letter
       const currentCell = grid[row][col];
-      if (currentCell !== '' && currentCell !== word[i]) {
+      if (currentCell !== "" && currentCell !== word[i]) {
         return false;
       }
     }
@@ -246,10 +266,10 @@ export default function CacaPalavras() {
     word: string,
     startRow: number,
     startCol: number,
-    direction: typeof DIRECTIONS[number]
+    direction: (typeof DIRECTIONS)[number],
   ): WordPosition => {
-    const cells: Array<{row: number, col: number, letter: string}> = [];
-    
+    const cells: Array<{ row: number; col: number; letter: string }> = [];
+
     for (let i = 0; i < word.length; i++) {
       const row = startRow + direction.dr * i;
       const col = startCol + direction.dc * i;
@@ -266,17 +286,17 @@ export default function CacaPalavras() {
       startCol,
       endRow,
       endCol,
-      direction: direction.name as WordPosition['direction'],
-      cells
+      direction: direction.name as WordPosition["direction"],
+      cells,
     };
   };
 
   // Fill empty cells with random letters
   const fillEmptyCells = (grid: string[][], gridSize: number) => {
-    const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     for (let row = 0; row < gridSize; row++) {
       for (let col = 0; col < gridSize; col++) {
-        if (grid[row][col] === '') {
+        if (grid[row][col] === "") {
           grid[row][col] = letters[Math.floor(Math.random() * letters.length)];
         }
       }
@@ -289,26 +309,26 @@ export default function CacaPalavras() {
       return;
     }
 
-    const wordList = words.map(w => w.word);
+    const wordList = words.map((w) => w.word);
     console.log("Generating word search with words:", wordList);
 
     const result = generateEnhancedWordSearch(wordList);
-    
+
     if (result) {
       setWordSearchGrid(result);
 
       // Scroll automático para mostrar a atividade gerada
       setTimeout(() => {
         gridRef.current?.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start'
+          behavior: "smooth",
+          block: "start",
         });
       }, 100);
 
       if (result.unplacedWords.length > 0) {
         alert(
-          `Aviso: ${result.unplacedWords.length} palavra(s) não puderam ser colocadas na grade: ${result.unplacedWords.join(', ')}. ` +
-          'Tente usar palavras menores ou reduza a quantidade de palavras.'
+          `Aviso: ${result.unplacedWords.length} palavra(s) não puderam ser colocadas na grade: ${result.unplacedWords.join(", ")}. ` +
+            "Tente usar palavras menores ou reduza a quantidade de palavras.",
         );
       }
     } else {
@@ -318,37 +338,40 @@ export default function CacaPalavras() {
 
   // Array de cores vibrantes para destacar cada palavra
   const colors = [
-    { bg: 'bg-red-200', text: 'text-red-800', name: 'Vermelho' },
-    { bg: 'bg-blue-200', text: 'text-blue-800', name: 'Azul' },
-    { bg: 'bg-green-200', text: 'text-green-800', name: 'Verde' },
-    { bg: 'bg-yellow-200', text: 'text-yellow-800', name: 'Amarelo' },
-    { bg: 'bg-purple-200', text: 'text-purple-800', name: 'Roxo' },
-    { bg: 'bg-pink-200', text: 'text-pink-800', name: 'Rosa' },
-    { bg: 'bg-indigo-200', text: 'text-indigo-800', name: 'Índigo' },
-    { bg: 'bg-orange-200', text: 'text-orange-800', name: 'Laranja' },
-    { bg: 'bg-teal-200', text: 'text-teal-800', name: 'Verde-água' },
-    { bg: 'bg-cyan-200', text: 'text-cyan-800', name: 'Ciano' },
-    { bg: 'bg-lime-200', text: 'text-lime-800', name: 'Lima' },
-    { bg: 'bg-emerald-200', text: 'text-emerald-800', name: 'Esmeralda' },
-    { bg: 'bg-rose-200', text: 'text-rose-800', name: 'Rosa-escuro' },
-    { bg: 'bg-violet-200', text: 'text-violet-800', name: 'Violeta' },
-    { bg: 'bg-sky-200', text: 'text-sky-800', name: 'Céu' },
-    { bg: 'bg-amber-200', text: 'text-amber-800', name: 'Âmbar' },
-    { bg: 'bg-fuchsia-200', text: 'text-fuchsia-800', name: 'Fúcsia' },
-    { bg: 'bg-slate-200', text: 'text-slate-800', name: 'Ardósia' },
-    { bg: 'bg-zinc-200', text: 'text-zinc-800', name: 'Zinco' },
-    { bg: 'bg-neutral-200', text: 'text-neutral-800', name: 'Neutro' },
+    { bg: "bg-red-200", text: "text-red-800", name: "Vermelho" },
+    { bg: "bg-blue-200", text: "text-blue-800", name: "Azul" },
+    { bg: "bg-green-200", text: "text-green-800", name: "Verde" },
+    { bg: "bg-yellow-200", text: "text-yellow-800", name: "Amarelo" },
+    { bg: "bg-purple-200", text: "text-purple-800", name: "Roxo" },
+    { bg: "bg-pink-200", text: "text-pink-800", name: "Rosa" },
+    { bg: "bg-indigo-200", text: "text-indigo-800", name: "Índigo" },
+    { bg: "bg-orange-200", text: "text-orange-800", name: "Laranja" },
+    { bg: "bg-teal-200", text: "text-teal-800", name: "Verde-água" },
+    { bg: "bg-cyan-200", text: "text-cyan-800", name: "Ciano" },
+    { bg: "bg-lime-200", text: "text-lime-800", name: "Lima" },
+    { bg: "bg-emerald-200", text: "text-emerald-800", name: "Esmeralda" },
+    { bg: "bg-rose-200", text: "text-rose-800", name: "Rosa-escuro" },
+    { bg: "bg-violet-200", text: "text-violet-800", name: "Violeta" },
+    { bg: "bg-sky-200", text: "text-sky-800", name: "Céu" },
+    { bg: "bg-amber-200", text: "text-amber-800", name: "Âmbar" },
+    { bg: "bg-fuchsia-200", text: "text-fuchsia-800", name: "Fúcsia" },
+    { bg: "bg-slate-200", text: "text-slate-800", name: "Ardósia" },
+    { bg: "bg-zinc-200", text: "text-zinc-800", name: "Zinco" },
+    { bg: "bg-neutral-200", text: "text-neutral-800", name: "Neutro" },
   ];
 
   const renderGrid = () => {
     if (!wordSearchGrid) return null;
 
     // Criar mapa de células para palavras com suas cores
-    const cellColorMap = new Map<string, { colorIndex: number, word: string }>();
+    const cellColorMap = new Map<
+      string,
+      { colorIndex: number; word: string }
+    >();
 
     wordSearchGrid.solutions.forEach((solution, index) => {
       const colorIndex = index % colors.length;
-      solution.cells.forEach(cell => {
+      solution.cells.forEach((cell) => {
         const key = `${cell.row}-${cell.col}`;
         cellColorMap.set(key, { colorIndex, word: solution.word });
       });
@@ -375,9 +398,11 @@ export default function CacaPalavras() {
                   className={`w-8 h-8 border border-gray-300 flex items-center justify-center text-sm font-bold transition-all duration-200 ${
                     isHighlighted
                       ? `${color?.bg} ${color?.text} border-2 border-gray-400 shadow-sm scale-105`
-                      : 'bg-white text-gray-800 hover:bg-gray-50'
+                      : "bg-white text-gray-800 hover:bg-gray-50"
                   }`}
-                  title={isHighlighted ? `Palavra: ${cellInfo.word}` : undefined}
+                  title={
+                    isHighlighted ? `Palavra: ${cellInfo.word}` : undefined
+                  }
                 >
                   <span className="font-extrabold">{cell}</span>
                 </div>
@@ -409,14 +434,18 @@ export default function CacaPalavras() {
                       <div
                         className={`w-6 h-6 rounded-full ${color.bg} border-2 border-gray-400 flex items-center justify-center`}
                       >
-                        <span className="text-xs font-bold text-gray-600">{index + 1}</span>
+                        <span className="text-xs font-bold text-gray-600">
+                          {index + 1}
+                        </span>
                       </div>
                       <div className="flex-1">
                         <span className={`font-bold text-base ${color.text}`}>
                           {solution.word}
                         </span>
                         <div className="text-xs text-gray-600 mt-1">
-                          {solution.direction} • ({solution.startRow + 1},{solution.startCol + 1}) → ({solution.endRow + 1},{solution.endCol + 1})
+                          {solution.direction} • ({solution.startRow + 1},
+                          {solution.startCol + 1}) → ({solution.endRow + 1},
+                          {solution.endCol + 1})
                         </div>
                       </div>
                     </div>
@@ -427,7 +456,8 @@ export default function CacaPalavras() {
               {wordSearchGrid.unplacedWords.length > 0 && (
                 <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
                   <p className="text-sm text-yellow-700">
-                    <strong>Palavras não colocadas:</strong> {wordSearchGrid.unplacedWords.join(', ')}
+                    <strong>Palavras não colocadas:</strong>{" "}
+                    {wordSearchGrid.unplacedWords.join(", ")}
                   </p>
                 </div>
               )}
@@ -489,7 +519,7 @@ export default function CacaPalavras() {
 
       // Calcular espaçamento baseado na largura da página
       const margin = 20;
-      const availableWidth = pageWidth - (margin * 2); // Largura disponível
+      const availableWidth = pageWidth - margin * 2; // Largura disponível
       const fieldSpacing = 8; // Espaçamento entre campos
 
       // Larguras dos textos dos labels
@@ -498,7 +528,8 @@ export default function CacaPalavras() {
       const dataTextWidth = pdf.getTextWidth("Data:");
 
       // Calcular largura disponível para as linhas dividida proporcionalmente
-      const totalLabelWidth = nomeTextWidth + turmaTextWidth + dataTextWidth + (fieldSpacing * 6);
+      const totalLabelWidth =
+        nomeTextWidth + turmaTextWidth + dataTextWidth + fieldSpacing * 6;
       const lineWidth = (availableWidth - totalLabelWidth) / 3;
 
       // Posições dos campos
@@ -517,7 +548,10 @@ export default function CacaPalavras() {
       currentX += lineWidth + fieldSpacing;
 
       // Campo Data (verificar se cabe na página)
-      if (currentX + dataTextWidth + fieldSpacing + lineWidth <= pageWidth - margin) {
+      if (
+        currentX + dataTextWidth + fieldSpacing + lineWidth <=
+        pageWidth - margin
+      ) {
         pdf.text("Data:", currentX, currentY);
         currentX += dataTextWidth + fieldSpacing;
         pdf.line(currentX, currentY + 1, currentX + lineWidth, currentY + 1);
@@ -527,7 +561,12 @@ export default function CacaPalavras() {
         currentX = margin;
         pdf.text("Data:", currentX, currentY);
         currentX += dataTextWidth + fieldSpacing;
-        pdf.line(currentX, currentY + 1, currentX + (lineWidth * 1.5), currentY + 1);
+        pdf.line(
+          currentX,
+          currentY + 1,
+          currentX + lineWidth * 1.5,
+          currentY + 1,
+        );
       }
 
       currentY += 15;
@@ -554,7 +593,7 @@ export default function CacaPalavras() {
     if (withAnswers) {
       wordSearchGrid.solutions.forEach((solution, solutionIndex) => {
         const colorIndex = solutionIndex % pdfColors.length;
-        solution.cells.forEach(cell => {
+        solution.cells.forEach((cell) => {
           cellColorMap.set(`${cell.row}-${cell.col}`, colorIndex);
         });
       });
@@ -584,7 +623,7 @@ export default function CacaPalavras() {
         if (withAnswers && isHighlighted) {
           const color = pdfColors[colorIndex];
           pdf.setFillColor(color.r, color.g, color.b);
-          pdf.rect(cellX, cellY, finalCellSize, finalCellSize, 'F');
+          pdf.rect(cellX, cellY, finalCellSize, finalCellSize, "F");
           pdf.setDrawColor(100, 100, 100); // Darker border for highlighted cells
           pdf.setLineWidth(0.5);
           pdf.rect(cellX, cellY, finalCellSize, finalCellSize); // Redraw border
@@ -630,7 +669,7 @@ export default function CacaPalavras() {
           // Draw colored square indicator
           pdf.setFillColor(color.r, color.g, color.b);
           pdf.setDrawColor(100, 100, 100);
-          pdf.rect(x, y - 3, 3, 3, 'FD');
+          pdf.rect(x, y - 3, 3, 3, "FD");
 
           // Draw word
           pdf.setTextColor(0, 0, 0);
@@ -654,7 +693,6 @@ export default function CacaPalavras() {
         }
       });
     }
-
 
     const filename = `${searchTitle.toLowerCase().replace(/\s+/g, "-")}-${withAnswers ? "gabarito" : "em-branco"}.pdf`;
     pdf.save(filename);
@@ -684,7 +722,8 @@ export default function CacaPalavras() {
             Gerador de Caça-Palavras
           </h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Crie caça-palavras personalizados com posicionamento preciso das respostas
+            Crie caça-palavras personalizados com posicionamento preciso das
+            respostas
           </p>
           <div className="flex justify-center mt-4">
             <Search className="w-6 h-6 text-emerald-500 animate-pulse" />
@@ -804,9 +843,13 @@ export default function CacaPalavras() {
                             <SelectContent>
                               <SelectItem value="animais">Animais</SelectItem>
                               <SelectItem value="ciencia">Ciência</SelectItem>
-                              <SelectItem value="geografia">Geografia</SelectItem>
+                              <SelectItem value="geografia">
+                                Geografia
+                              </SelectItem>
                               <SelectItem value="historia">História</SelectItem>
-                              <SelectItem value="matematica">Matemática</SelectItem>
+                              <SelectItem value="matematica">
+                                Matemática
+                              </SelectItem>
                               <SelectItem value="esportes">Esportes</SelectItem>
                             </SelectContent>
                           </Select>
@@ -950,7 +993,10 @@ export default function CacaPalavras() {
 
           {/* Word Search Grid */}
           {wordSearchGrid && (
-            <Card ref={gridRef} className="shadow-2xl border-0 bg-gradient-to-r from-white to-green-50 hover:shadow-3xl transition-shadow duration-300">
+            <Card
+              ref={gridRef}
+              className="shadow-2xl border-0 bg-gradient-to-r from-white to-green-50 hover:shadow-3xl transition-shadow duration-300"
+            >
               <CardHeader>
                 <CardTitle className="text-green-700 flex items-center gap-2">
                   <Search className="w-5 h-5" />
