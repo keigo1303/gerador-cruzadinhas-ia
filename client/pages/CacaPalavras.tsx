@@ -155,7 +155,7 @@ export default function CacaPalavras() {
     // Filter directions based on selected mode
     const availableDirections = directionMode === "horizontal-vertical"
       ? DIRECTIONS.filter(d => d.name === "horizontal" || d.name === "vertical")
-      : DIRECTIONS;
+      : DIRECTIONS; // all-directions includes diagonal
 
     // Calculate optimal grid size
     const longestWord = Math.max(...wordList.map((w) => w.length));
@@ -560,7 +560,7 @@ export default function CacaPalavras() {
       // Calcular espaçamento baseado na largura da página
       const margin = 20;
       const availableWidth = pageWidth - margin * 2; // Largura disponível
-      const fieldSpacing = 8; // Espaçamento entre campos
+      const fieldSpacing = 8; // Espa��amento entre campos
 
       // Larguras dos textos dos labels
       const nomeTextWidth = pdf.getTextWidth("Nome:");
