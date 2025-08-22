@@ -50,6 +50,23 @@ export default function Index() {
         "Até 20 palavras",
       ],
     },
+    {
+      id: "bingo-palavras",
+      title: "Gerador de Bingo de Palavras",
+      description:
+        "Crie cartelas de bingo personalizadas com palavras e definições. Perfeito para revisão de conteúdo.",
+      icon: Trophy,
+      path: "/bingo-palavras",
+      color: "from-purple-600 to-pink-600",
+      bgColor: "from-purple-50 to-pink-50",
+      iconColor: "text-purple-600",
+      features: [
+        "Cartelas 4x4, 5x5 e 6x6",
+        "Múltiplas cartelas únicas",
+        "PDF com definições",
+        "Campo para nome do aluno",
+      ],
+    },
   ];
 
   return (
