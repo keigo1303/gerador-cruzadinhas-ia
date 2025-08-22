@@ -25,10 +25,9 @@ import {
   X,
   Bot,
   User,
-  ArrowLeft,
+  RotateCcw,
 } from "lucide-react";
 import { wordDatabase } from "@shared/word-database";
-import { Link } from "react-router-dom";
 
 interface WordClue {
   id: string;
@@ -140,7 +139,9 @@ export default function Cruzadinha() {
 
     try {
       // Convert to the format expected by the library
-      const inputJson = wordClues.map((wc) => ({
+      // Shuffle the word order to get different layouts
+      const shuffledWordClues = [...wordClues].sort(() => Math.random() - 0.5);
+      const inputJson = shuffledWordClues.map((wc) => ({
         clue: wc.clue,
         answer: wc.word,
       }));
@@ -463,16 +464,6 @@ export default function Cruzadinha() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       <div className="container mx-auto px-4 py-8">
         <div className="text-center mb-12">
-          <div className="flex justify-center items-center gap-4 mb-6">
-            <Link
-              to="/"
-              className="inline-flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-800 bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-200"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Voltar
-            </Link>
-          </div>
-
           <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 bg-clip-text text-transparent mb-4">
             Gerador de Cruzadinhas
           </h1>
@@ -525,8 +516,7 @@ export default function Cruzadinha() {
                       htmlFor="header-info"
                       className="text-sm font-medium text-gray-700"
                     >
-                      Incluir campos para Nome, Turma e Data no PDF (linhas em
-                      branco para o aluno preencher)
+                      Incluir campos para Nome, Turma e Data no PDF
                     </Label>
                   </div>
                 </CardContent>
@@ -775,9 +765,20 @@ export default function Cruzadinha() {
               className="shadow-2xl border-0 bg-gradient-to-r from-white to-blue-50 hover:shadow-3xl transition-shadow duration-300"
             >
               <CardHeader>
-                <CardTitle className="text-blue-700 flex items-center gap-2">
-                  <Sparkles className="w-5 h-5" />
-                  {title || "Cruzadinha Gerada"}
+                <CardTitle className="text-blue-700 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="w-5 h-5" />
+                    {title || "Cruzadinha Gerada"}
+                  </div>
+                  <Button
+                    onClick={generateCrossword}
+                    variant="outline"
+                    size="sm"
+                    className="flex items-center gap-2 border-2 border-blue-300 hover:bg-blue-50 shadow-md hover:shadow-lg transition-all duration-200"
+                  >
+                    <RotateCcw className="w-4 h-4" />
+                    Regerar
+                  </Button>
                 </CardTitle>
               </CardHeader>
               <CardContent>{renderGrid()}</CardContent>

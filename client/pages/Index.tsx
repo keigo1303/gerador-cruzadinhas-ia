@@ -64,7 +64,7 @@ export default function Index() {
         "Cartelas 4x4, 5x5 e 6x6",
         "Múltiplas cartelas únicas",
         "PDF com definições",
-        "Campo para nome do aluno",
+        "Modo Manual e IA",
       ],
     },
   ];
@@ -128,7 +128,7 @@ export default function Index() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+          <div className="grid md:grid-cols-2 gap-8 mb-16">
             {activities.map((activity) => {
               const IconComponent = activity.icon;
 

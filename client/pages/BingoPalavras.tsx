@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -19,7 +20,6 @@ import {
   Sparkles,
   Plus,
   X,
-  ArrowLeft,
   Grid3x3,
   Bot,
   User,
@@ -28,7 +28,6 @@ import {
 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { bingoDatabase } from "@shared/bingo-database";
-import { Link } from "react-router-dom";
 
 interface WordDefinition {
   id: string;
@@ -45,7 +44,6 @@ interface BingoCard {
 export default function BingoPalavras() {
   const [word, setWord] = React.useState("");
   const [definition, setDefinition] = React.useState("");
-  const [title, setTitle] = React.useState("");
   const [wordDefinitions, setWordDefinitions] = React.useState<
     WordDefinition[]
   >([]);
@@ -56,6 +54,7 @@ export default function BingoPalavras() {
   const [aiTheme, setAiTheme] = React.useState("");
   const [isGenerating, setIsGenerating] = React.useState(false);
   const [currentCardIndex, setCurrentCardIndex] = React.useState(0);
+  const [showStudentInfo, setShowStudentInfo] = React.useState(true);
   const wordInputRef = React.useRef<HTMLInputElement>(null);
   const cardsRef = React.useRef<HTMLDivElement>(null);
 
@@ -296,21 +295,26 @@ export default function BingoPalavras() {
         const card = bingoCards[i + j];
         const cardY = j * (pageHeight / 2) + 20;
 
-        // Title
-        const bingoTitle = title || "Bingo de Palavras";
-        pdf.setFontSize(16);
-        pdf.setFont("helvetica", "bold");
-        const titleWidth = pdf.getTextWidth(bingoTitle);
-        pdf.text(bingoTitle, (pageWidth - titleWidth) / 2, cardY);
+        // Student info fields (if enabled)
+        let infoFieldsHeight = 0;
+        if (showStudentInfo) {
+          pdf.setFontSize(10);
+          pdf.setFont("helvetica", "normal");
 
-        // Card number
-        pdf.setFontSize(12);
-        pdf.setFont("helvetica", "normal");
-        pdf.text(`Cartela ${i + j + 1}`, 20, cardY + 10);
+          // Name field
+          pdf.text("Nome:", 20, cardY + 10);
+          pdf.line(35, cardY + 11, 120, cardY + 11);
 
-        // Student name field
-        pdf.text("Nome:", 20, cardY + 25);
-        pdf.line(35, cardY + 26, pageWidth - 20, cardY + 26);
+          // Class field
+          pdf.text("Turma:", 125, cardY + 10);
+          pdf.line(140, cardY + 11, pageWidth - 20, cardY + 11);
+
+          // Date field
+          pdf.text("Data:", 20, cardY + 20);
+          pdf.line(32, cardY + 21, 100, cardY + 21);
+
+          infoFieldsHeight = 25;
+        }
 
         // Calculate grid position and size
         const maxGridSize = 120; // max size in mm
@@ -318,7 +322,7 @@ export default function BingoPalavras() {
         const gridWidth = size * cellSize;
         const gridHeight = size * cellSize;
         const gridStartX = (pageWidth - gridWidth) / 2;
-        const gridStartY = cardY + 40;
+        const gridStartY = cardY + 10 + infoFieldsHeight;
 
         // Draw grid
         pdf.setLineWidth(0.5);
@@ -377,19 +381,22 @@ export default function BingoPalavras() {
         currentY = 20;
       }
 
+      // Add checkbox
+      pdf.rect(20, currentY - 3, 3, 3); // Draw checkbox square
+
       const definitionText = `${wd.word}: ${wd.definition}`;
-      const lines = pdf.splitTextToSize(definitionText, pageWidth - 40);
+      const lines = pdf.splitTextToSize(definitionText, pageWidth - 50);
 
       pdf.setFont("helvetica", "bold");
-      pdf.text(`${index + 1}.`, 20, currentY);
+      pdf.text(`${index + 1}.`, 28, currentY);
 
       pdf.setFont("helvetica", "normal");
-      pdf.text(lines, 30, currentY);
+      pdf.text(lines, 38, currentY);
 
       currentY += lines.length * 5 + 2;
     });
 
-    const filename = `${(title || "bingo-palavras").toLowerCase().replace(/\s+/g, "-")}.pdf`;
+    const filename = "bingo-palavras.pdf";
     pdf.save(filename);
   };
 
@@ -408,16 +415,6 @@ export default function BingoPalavras() {
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-purple-50">
       <div className="container mx-auto px-4 py-8">
         <div className="text-center mb-12">
-          <div className="flex justify-center items-center gap-4 mb-6">
-            <Link
-              to="/"
-              className="inline-flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-800 bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-200"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Voltar
-            </Link>
-          </div>
-
           <h1 className="text-5xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-purple-800 bg-clip-text text-transparent mb-4">
             Gerador de Bingo de Palavras
           </h1>
@@ -434,7 +431,7 @@ export default function BingoPalavras() {
           <div className="grid lg:grid-cols-2 gap-8">
             {/* Coluna esquerda - Configurações */}
             <div className="space-y-6">
-              {/* Title Section */}
+              {/* Configuration Section */}
               <Card className="shadow-xl border-0 bg-gradient-to-r from-white to-purple-50 hover:shadow-2xl transition-shadow duration-300">
                 <CardHeader>
                   <CardTitle className="text-purple-700 flex items-center gap-2">
@@ -443,22 +440,6 @@ export default function BingoPalavras() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                  <div>
-                    <Label
-                      htmlFor="title"
-                      className="text-sm font-medium text-gray-700 mb-2 block"
-                    >
-                      Título do Bingo
-                    </Label>
-                    <Input
-                      id="title"
-                      placeholder="Digite o título do bingo"
-                      value={title}
-                      onChange={(e) => setTitle(e.target.value)}
-                      className="border-2 border-purple-200 focus:border-purple-400 transition-colors duration-200"
-                    />
-                  </div>
-
                   <div>
                     <Label
                       htmlFor="grid-size"
@@ -504,6 +485,20 @@ export default function BingoPalavras() {
                       }
                       className="border-2 border-purple-200 focus:border-purple-400 transition-colors duration-200"
                     />
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="show-student-info"
+                      checked={showStudentInfo}
+                      onCheckedChange={setShowStudentInfo}
+                    />
+                    <Label
+                      htmlFor="show-student-info"
+                      className="text-sm font-medium text-gray-700 cursor-pointer"
+                    >
+                      Incluir campos para Nome, Turma e Data no PDF
+                    </Label>
                   </div>
                 </CardContent>
               </Card>
