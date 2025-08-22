@@ -48,6 +48,9 @@ export default function BingoPalavras() {
   const [gridSize, setGridSize] = React.useState("4x4");
   const [cardCount, setCardCount] = React.useState(4);
   const [bingoCards, setBingoCards] = React.useState<BingoCard[]>([]);
+  const [isAIMode, setIsAIMode] = React.useState(false);
+  const [aiTheme, setAiTheme] = React.useState("");
+  const [isGenerating, setIsGenerating] = React.useState(false);
   const wordInputRef = React.useRef<HTMLInputElement>(null);
   const cardsRef = React.useRef<HTMLDivElement>(null);
 
