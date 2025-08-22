@@ -477,7 +477,7 @@ export default function Cruzadinha() {
             Gerador de Cruzadinhas
           </h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Crie cruzadinhas personalizadas de forma fácil e r��pida
+            Crie cruzadinhas personalizadas de forma fácil e rápida
           </p>
           <div className="flex justify-center mt-4">
             <Sparkles className="w-6 h-6 text-purple-500 animate-pulse" />
