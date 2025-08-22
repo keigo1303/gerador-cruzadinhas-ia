@@ -1,5 +1,4 @@
 import * as React from "react";
-import * as WordSearchGenerator from "@sbj42/word-search-generator";
 import jsPDF from "jspdf";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -36,20 +35,34 @@ interface Word {
   word: string;
 }
 
+interface WordPosition {
+  word: string;
+  startRow: number;
+  startCol: number;
+  endRow: number;
+  endCol: number;
+  direction: "horizontal" | "vertical" | "diagonal-down" | "diagonal-up";
+  cells: Array<{ row: number; col: number; letter: string }>;
+}
+
 interface WordSearchResult {
   grid: string[][];
-  solution: Array<{
-    word: string;
-    startRow: number;
-    startCol: number;
-    endRow: number;
-    endCol: number;
-  }>;
+  solutions: WordPosition[];
   size: {
     rows: number;
     cols: number;
   };
+  placedWords: string[];
+  unplacedWords: string[];
 }
+
+// Directions for word placement
+const DIRECTIONS = [
+  { name: "horizontal", dr: 0, dc: 1 }, // →
+  { name: "vertical", dr: 1, dc: 0 }, // ↓
+  { name: "diagonal-down", dr: 1, dc: 1 }, // ↘
+  { name: "diagonal-up", dr: -1, dc: 1 }, // ↗
+] as const;
 
 export default function CacaPalavras() {
   const [word, setWord] = React.useState("");
@@ -64,11 +77,12 @@ export default function CacaPalavras() {
   const [aiWordCount, setAiWordCount] = React.useState(10);
   const [isGenerating, setIsGenerating] = React.useState(false);
   const wordInputRef = React.useRef<HTMLInputElement>(null);
+  const gridRef = React.useRef<HTMLDivElement>(null);
 
   const addWord = () => {
     if (word.trim()) {
-      if (words.length >= 25) {
-        alert("Limite máximo de 25 palavras por caça-palavras atingido.");
+      if (words.length >= 20) {
+        alert("Limite máximo de 20 palavras por caça-palavras atingido.");
         return;
       }
       const newWord: Word = {
@@ -130,246 +144,238 @@ export default function CacaPalavras() {
     }, 2000);
   };
 
+  // Enhanced word search generator with precise positioning
+  const generateEnhancedWordSearch = (
+    wordList: string[],
+  ): WordSearchResult | null => {
+    if (wordList.length === 0) return null;
+
+    // Calculate optimal grid size
+    const longestWord = Math.max(...wordList.map((w) => w.length));
+    const wordCount = wordList.length;
+    const baseSize = Math.max(15, longestWord + 3);
+    const gridSize = Math.min(
+      30,
+      baseSize + Math.ceil(Math.sqrt(wordCount)) * 2,
+    );
+
+    console.log(
+      `Generating ${gridSize}x${gridSize} grid for ${wordCount} words`,
+    );
+
+    // Initialize empty grid
+    const grid: string[][] = Array(gridSize)
+      .fill(null)
+      .map(() => Array(gridSize).fill(""));
+
+    const solutions: WordPosition[] = [];
+    const placedWords: string[] = [];
+    const unplacedWords: string[] = [];
+
+    // Sort words by length (longest first) for better placement
+    const sortedWords = [...wordList].sort((a, b) => b.length - a.length);
+
+    // Try to place each word
+    for (const word of sortedWords) {
+      let placed = false;
+      let attempts = 0;
+      const maxAttempts = 1000;
+
+      while (!placed && attempts < maxAttempts) {
+        // Random starting position
+        const startRow = Math.floor(Math.random() * gridSize);
+        const startCol = Math.floor(Math.random() * gridSize);
+
+        // Random direction
+        const direction =
+          DIRECTIONS[Math.floor(Math.random() * DIRECTIONS.length)];
+
+        if (canPlaceWord(grid, word, startRow, startCol, direction, gridSize)) {
+          const wordPosition = placeWord(
+            grid,
+            word,
+            startRow,
+            startCol,
+            direction,
+          );
+          solutions.push(wordPosition);
+          placedWords.push(word);
+          placed = true;
+          console.log(
+            `Placed "${word}" at (${startRow},${startCol}) direction: ${direction.name}`,
+          );
+        }
+
+        attempts++;
+      }
+
+      if (!placed) {
+        console.warn(
+          `Could not place word: ${word} after ${maxAttempts} attempts`,
+        );
+        unplacedWords.push(word);
+      }
+    }
+
+    // Fill empty cells with random letters
+    fillEmptyCells(grid, gridSize);
+
+    console.log(
+      `Successfully placed ${placedWords.length}/${wordList.length} words`,
+    );
+
+    return {
+      grid,
+      solutions,
+      size: { rows: gridSize, cols: gridSize },
+      placedWords,
+      unplacedWords,
+    };
+  };
+
+  // Check if a word can be placed at the given position and direction
+  const canPlaceWord = (
+    grid: string[][],
+    word: string,
+    startRow: number,
+    startCol: number,
+    direction: (typeof DIRECTIONS)[number],
+    gridSize: number,
+  ): boolean => {
+    for (let i = 0; i < word.length; i++) {
+      const row = startRow + direction.dr * i;
+      const col = startCol + direction.dc * i;
+
+      // Check bounds
+      if (row < 0 || row >= gridSize || col < 0 || col >= gridSize) {
+        return false;
+      }
+
+      // Check if cell is empty or contains the same letter
+      const currentCell = grid[row][col];
+      if (currentCell !== "" && currentCell !== word[i]) {
+        return false;
+      }
+    }
+    return true;
+  };
+
+  // Place a word in the grid and return position information
+  const placeWord = (
+    grid: string[][],
+    word: string,
+    startRow: number,
+    startCol: number,
+    direction: (typeof DIRECTIONS)[number],
+  ): WordPosition => {
+    const cells: Array<{ row: number; col: number; letter: string }> = [];
+
+    for (let i = 0; i < word.length; i++) {
+      const row = startRow + direction.dr * i;
+      const col = startCol + direction.dc * i;
+      grid[row][col] = word[i];
+      cells.push({ row, col, letter: word[i] });
+    }
+
+    const endRow = startRow + direction.dr * (word.length - 1);
+    const endCol = startCol + direction.dc * (word.length - 1);
+
+    return {
+      word,
+      startRow,
+      startCol,
+      endRow,
+      endCol,
+      direction: direction.name as WordPosition["direction"],
+      cells,
+    };
+  };
+
+  // Fill empty cells with random letters
+  const fillEmptyCells = (grid: string[][], gridSize: number) => {
+    const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    for (let row = 0; row < gridSize; row++) {
+      for (let col = 0; col < gridSize; col++) {
+        if (grid[row][col] === "") {
+          grid[row][col] = letters[Math.floor(Math.random() * letters.length)];
+        }
+      }
+    }
+  };
+
   const generateWordSearchGrid = () => {
     if (words.length < 3) {
       alert("Adicione pelo menos 3 palavras para gerar o caça-palavras");
       return;
     }
 
-    try {
-      const wordList = words.map((w) => w.word);
+    const wordList = words.map((w) => w.word);
+    console.log("Generating word search with words:", wordList);
 
-      console.log("Generating word search with words:", wordList);
+    const result = generateEnhancedWordSearch(wordList);
 
-      // Calculate appropriate grid size based on word count and length
-      const longestWord = Math.max(...wordList.map((w) => w.length));
-      const wordCount = wordList.length;
-      // Make grid larger to accommodate more words in different directions
-      const gridSize = Math.max(
-        20,
-        Math.min(30, longestWord + Math.ceil(Math.sqrt(wordCount)) + 5),
-      );
+    if (result) {
+      setWordSearchGrid(result);
 
-      let result;
-
-      try {
-        console.log(
-          "Available WordSearchGenerator methods:",
-          Object.keys(WordSearchGenerator),
-        );
-
-        // Try different ways to call the library
-        if (typeof WordSearchGenerator.generateWordSearch === "function") {
-          console.log("Using WordSearchGenerator.generateWordSearch");
-          result = WordSearchGenerator.generateWordSearch(wordList, {
-            rows: gridSize,
-            cols: gridSize,
-            allowBackwards: true,
-            allowVertical: true,
-            allowDiagonal: true,
-          });
-        } else if (typeof WordSearchGenerator.default === "function") {
-          console.log("Using WordSearchGenerator.default");
-          result = WordSearchGenerator.default(wordList, {
-            rows: gridSize,
-            cols: gridSize,
-            allowBackwards: true,
-            allowVertical: true,
-            allowDiagonal: true,
-          });
-        } else if (typeof WordSearchGenerator === "function") {
-          console.log("Using WordSearchGenerator directly");
-          result = WordSearchGenerator(wordList, {
-            rows: gridSize,
-            cols: gridSize,
-            allowBackwards: true,
-            allowVertical: true,
-            allowDiagonal: true,
-          });
-        } else {
-          console.log(
-            "No library function found, available:",
-            WordSearchGenerator,
-          );
-          throw new Error("Library function not found");
-        }
-      } catch (libError) {
-        console.warn("Library error, using enhanced fallback:", libError);
-        // Fallback: create an improved grid manually
-        result = createSimpleWordSearch(wordList, gridSize);
-      }
-
-      console.log("Generated result:", result);
-
-      if (result && result.grid) {
-        setWordSearchGrid(result);
-      } else {
-        console.error("No valid result from generateWordSearch");
-        // Try fallback
-        const fallbackResult = createSimpleWordSearch(wordList, gridSize);
-        if (fallbackResult) {
-          setWordSearchGrid(fallbackResult);
-        } else {
-          alert(
-            "Não foi possível gerar o caça-palavras com essas palavras. Tente palavras diferentes.",
-          );
-        }
-      }
-    } catch (error) {
-      console.error("Error generating word search:", error);
-      alert("Erro ao gerar o caça-palavras. Tente palavras diferentes.");
-    }
-  };
-
-  // Improved fallback function to create a proper word search manually
-  const createSimpleWordSearch = (
-    wordList: string[],
-    size: number,
-  ): WordSearchResult | null => {
-    try {
-      // Create empty grid
-      const grid: string[][] = Array(size)
-        .fill(null)
-        .map(() => Array(size).fill(""));
-      const solution: Array<{
-        word: string;
-        startRow: number;
-        startCol: number;
-        endRow: number;
-        endCol: number;
-      }> = [];
-
-      // Directions: horizontal, vertical, diagonal (8 directions)
-      const directions = [
-        { dr: 0, dc: 1 }, // horizontal right
-        { dr: 0, dc: -1 }, // horizontal left
-        { dr: 1, dc: 0 }, // vertical down
-        { dr: -1, dc: 0 }, // vertical up
-        { dr: 1, dc: 1 }, // diagonal down-right
-        { dr: 1, dc: -1 }, // diagonal down-left
-        { dr: -1, dc: 1 }, // diagonal up-right
-        { dr: -1, dc: -1 }, // diagonal up-left
-      ];
-
-      // Shuffle words to randomize placement order
-      const shuffledWords = [...wordList].sort(() => Math.random() - 0.5);
-
-      // Function to check if a word can be placed at a position
-      const canPlaceWord = (
-        word: string,
-        row: number,
-        col: number,
-        direction: { dr: number; dc: number },
-      ): boolean => {
-        for (let i = 0; i < word.length; i++) {
-          const newRow = row + direction.dr * i;
-          const newCol = col + direction.dc * i;
-
-          // Check bounds
-          if (newRow < 0 || newRow >= size || newCol < 0 || newCol >= size) {
-            return false;
-          }
-
-          // Check if cell is empty or has the same letter
-          if (grid[newRow][newCol] !== "" && grid[newRow][newCol] !== word[i]) {
-            return false;
-          }
-        }
-        return true;
-      };
-
-      // Function to place a word at a position
-      const placeWord = (
-        word: string,
-        row: number,
-        col: number,
-        direction: { dr: number; dc: number },
-      ): void => {
-        const endRow = row + direction.dr * (word.length - 1);
-        const endCol = col + direction.dc * (word.length - 1);
-
-        for (let i = 0; i < word.length; i++) {
-          const newRow = row + direction.dr * i;
-          const newCol = col + direction.dc * i;
-          grid[newRow][newCol] = word[i];
-        }
-
-        solution.push({
-          word,
-          startRow: row,
-          startCol: col,
-          endRow: endRow,
-          endCol: endCol,
+      // Scroll automático para mostrar a atividade gerada
+      setTimeout(() => {
+        gridRef.current?.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
         });
-      };
+      }, 100);
 
-      // Try to place each word
-      for (const word of shuffledWords) {
-        let placed = false;
-        let attempts = 0;
-        const maxAttempts = 100;
-
-        while (!placed && attempts < maxAttempts) {
-          // Random position and direction
-          const row = Math.floor(Math.random() * size);
-          const col = Math.floor(Math.random() * size);
-          const direction =
-            directions[Math.floor(Math.random() * directions.length)];
-
-          if (canPlaceWord(word, row, col, direction)) {
-            placeWord(word, row, col, direction);
-            placed = true;
-          }
-          attempts++;
-        }
-
-        // If couldn't place randomly, try systematically
-        if (!placed) {
-          outerLoop: for (let r = 0; r < size; r++) {
-            for (let c = 0; c < size; c++) {
-              for (const direction of directions) {
-                if (canPlaceWord(word, r, c, direction)) {
-                  placeWord(word, r, c, direction);
-                  placed = true;
-                  break outerLoop;
-                }
-              }
-            }
-          }
-        }
-
-        if (!placed) {
-          console.warn(`Could not place word: ${word}`);
-        }
+      if (result.unplacedWords.length > 0) {
+        alert(
+          `Aviso: ${result.unplacedWords.length} palavra(s) não puderam ser colocadas na grade: ${result.unplacedWords.join(", ")}. ` +
+            "Tente usar palavras menores ou reduza a quantidade de palavras.",
+        );
       }
-
-      // Fill empty cells with random letters
-      const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-      for (let r = 0; r < size; r++) {
-        for (let c = 0; c < size; c++) {
-          if (!grid[r][c]) {
-            grid[r][c] = letters[Math.floor(Math.random() * letters.length)];
-          }
-        }
-      }
-
-      console.log(
-        `Successfully placed ${solution.length} out of ${wordList.length} words`,
-      );
-
-      return {
-        grid,
-        solution,
-        size: { rows: size, cols: size },
-      };
-    } catch (error) {
-      console.error("Error in fallback word search generation:", error);
-      return null;
+    } else {
+      alert("Erro ao gerar o caça-palavras. Tente com palavras diferentes.");
     }
   };
+
+  // Array de cores vibrantes para destacar cada palavra
+  const colors = [
+    { bg: "bg-red-200", text: "text-red-800", name: "Vermelho" },
+    { bg: "bg-blue-200", text: "text-blue-800", name: "Azul" },
+    { bg: "bg-green-200", text: "text-green-800", name: "Verde" },
+    { bg: "bg-yellow-200", text: "text-yellow-800", name: "Amarelo" },
+    { bg: "bg-purple-200", text: "text-purple-800", name: "Roxo" },
+    { bg: "bg-pink-200", text: "text-pink-800", name: "Rosa" },
+    { bg: "bg-indigo-200", text: "text-indigo-800", name: "Índigo" },
+    { bg: "bg-orange-200", text: "text-orange-800", name: "Laranja" },
+    { bg: "bg-teal-200", text: "text-teal-800", name: "Verde-água" },
+    { bg: "bg-cyan-200", text: "text-cyan-800", name: "Ciano" },
+    { bg: "bg-lime-200", text: "text-lime-800", name: "Lima" },
+    { bg: "bg-emerald-200", text: "text-emerald-800", name: "Esmeralda" },
+    { bg: "bg-rose-200", text: "text-rose-800", name: "Rosa-escuro" },
+    { bg: "bg-violet-200", text: "text-violet-800", name: "Violeta" },
+    { bg: "bg-sky-200", text: "text-sky-800", name: "Céu" },
+    { bg: "bg-amber-200", text: "text-amber-800", name: "Âmbar" },
+    { bg: "bg-fuchsia-200", text: "text-fuchsia-800", name: "Fúcsia" },
+    { bg: "bg-slate-200", text: "text-slate-800", name: "Ardósia" },
+    { bg: "bg-zinc-200", text: "text-zinc-800", name: "Zinco" },
+    { bg: "bg-neutral-200", text: "text-neutral-800", name: "Neutro" },
+  ];
 
   const renderGrid = () => {
     if (!wordSearchGrid) return null;
+
+    // Criar mapa de células para palavras com suas cores
+    const cellColorMap = new Map<
+      string,
+      { colorIndex: number; word: string }
+    >();
+
+    wordSearchGrid.solutions.forEach((solution, index) => {
+      const colorIndex = index % colors.length;
+      solution.cells.forEach((cell) => {
+        const key = `${cell.row}-${cell.col}`;
+        cellColorMap.set(key, { colorIndex, word: solution.word });
+      });
+    });
 
     return (
       <div className="flex flex-col items-center gap-8">
@@ -380,42 +386,111 @@ export default function CacaPalavras() {
           }}
         >
           {wordSearchGrid.grid.map((row, y) =>
-            row.map((cell, x) => (
-              <div
-                key={`${x}-${y}`}
-                className="w-8 h-8 border border-gray-300 flex items-center justify-center text-sm font-bold bg-white hover:bg-green-50 transition-colors duration-200"
-              >
-                <span className="text-gray-800">{cell}</span>
-              </div>
-            )),
+            row.map((cell, x) => {
+              const cellKey = `${y}-${x}`;
+              const cellInfo = cellColorMap.get(cellKey);
+              const isHighlighted = cellInfo !== undefined;
+              const color = isHighlighted ? colors[cellInfo.colorIndex] : null;
+
+              return (
+                <div
+                  key={`${x}-${y}`}
+                  className={`w-8 h-8 border border-gray-300 flex items-center justify-center text-sm font-bold transition-all duration-200 ${
+                    isHighlighted
+                      ? `${color?.bg} ${color?.text} border-2 border-gray-400 shadow-sm scale-105`
+                      : "bg-white text-gray-800 hover:bg-gray-50"
+                  }`}
+                  title={
+                    isHighlighted ? `Palavra: ${cellInfo.word}` : undefined
+                  }
+                >
+                  <span className="font-extrabold">{cell}</span>
+                </div>
+              );
+            }),
           )}
         </div>
 
+        {/* Legenda de cores */}
         <div className="w-full max-w-4xl">
           <Card className="border-l-4 border-l-green-500 shadow-lg hover:shadow-xl transition-all duration-300">
             <CardHeader className="bg-gradient-to-r from-green-50 to-green-100">
               <CardTitle className="text-green-700 flex items-center gap-2">
                 <Search className="w-5 h-5" />
-                Palavras para Encontrar
+                Palavras Encontradas com Cores
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-6">
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                {words.map((w, index) => (
-                  <div
-                    key={w.id}
-                    className="text-sm p-3 rounded-lg bg-green-50 hover:bg-green-100 transition-colors duration-200 text-center"
-                  >
-                    <span className="font-bold text-green-600">{w.word}</span>
-                  </div>
-                ))}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {wordSearchGrid.solutions.map((solution, index) => {
+                  const colorIndex = index % colors.length;
+                  const color = colors[colorIndex];
+
+                  return (
+                    <div
+                      key={`${solution.word}-${index}`}
+                      className={`flex items-center gap-3 p-4 rounded-lg border-2 ${color.bg} border-gray-300 shadow-sm hover:shadow-md transition-all duration-200`}
+                    >
+                      <div
+                        className={`w-6 h-6 rounded-full ${color.bg} border-2 border-gray-400 flex items-center justify-center`}
+                      >
+                        <span className="text-xs font-bold text-gray-600">
+                          {index + 1}
+                        </span>
+                      </div>
+                      <div className="flex-1">
+                        <span className={`font-bold text-base ${color.text}`}>
+                          {solution.word}
+                        </span>
+                        <div className="text-xs text-gray-600 mt-1">
+                          {solution.direction} • ({solution.startRow + 1},
+                          {solution.startCol + 1}) → ({solution.endRow + 1},
+                          {solution.endCol + 1})
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
+
+              {wordSearchGrid.unplacedWords.length > 0 && (
+                <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                  <p className="text-sm text-yellow-700">
+                    <strong>Palavras não colocadas:</strong>{" "}
+                    {wordSearchGrid.unplacedWords.join(", ")}
+                  </p>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
       </div>
     );
   };
+
+  // Cores RGB para PDF (equivalentes às cores Tailwind usadas na grade)
+  const pdfColors = [
+    { r: 254, g: 202, b: 202 }, // red-200
+    { r: 191, g: 219, b: 254 }, // blue-200
+    { r: 187, g: 247, b: 208 }, // green-200
+    { r: 254, g: 240, b: 138 }, // yellow-200
+    { r: 221, g: 214, b: 254 }, // purple-200
+    { r: 251, g: 207, b: 232 }, // pink-200
+    { r: 199, g: 210, b: 254 }, // indigo-200
+    { r: 254, g: 215, b: 170 }, // orange-200
+    { r: 153, g: 246, b: 228 }, // teal-200
+    { r: 165, g: 243, b: 252 }, // cyan-200
+    { r: 217, g: 249, b: 157 }, // lime-200
+    { r: 167, g: 243, b: 208 }, // emerald-200
+    { r: 254, g: 205, b: 211 }, // rose-200
+    { r: 196, g: 181, b: 253 }, // violet-200
+    { r: 186, g: 230, b: 253 }, // sky-200
+    { r: 253, g: 230, b: 138 }, // amber-200
+    { r: 245, g: 208, b: 254 }, // fuchsia-200
+    { r: 226, g: 232, b: 240 }, // slate-200
+    { r: 228, g: 228, b: 231 }, // zinc-200
+    { r: 229, g: 229, b: 229 }, // neutral-200
+  ];
 
   const exportToPDF = (withAnswers: boolean) => {
     if (!wordSearchGrid) {
@@ -442,27 +517,57 @@ export default function CacaPalavras() {
       pdf.setFontSize(12);
       pdf.setFont("helvetica", "normal");
 
-      const underlineLength = 40;
-      const spacing = 60;
+      // Calcular espaçamento baseado na largura da página
+      const margin = 20;
+      const availableWidth = pageWidth - margin * 2; // Largura disponível
+      const fieldSpacing = 8; // Espaçamento entre campos
 
-      pdf.text("Nome:", 20, currentY);
-      pdf.line(35, currentY + 1, 35 + underlineLength, currentY + 1);
+      // Larguras dos textos dos labels
+      const nomeTextWidth = pdf.getTextWidth("Nome:");
+      const turmaTextWidth = pdf.getTextWidth("Turma:");
+      const dataTextWidth = pdf.getTextWidth("Data:");
 
-      pdf.text("Turma:", 20 + spacing + underlineLength, currentY);
-      pdf.line(
-        35 + spacing + underlineLength + 15,
-        currentY + 1,
-        35 + spacing + underlineLength + 15 + 25,
-        currentY + 1,
-      );
+      // Calcular largura disponível para as linhas dividida proporcionalmente
+      const totalLabelWidth =
+        nomeTextWidth + turmaTextWidth + dataTextWidth + fieldSpacing * 6;
+      const lineWidth = (availableWidth - totalLabelWidth) / 3;
 
-      pdf.text("Data:", 20 + (spacing + underlineLength) * 1.7, currentY);
-      pdf.line(
-        35 + (spacing + underlineLength) * 1.7 + 15,
-        currentY + 1,
-        35 + (spacing + underlineLength) * 1.7 + 15 + 25,
-        currentY + 1,
-      );
+      // Posições dos campos
+      let currentX = margin;
+
+      // Campo Nome
+      pdf.text("Nome:", currentX, currentY);
+      currentX += nomeTextWidth + fieldSpacing;
+      pdf.line(currentX, currentY + 1, currentX + lineWidth, currentY + 1);
+      currentX += lineWidth + fieldSpacing;
+
+      // Campo Turma
+      pdf.text("Turma:", currentX, currentY);
+      currentX += turmaTextWidth + fieldSpacing;
+      pdf.line(currentX, currentY + 1, currentX + lineWidth, currentY + 1);
+      currentX += lineWidth + fieldSpacing;
+
+      // Campo Data (verificar se cabe na página)
+      if (
+        currentX + dataTextWidth + fieldSpacing + lineWidth <=
+        pageWidth - margin
+      ) {
+        pdf.text("Data:", currentX, currentY);
+        currentX += dataTextWidth + fieldSpacing;
+        pdf.line(currentX, currentY + 1, currentX + lineWidth, currentY + 1);
+      } else {
+        // Se não cabe, colocar em uma nova linha
+        currentY += 8;
+        currentX = margin;
+        pdf.text("Data:", currentX, currentY);
+        currentX += dataTextWidth + fieldSpacing;
+        pdf.line(
+          currentX,
+          currentY + 1,
+          currentX + lineWidth * 1.5,
+          currentY + 1,
+        );
+      }
 
       currentY += 15;
     }
@@ -483,6 +588,17 @@ export default function CacaPalavras() {
     const gridStartX = (pageWidth - gridWidth) / 2;
     const gridStartY = currentY + 10;
 
+    // Create mapping of cells to word colors
+    const cellColorMap = new Map<string, number>();
+    if (withAnswers) {
+      wordSearchGrid.solutions.forEach((solution, solutionIndex) => {
+        const colorIndex = solutionIndex % pdfColors.length;
+        solution.cells.forEach((cell) => {
+          cellColorMap.set(`${cell.row}-${cell.col}`, colorIndex);
+        });
+      });
+    }
+
     // Draw the grid
     pdf.setLineWidth(0.3);
     pdf.setFontSize(Math.max(6, finalCellSize * 0.6));
@@ -493,59 +609,41 @@ export default function CacaPalavras() {
         const cellX = gridStartX + x * finalCellSize;
         const cellY = gridStartY + y * finalCellSize;
 
+        // Check if cell is part of a solution and get its color
+        const cellKey = `${y}-${x}`;
+        const colorIndex = cellColorMap.get(cellKey);
+        const isHighlighted = colorIndex !== undefined;
+
+        // Draw cell border
+        pdf.setDrawColor(0, 0, 0);
+        pdf.setLineWidth(0.3);
         pdf.rect(cellX, cellY, finalCellSize, finalCellSize);
 
+        // Highlight cell with word-specific color if it's part of a solution
+        if (withAnswers && isHighlighted) {
+          const color = pdfColors[colorIndex];
+          pdf.setFillColor(color.r, color.g, color.b);
+          pdf.rect(cellX, cellY, finalCellSize, finalCellSize, "F");
+          pdf.setDrawColor(100, 100, 100); // Darker border for highlighted cells
+          pdf.setLineWidth(0.5);
+          pdf.rect(cellX, cellY, finalCellSize, finalCellSize); // Redraw border
+          pdf.setDrawColor(0, 0, 0); // Reset border color
+          pdf.setLineWidth(0.3);
+        }
+
+        // Draw letter
         const letter = wordSearchGrid.grid[y][x];
         const textWidth = pdf.getTextWidth(letter);
+        pdf.setTextColor(0, 0, 0);
         pdf.text(
           letter,
           cellX + (finalCellSize - textWidth) / 2,
           cellY + finalCellSize * 0.7,
         );
-
-        // Highlight found words if showing answers
-        if (withAnswers) {
-          const isPartOfWord = wordSearchGrid.solution.some((solution) => {
-            const { startRow, startCol, endRow, endCol } = solution;
-            const minRow = Math.min(startRow, endRow);
-            const maxRow = Math.max(startRow, endRow);
-            const minCol = Math.min(startCol, endCol);
-            const maxCol = Math.max(startCol, endCol);
-
-            // Check if current cell is on the line between start and end
-            if (startRow === endRow) {
-              return y === startRow && x >= minCol && x <= maxCol;
-            } else if (startCol === endCol) {
-              return x === startCol && y >= minRow && y <= maxRow;
-            } else {
-              // Diagonal
-              const deltaRow = endRow - startRow;
-              const deltaCol = endCol - startCol;
-              const currentDeltaRow = y - startRow;
-              const currentDeltaCol = x - startCol;
-
-              return (
-                currentDeltaRow / deltaRow === currentDeltaCol / deltaCol &&
-                currentDeltaRow >= 0 &&
-                currentDeltaRow <= Math.abs(deltaRow) &&
-                currentDeltaCol >= 0 &&
-                currentDeltaCol <= Math.abs(deltaCol)
-              );
-            }
-          });
-
-          if (isPartOfWord) {
-            pdf.setDrawColor(255, 0, 0);
-            pdf.setLineWidth(1);
-            pdf.rect(cellX, cellY, finalCellSize, finalCellSize);
-            pdf.setDrawColor(0, 0, 0);
-            pdf.setLineWidth(0.3);
-          }
-        }
       }
     }
 
-    // Add word list
+    // Add word list with colors if showing answers
     const wordsStartY = gridStartY + gridHeight + 20;
     pdf.setFontSize(14);
     pdf.setFont("helvetica", "bold");
@@ -554,19 +652,47 @@ export default function CacaPalavras() {
     pdf.setFontSize(10);
     pdf.setFont("helvetica", "normal");
 
-    const wordsPerColumn = Math.ceil(words.length / 3);
-    const columnWidth = (pageWidth - 40) / 3;
+    if (withAnswers) {
+      // Show words with their corresponding colors
+      const wordsPerColumn = Math.ceil(wordSearchGrid.solutions.length / 3);
+      const columnWidth = (pageWidth - 40) / 3;
 
-    words.forEach((w, index) => {
-      const column = Math.floor(index / wordsPerColumn);
-      const row = index % wordsPerColumn;
-      const x = 20 + column * columnWidth;
-      const y = wordsStartY + 10 + row * 6;
+      wordSearchGrid.solutions.forEach((solution, index) => {
+        const colorIndex = index % pdfColors.length;
+        const color = pdfColors[colorIndex];
+        const column = Math.floor(index / wordsPerColumn);
+        const row = index % wordsPerColumn;
+        const x = 20 + column * columnWidth;
+        const y = wordsStartY + 10 + row * 8;
 
-      if (y < pageHeight - 10) {
-        pdf.text(`• ${w.word}`, x, y);
-      }
-    });
+        if (y < pageHeight - 10) {
+          // Draw colored square indicator
+          pdf.setFillColor(color.r, color.g, color.b);
+          pdf.setDrawColor(100, 100, 100);
+          pdf.rect(x, y - 3, 3, 3, "FD");
+
+          // Draw word
+          pdf.setTextColor(0, 0, 0);
+          pdf.text(`${solution.word}`, x + 5, y);
+        }
+      });
+    } else {
+      // Show words without colors (original layout)
+      const wordsToShow = wordSearchGrid.placedWords;
+      const wordsPerColumn = Math.ceil(wordsToShow.length / 3);
+      const columnWidth = (pageWidth - 40) / 3;
+
+      wordsToShow.forEach((word, index) => {
+        const column = Math.floor(index / wordsPerColumn);
+        const row = index % wordsPerColumn;
+        const x = 20 + column * columnWidth;
+        const y = wordsStartY + 10 + row * 6;
+
+        if (y < pageHeight - 10) {
+          pdf.text(`• ${word}`, x, y);
+        }
+      });
+    }
 
     const filename = `${searchTitle.toLowerCase().replace(/\s+/g, "-")}-${withAnswers ? "gabarito" : "em-branco"}.pdf`;
     pdf.save(filename);
@@ -596,265 +722,281 @@ export default function CacaPalavras() {
             Gerador de Caça-Palavras
           </h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Crie caça-palavras personalizados de forma fácil e rápida
+            Crie caça-palavras personalizados com posicionamento preciso das
+            respostas
           </p>
           <div className="flex justify-center mt-4">
             <Search className="w-6 h-6 text-emerald-500 animate-pulse" />
           </div>
         </div>
 
-        <div className="max-w-5xl mx-auto space-y-8">
-          {/* Title and Header Info Section */}
-          <Card className="shadow-xl border-0 bg-gradient-to-r from-white to-green-50 hover:shadow-2xl transition-shadow duration-300">
-            <CardHeader>
-              <CardTitle className="text-green-700 flex items-center gap-2">
-                <FileText className="w-5 h-5" />
-                Configurações do Caça-Palavras
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div>
-                <Label
-                  htmlFor="title"
-                  className="text-sm font-medium text-gray-700 mb-2 block"
-                >
-                  Título do Caça-Palavras
-                </Label>
-                <Input
-                  id="title"
-                  placeholder="Digite o título do caça-palavras"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  className="border-2 border-green-200 focus:border-green-400 transition-colors duration-200"
-                />
-              </div>
+        <div className="max-w-7xl mx-auto space-y-8">
+          {/* Layout em duas colunas */}
+          <div className="grid lg:grid-cols-2 gap-8">
+            {/* Coluna esquerda - Configurações */}
+            <div className="space-y-6">
+              {/* Title and Header Info Section */}
+              <Card className="shadow-xl border-0 bg-gradient-to-r from-white to-green-50 hover:shadow-2xl transition-shadow duration-300">
+                <CardHeader>
+                  <CardTitle className="text-green-700 flex items-center gap-2">
+                    <FileText className="w-5 h-5" />
+                    Configurações do Caça-Palavras
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div>
+                    <Label
+                      htmlFor="title"
+                      className="text-sm font-medium text-gray-700 mb-2 block"
+                    >
+                      Título do Caça-Palavras
+                    </Label>
+                    <Input
+                      id="title"
+                      placeholder="Digite o título do caça-palavras"
+                      value={title}
+                      onChange={(e) => setTitle(e.target.value)}
+                      className="border-2 border-green-200 focus:border-green-400 transition-colors duration-200"
+                    />
+                  </div>
 
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="header-info"
-                  checked={showHeaderInfo}
-                  onCheckedChange={setShowHeaderInfo}
-                  className="border-2 border-green-300"
-                />
-                <Label
-                  htmlFor="header-info"
-                  className="text-sm font-medium text-gray-700"
-                >
-                  Incluir campos para Nome, Turma e Data no PDF
-                </Label>
-              </div>
-            </CardContent>
-          </Card>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="header-info"
+                      checked={showHeaderInfo}
+                      onCheckedChange={setShowHeaderInfo}
+                      className="border-2 border-green-300"
+                    />
+                    <Label
+                      htmlFor="header-info"
+                      className="text-sm font-medium text-gray-700"
+                    >
+                      Incluir campos para Nome, Turma e Data no PDF
+                    </Label>
+                  </div>
+                </CardContent>
+              </Card>
 
-          {/* Mode Switch */}
-          <Card className="shadow-xl border-0 bg-gradient-to-r from-white to-emerald-50 hover:shadow-2xl transition-shadow duration-300">
-            <CardHeader>
-              <CardTitle className="text-emerald-700 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  {isAIMode ? (
-                    <Bot className="w-5 h-5" />
-                  ) : (
-                    <User className="w-5 h-5" />
-                  )}
-                  {isAIMode ? "Modo IA" : "Modo Manual"}
-                </div>
-                <div className="flex items-center gap-3">
-                  <Label
-                    htmlFor="mode-switch"
-                    className="text-sm font-medium text-gray-600"
-                  >
-                    {isAIMode ? "IA" : "Manual"}
-                  </Label>
-                  <Switch
-                    id="mode-switch"
-                    checked={isAIMode}
-                    onCheckedChange={setIsAIMode}
-                  />
-                </div>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {!isAIMode ? (
-                // Manual Mode
-                <div className="grid md:grid-cols-2 gap-4">
-                  <Input
-                    ref={wordInputRef}
-                    placeholder="Digite a palavra"
-                    value={word}
-                    onChange={(e) => setWord(e.target.value)}
-                    onKeyPress={handleKeyPress}
-                    className="uppercase border-2 border-emerald-200 focus:border-emerald-400 transition-colors duration-200"
-                  />
-                  <Button
-                    onClick={addWord}
-                    disabled={words.length >= 25}
-                    className="bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
-                  >
-                    <Plus className="w-4 h-4 mr-1" />
-                    Adicionar {words.length >= 25 ? "(Limite: 25)" : ""}
-                  </Button>
-                </div>
-              ) : (
-                // AI Mode
-                <div className="space-y-4">
-                  <div className="grid md:grid-cols-3 gap-4">
-                    <div>
-                      <Label
-                        htmlFor="ai-theme"
-                        className="text-sm font-medium text-gray-700 mb-2 block"
-                      >
-                        Tema
-                      </Label>
-                      <Select value={aiTheme} onValueChange={setAiTheme}>
-                        <SelectTrigger className="border-2 border-emerald-200 focus:border-emerald-400">
-                          <SelectValue placeholder="Selecione o tema" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="animais">Animais</SelectItem>
-                          <SelectItem value="ciencia">Ciência</SelectItem>
-                          <SelectItem value="geografia">Geografia</SelectItem>
-                          <SelectItem value="historia">História</SelectItem>
-                          <SelectItem value="matematica">Matemática</SelectItem>
-                          <SelectItem value="esportes">Esportes</SelectItem>
-                        </SelectContent>
-                      </Select>
+              {/* Mode Switch */}
+              <Card className="shadow-xl border-0 bg-gradient-to-r from-white to-emerald-50 hover:shadow-2xl transition-shadow duration-300">
+                <CardHeader>
+                  <CardTitle className="text-emerald-700 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      {isAIMode ? (
+                        <Bot className="w-5 h-5" />
+                      ) : (
+                        <User className="w-5 h-5" />
+                      )}
+                      {isAIMode ? "Modo IA" : "Modo Manual"}
                     </div>
-                    <div>
+                    <div className="flex items-center gap-3">
                       <Label
-                        htmlFor="ai-difficulty"
-                        className="text-sm font-medium text-gray-700 mb-2 block"
+                        htmlFor="mode-switch"
+                        className="text-sm font-medium text-gray-600"
                       >
-                        Dificuldade
+                        {isAIMode ? "IA" : "Manual"}
                       </Label>
-                      <Select
-                        value={aiDifficulty}
-                        onValueChange={setAiDifficulty}
-                      >
-                        <SelectTrigger className="border-2 border-emerald-200 focus:border-emerald-400">
-                          <SelectValue placeholder="Selecione a dificuldade" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="facil">Fácil</SelectItem>
-                          <SelectItem value="medio">Médio</SelectItem>
-                          <SelectItem value="dificil">Difícil</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label
-                        htmlFor="ai-count"
-                        className="text-sm font-medium text-gray-700 mb-2 block"
-                      >
-                        Quantidade (5-25)
-                      </Label>
-                      <Input
-                        id="ai-count"
-                        type="number"
-                        min="5"
-                        max="25"
-                        value={aiWordCount}
-                        onChange={(e) =>
-                          setAiWordCount(
-                            Math.min(
-                              25,
-                              Math.max(5, parseInt(e.target.value) || 10),
-                            ),
-                          )
-                        }
-                        className="border-2 border-emerald-200 focus:border-emerald-400 transition-colors duration-200"
+                      <Switch
+                        id="mode-switch"
+                        checked={isAIMode}
+                        onCheckedChange={setIsAIMode}
                       />
                     </div>
-                  </div>
-                  <Button
-                    onClick={generateAIWords}
-                    disabled={!aiTheme || !aiDifficulty || isGenerating}
-                    className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
-                  >
-                    {isGenerating ? (
-                      <>
-                        <Sparkles className="w-4 h-4 mr-2 animate-spin" />
-                        Gerando palavras...
-                      </>
-                    ) : (
-                      <>
-                        <Bot className="w-4 h-4 mr-2" />
-                        Gerar Palavras com IA
-                      </>
-                    )}
-                  </Button>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {!isAIMode ? (
+                    // Manual Mode
+                    <div className="space-y-4">
+                      <Input
+                        ref={wordInputRef}
+                        placeholder="Digite a palavra"
+                        value={word}
+                        onChange={(e) => setWord(e.target.value)}
+                        onKeyPress={handleKeyPress}
+                        className="uppercase border-2 border-emerald-200 focus:border-emerald-400 transition-colors duration-200"
+                      />
+                      <Button
+                        onClick={addWord}
+                        disabled={words.length >= 20}
+                        className="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                      >
+                        <Plus className="w-4 h-4 mr-1" />
+                        Adicionar {words.length >= 20 ? "(Limite: 20)" : ""}
+                      </Button>
+                    </div>
+                  ) : (
+                    // AI Mode
+                    <div className="space-y-4">
+                      <div className="space-y-4">
+                        <div>
+                          <Label
+                            htmlFor="ai-theme"
+                            className="text-sm font-medium text-gray-700 mb-2 block"
+                          >
+                            Tema
+                          </Label>
+                          <Select value={aiTheme} onValueChange={setAiTheme}>
+                            <SelectTrigger className="border-2 border-emerald-200 focus:border-emerald-400">
+                              <SelectValue placeholder="Selecione o tema" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="animais">Animais</SelectItem>
+                              <SelectItem value="ciencia">Ciência</SelectItem>
+                              <SelectItem value="geografia">
+                                Geografia
+                              </SelectItem>
+                              <SelectItem value="historia">História</SelectItem>
+                              <SelectItem value="matematica">
+                                Matemática
+                              </SelectItem>
+                              <SelectItem value="esportes">Esportes</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div>
+                          <Label
+                            htmlFor="ai-difficulty"
+                            className="text-sm font-medium text-gray-700 mb-2 block"
+                          >
+                            Dificuldade
+                          </Label>
+                          <Select
+                            value={aiDifficulty}
+                            onValueChange={setAiDifficulty}
+                          >
+                            <SelectTrigger className="border-2 border-emerald-200 focus:border-emerald-400">
+                              <SelectValue placeholder="Selecione a dificuldade" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="facil">Fácil</SelectItem>
+                              <SelectItem value="medio">Médio</SelectItem>
+                              <SelectItem value="dificil">Difícil</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div>
+                          <Label
+                            htmlFor="ai-count"
+                            className="text-sm font-medium text-gray-700 mb-2 block"
+                          >
+                            Quantidade (5-20)
+                          </Label>
+                          <Input
+                            id="ai-count"
+                            type="number"
+                            min="5"
+                            max="20"
+                            value={aiWordCount}
+                            onChange={(e) =>
+                              setAiWordCount(
+                                Math.min(
+                                  20,
+                                  Math.max(5, parseInt(e.target.value) || 10),
+                                ),
+                              )
+                            }
+                            className="border-2 border-emerald-200 focus:border-emerald-400 transition-colors duration-200"
+                          />
+                        </div>
+                      </div>
+                      <Button
+                        onClick={generateAIWords}
+                        disabled={!aiTheme || !aiDifficulty || isGenerating}
+                        className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                      >
+                        {isGenerating ? (
+                          <>
+                            <Sparkles className="w-4 h-4 mr-2 animate-spin" />
+                            Gerando palavras...
+                          </>
+                        ) : (
+                          <>
+                            <Bot className="w-4 h-4 mr-2" />
+                            Gerar Palavras com IA
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
 
-          {/* Words List */}
-          {words.length > 0 && (
-            <Card className="shadow-xl border-0 bg-gradient-to-r from-white to-yellow-50 hover:shadow-2xl transition-shadow duration-300">
-              <CardHeader>
-                <CardTitle className="text-yellow-700 flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Badge
-                      variant="secondary"
-                      className={`${words.length >= 25 ? "bg-red-200 text-red-800" : "bg-yellow-200 text-yellow-800"}`}
-                    >
-                      {words.length}/25
-                    </Badge>
-                    Palavras Adicionadas
-                  </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={clearAllWords}
-                    className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200 hover:border-red-300"
-                  >
-                    <X className="w-4 h-4 mr-1" />
-                    Limpar Todas
-                  </Button>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid gap-3">
-                  {words.map((w) => (
-                    <div
-                      key={w.id}
-                      className="flex items-center justify-between p-4 bg-gradient-to-r from-yellow-50 to-yellow-100 rounded-xl border border-yellow-200 hover:shadow-md transition-shadow duration-200"
-                    >
-                      <div className="flex-1">
+            {/* Coluna direita - Lista de palavras */}
+            <div>
+              {words.length > 0 && (
+                <Card className="shadow-xl border-0 bg-gradient-to-r from-white to-yellow-50 hover:shadow-2xl transition-shadow duration-300 h-fit">
+                  <CardHeader>
+                    <CardTitle className="text-yellow-700 flex items-center justify-between">
+                      <div className="flex items-center gap-2">
                         <Badge
                           variant="secondary"
-                          className="bg-yellow-200 text-yellow-800 font-semibold"
+                          className={`${words.length >= 20 ? "bg-red-200 text-red-800" : "bg-yellow-200 text-yellow-800"}`}
                         >
-                          {w.word}
+                          {words.length}/20
                         </Badge>
+                        Palavras Adicionadas
                       </div>
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => removeWord(w.id)}
-                        className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200 hover:border-red-300 transition-all duration-200"
+                        onClick={clearAllWords}
+                        className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200 hover:border-red-300"
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <X className="w-4 h-4 mr-1" />
+                        Limpar Todas
+                      </Button>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid gap-3 max-h-96 overflow-y-auto">
+                      {words.map((w) => (
+                        <div
+                          key={w.id}
+                          className="flex items-center justify-between p-4 bg-gradient-to-r from-yellow-50 to-yellow-100 rounded-xl border border-yellow-200 hover:shadow-md transition-shadow duration-200"
+                        >
+                          <div className="flex-1">
+                            <Badge
+                              variant="secondary"
+                              className="bg-yellow-200 text-yellow-800 font-semibold"
+                            >
+                              {w.word}
+                            </Badge>
+                          </div>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => removeWord(w.id)}
+                            className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200 hover:border-red-300 transition-all duration-200"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="mt-6">
+                      <Button
+                        onClick={generateWordSearchGrid}
+                        className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
+                        disabled={words.length < 3}
+                      >
+                        <Search className="w-4 h-4 mr-2" />
+                        Gerar Caça-Palavras
                       </Button>
                     </div>
-                  ))}
-                </div>
-                <div className="mt-6">
-                  <Button
-                    onClick={generateWordSearchGrid}
-                    className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
-                    disabled={words.length < 3}
-                  >
-                    <Search className="w-4 h-4 mr-2" />
-                    Gerar Caça-Palavras
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          )}
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          </div>
 
           {/* Word Search Grid */}
           {wordSearchGrid && (
-            <Card className="shadow-2xl border-0 bg-gradient-to-r from-white to-green-50 hover:shadow-3xl transition-shadow duration-300">
+            <Card
+              ref={gridRef}
+              className="shadow-2xl border-0 bg-gradient-to-r from-white to-green-50 hover:shadow-3xl transition-shadow duration-300"
+            >
               <CardHeader>
                 <CardTitle className="text-green-700 flex items-center gap-2">
                   <Search className="w-5 h-5" />
