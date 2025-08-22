@@ -481,270 +481,278 @@ export default function Cruzadinha() {
             Gerador de Cruzadinhas
           </h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Crie cruzadinhas personalizadas de forma fácil e rápida
+            Crie cruzadinhas personalizadas de forma fácil e r��pida
           </p>
           <div className="flex justify-center mt-4">
             <Sparkles className="w-6 h-6 text-purple-500 animate-pulse" />
           </div>
         </div>
 
-        <div className="max-w-5xl mx-auto space-y-8">
-          {/* Title and Header Info Section */}
-          <Card className="shadow-xl border-0 bg-gradient-to-r from-white to-blue-50 hover:shadow-2xl transition-shadow duration-300">
-            <CardHeader>
-              <CardTitle className="text-blue-700 flex items-center gap-2">
-                <FileText className="w-5 h-5" />
-                Configurações da Cruzadinha
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div>
-                <Label
-                  htmlFor="title"
-                  className="text-sm font-medium text-gray-700 mb-2 block"
-                >
-                  Título da Cruzadinha
-                </Label>
-                <Input
-                  id="title"
-                  placeholder="Digite o título da cruzadinha"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  className="border-2 border-blue-200 focus:border-blue-400 transition-colors duration-200"
-                />
-              </div>
+        <div className="max-w-7xl mx-auto space-y-8">
+          {/* Layout em duas colunas */}
+          <div className="grid lg:grid-cols-2 gap-8">
+            {/* Coluna esquerda - Configurações */}
+            <div className="space-y-6">
+              {/* Title and Header Info Section */}
+              <Card className="shadow-xl border-0 bg-gradient-to-r from-white to-blue-50 hover:shadow-2xl transition-shadow duration-300">
+                <CardHeader>
+                  <CardTitle className="text-blue-700 flex items-center gap-2">
+                    <FileText className="w-5 h-5" />
+                    Configurações da Cruzadinha
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div>
+                    <Label
+                      htmlFor="title"
+                      className="text-sm font-medium text-gray-700 mb-2 block"
+                    >
+                      Título da Cruzadinha
+                    </Label>
+                    <Input
+                      id="title"
+                      placeholder="Digite o título da cruzadinha"
+                      value={title}
+                      onChange={(e) => setTitle(e.target.value)}
+                      className="border-2 border-blue-200 focus:border-blue-400 transition-colors duration-200"
+                    />
+                  </div>
 
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="header-info"
-                  checked={showHeaderInfo}
-                  onCheckedChange={setShowHeaderInfo}
-                  className="border-2 border-blue-300"
-                />
-                <Label
-                  htmlFor="header-info"
-                  className="text-sm font-medium text-gray-700"
-                >
-                  Incluir campos para Nome, Turma e Data no PDF (linhas em
-                  branco para o aluno preencher)
-                </Label>
-              </div>
-            </CardContent>
-          </Card>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="header-info"
+                      checked={showHeaderInfo}
+                      onCheckedChange={setShowHeaderInfo}
+                      className="border-2 border-blue-300"
+                    />
+                    <Label
+                      htmlFor="header-info"
+                      className="text-sm font-medium text-gray-700"
+                    >
+                      Incluir campos para Nome, Turma e Data no PDF (linhas em
+                      branco para o aluno preencher)
+                    </Label>
+                  </div>
+                </CardContent>
+              </Card>
 
-          {/* Mode Switch */}
-          <Card className="shadow-xl border-0 bg-gradient-to-r from-white to-indigo-50 hover:shadow-2xl transition-shadow duration-300">
-            <CardHeader>
-              <CardTitle className="text-indigo-700 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  {isAIMode ? (
-                    <Bot className="w-5 h-5" />
-                  ) : (
-                    <User className="w-5 h-5" />
-                  )}
-                  {isAIMode ? "Modo IA" : "Modo Manual"}
-                </div>
-                <div className="flex items-center gap-3">
-                  <Label
-                    htmlFor="mode-switch"
-                    className="text-sm font-medium text-gray-600"
-                  >
-                    {isAIMode ? "IA" : "Manual"}
-                  </Label>
-                  <Switch
-                    id="mode-switch"
-                    checked={isAIMode}
-                    onCheckedChange={setIsAIMode}
-                  />
-                </div>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {!isAIMode ? (
-                // Manual Mode
-                <div className="grid md:grid-cols-3 gap-4">
-                  <Input
-                    ref={wordInputRef}
-                    placeholder="Digite a palavra"
-                    value={word}
-                    onChange={(e) => setWord(e.target.value)}
-                    onKeyPress={handleKeyPress}
-                    className="uppercase border-2 border-green-200 focus:border-green-400 transition-colors duration-200"
-                  />
-                  <Input
-                    placeholder="Digite a dica"
-                    value={clue}
-                    onChange={(e) => setClue(e.target.value)}
-                    onKeyPress={handleKeyPress}
-                    className="border-2 border-green-200 focus:border-green-400 transition-colors duration-200"
-                  />
-                  <Button
-                    onClick={addWordClue}
-                    disabled={wordClues.length >= 20}
-                    className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
-                  >
-                    <Plus className="w-4 h-4 mr-1" />
-                    Adicionar {wordClues.length >= 20 ? "(Limite: 20)" : ""}
-                  </Button>
-                </div>
-              ) : (
-                // AI Mode
-                <div className="space-y-4">
-                  <div className="grid md:grid-cols-3 gap-4">
-                    <div>
-                      <Label
-                        htmlFor="ai-theme"
-                        className="text-sm font-medium text-gray-700 mb-2 block"
-                      >
-                        Tema
-                      </Label>
-                      <Select value={aiTheme} onValueChange={setAiTheme}>
-                        <SelectTrigger className="border-2 border-indigo-200 focus:border-indigo-400">
-                          <SelectValue placeholder="Selecione o tema" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="animais">Animais</SelectItem>
-                          <SelectItem value="ciencia">Ciência</SelectItem>
-                          <SelectItem value="geografia">Geografia</SelectItem>
-                          <SelectItem value="historia">História</SelectItem>
-                          <SelectItem value="matematica">Matemática</SelectItem>
-                          <SelectItem value="esportes">Esportes</SelectItem>
-                        </SelectContent>
-                      </Select>
+              {/* Mode Switch */}
+              <Card className="shadow-xl border-0 bg-gradient-to-r from-white to-indigo-50 hover:shadow-2xl transition-shadow duration-300">
+                <CardHeader>
+                  <CardTitle className="text-indigo-700 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      {isAIMode ? (
+                        <Bot className="w-5 h-5" />
+                      ) : (
+                        <User className="w-5 h-5" />
+                      )}
+                      {isAIMode ? "Modo IA" : "Modo Manual"}
                     </div>
-                    <div>
+                    <div className="flex items-center gap-3">
                       <Label
-                        htmlFor="ai-difficulty"
-                        className="text-sm font-medium text-gray-700 mb-2 block"
+                        htmlFor="mode-switch"
+                        className="text-sm font-medium text-gray-600"
                       >
-                        Dificuldade
+                        {isAIMode ? "IA" : "Manual"}
                       </Label>
-                      <Select
-                        value={aiDifficulty}
-                        onValueChange={setAiDifficulty}
-                      >
-                        <SelectTrigger className="border-2 border-indigo-200 focus:border-indigo-400">
-                          <SelectValue placeholder="Selecione a dificuldade" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="facil">Fácil</SelectItem>
-                          <SelectItem value="medio">Médio</SelectItem>
-                          <SelectItem value="dificil">Difícil</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label
-                        htmlFor="ai-count"
-                        className="text-sm font-medium text-gray-700 mb-2 block"
-                      >
-                        Quantidade (5-20)
-                      </Label>
-                      <Input
-                        id="ai-count"
-                        type="number"
-                        min="5"
-                        max="20"
-                        value={aiWordCount}
-                        onChange={(e) =>
-                          setAiWordCount(
-                            Math.min(
-                              20,
-                              Math.max(5, parseInt(e.target.value) || 10),
-                            ),
-                          )
-                        }
-                        className="border-2 border-indigo-200 focus:border-indigo-400 transition-colors duration-200"
+                      <Switch
+                        id="mode-switch"
+                        checked={isAIMode}
+                        onCheckedChange={setIsAIMode}
                       />
                     </div>
-                  </div>
-                  <Button
-                    onClick={generateAIWords}
-                    disabled={!aiTheme || !aiDifficulty || isGenerating}
-                    className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
-                  >
-                    {isGenerating ? (
-                      <>
-                        <Sparkles className="w-4 h-4 mr-2 animate-spin" />
-                        Gerando palavras...
-                      </>
-                    ) : (
-                      <>
-                        <Bot className="w-4 h-4 mr-2" />
-                        Gerar Palavras com IA
-                      </>
-                    )}
-                  </Button>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {!isAIMode ? (
+                    // Manual Mode
+                    <div className="space-y-4">
+                      <Input
+                        ref={wordInputRef}
+                        placeholder="Digite a palavra"
+                        value={word}
+                        onChange={(e) => setWord(e.target.value)}
+                        onKeyPress={handleKeyPress}
+                        className="uppercase border-2 border-green-200 focus:border-green-400 transition-colors duration-200"
+                      />
+                      <Input
+                        placeholder="Digite a dica"
+                        value={clue}
+                        onChange={(e) => setClue(e.target.value)}
+                        onKeyPress={handleKeyPress}
+                        className="border-2 border-green-200 focus:border-green-400 transition-colors duration-200"
+                      />
+                      <Button
+                        onClick={addWordClue}
+                        disabled={wordClues.length >= 20}
+                        className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                      >
+                        <Plus className="w-4 h-4 mr-1" />
+                        Adicionar {wordClues.length >= 20 ? "(Limite: 20)" : ""}
+                      </Button>
+                    </div>
+                  ) : (
+                    // AI Mode
+                    <div className="space-y-4">
+                      <div className="space-y-4">
+                        <div>
+                          <Label
+                            htmlFor="ai-theme"
+                            className="text-sm font-medium text-gray-700 mb-2 block"
+                          >
+                            Tema
+                          </Label>
+                          <Select value={aiTheme} onValueChange={setAiTheme}>
+                            <SelectTrigger className="border-2 border-indigo-200 focus:border-indigo-400">
+                              <SelectValue placeholder="Selecione o tema" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="animais">Animais</SelectItem>
+                              <SelectItem value="ciencia">Ciência</SelectItem>
+                              <SelectItem value="geografia">Geografia</SelectItem>
+                              <SelectItem value="historia">História</SelectItem>
+                              <SelectItem value="matematica">Matemática</SelectItem>
+                              <SelectItem value="esportes">Esportes</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div>
+                          <Label
+                            htmlFor="ai-difficulty"
+                            className="text-sm font-medium text-gray-700 mb-2 block"
+                          >
+                            Dificuldade
+                          </Label>
+                          <Select
+                            value={aiDifficulty}
+                            onValueChange={setAiDifficulty}
+                          >
+                            <SelectTrigger className="border-2 border-indigo-200 focus:border-indigo-400">
+                              <SelectValue placeholder="Selecione a dificuldade" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="facil">Fácil</SelectItem>
+                              <SelectItem value="medio">Médio</SelectItem>
+                              <SelectItem value="dificil">Difícil</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div>
+                          <Label
+                            htmlFor="ai-count"
+                            className="text-sm font-medium text-gray-700 mb-2 block"
+                          >
+                            Quantidade (5-20)
+                          </Label>
+                          <Input
+                            id="ai-count"
+                            type="number"
+                            min="5"
+                            max="20"
+                            value={aiWordCount}
+                            onChange={(e) =>
+                              setAiWordCount(
+                                Math.min(
+                                  20,
+                                  Math.max(5, parseInt(e.target.value) || 10),
+                                ),
+                              )
+                            }
+                            className="border-2 border-indigo-200 focus:border-indigo-400 transition-colors duration-200"
+                          />
+                        </div>
+                      </div>
+                      <Button
+                        onClick={generateAIWords}
+                        disabled={!aiTheme || !aiDifficulty || isGenerating}
+                        className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                      >
+                        {isGenerating ? (
+                          <>
+                            <Sparkles className="w-4 h-4 mr-2 animate-spin" />
+                            Gerando palavras...
+                          </>
+                        ) : (
+                          <>
+                            <Bot className="w-4 h-4 mr-2" />
+                            Gerar Palavras com IA
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
 
-          {/* Words List */}
-          {wordClues.length > 0 && (
-            <Card className="shadow-xl border-0 bg-gradient-to-r from-white to-yellow-50 hover:shadow-2xl transition-shadow duration-300">
-              <CardHeader>
-                <CardTitle className="text-yellow-700 flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Badge
-                      variant="secondary"
-                      className={`${wordClues.length >= 20 ? "bg-red-200 text-red-800" : "bg-yellow-200 text-yellow-800"}`}
-                    >
-                      {wordClues.length}/20
-                    </Badge>
-                    Palavras Adicionadas
-                  </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={clearAllWords}
-                    className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200 hover:border-red-300"
-                  >
-                    <X className="w-4 h-4 mr-1" />
-                    Limpar Todas
-                  </Button>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid gap-3">
-                  {wordClues.map((wc) => (
-                    <div
-                      key={wc.id}
-                      className="flex items-center justify-between p-4 bg-gradient-to-r from-yellow-50 to-yellow-100 rounded-xl border border-yellow-200 hover:shadow-md transition-shadow duration-200"
-                    >
-                      <div className="flex-1">
+            {/* Coluna direita - Lista de palavras */}
+            <div>
+              {wordClues.length > 0 && (
+                <Card className="shadow-xl border-0 bg-gradient-to-r from-white to-yellow-50 hover:shadow-2xl transition-shadow duration-300 h-fit">
+                  <CardHeader>
+                    <CardTitle className="text-yellow-700 flex items-center justify-between">
+                      <div className="flex items-center gap-2">
                         <Badge
                           variant="secondary"
-                          className="mr-3 bg-yellow-200 text-yellow-800 font-semibold"
+                          className={`${wordClues.length >= 20 ? "bg-red-200 text-red-800" : "bg-yellow-200 text-yellow-800"}`}
                         >
-                          {wc.word}
+                          {wordClues.length}/20
                         </Badge>
-                        <span className="text-gray-700">{wc.clue}</span>
+                        Palavras Adicionadas
                       </div>
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => removeWordClue(wc.id)}
-                        className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200 hover:border-red-300 transition-all duration-200"
+                        onClick={clearAllWords}
+                        className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200 hover:border-red-300"
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <X className="w-4 h-4 mr-1" />
+                        Limpar Todas
+                      </Button>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid gap-3 max-h-96 overflow-y-auto">
+                      {wordClues.map((wc) => (
+                        <div
+                          key={wc.id}
+                          className="flex items-center justify-between p-4 bg-gradient-to-r from-yellow-50 to-yellow-100 rounded-xl border border-yellow-200 hover:shadow-md transition-shadow duration-200"
+                        >
+                          <div className="flex-1">
+                            <Badge
+                              variant="secondary"
+                              className="mr-3 bg-yellow-200 text-yellow-800 font-semibold"
+                            >
+                              {wc.word}
+                            </Badge>
+                            <span className="text-gray-700">{wc.clue}</span>
+                          </div>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => removeWordClue(wc.id)}
+                            className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200 hover:border-red-300 transition-all duration-200"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="mt-6">
+                      <Button
+                        onClick={generateCrossword}
+                        className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
+                        disabled={wordClues.length < 2}
+                      >
+                        <Sparkles className="w-4 h-4 mr-2" />
+                        Gerar Cruzadinha
                       </Button>
                     </div>
-                  ))}
-                </div>
-                <div className="mt-6">
-                  <Button
-                    onClick={generateCrossword}
-                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
-                    disabled={wordClues.length < 2}
-                  >
-                    <Sparkles className="w-4 h-4 mr-2" />
-                    Gerar Cruzadinha
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          )}
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          </div>
 
           {/* Crossword Grid */}
           {crosswordGrid.length > 0 && (
