@@ -80,8 +80,8 @@ export default function CacaPalavras() {
 
   const addWord = () => {
     if (word.trim()) {
-      if (words.length >= 25) {
-        alert("Limite máximo de 25 palavras por caça-palavras atingido.");
+      if (words.length >= 20) {
+        alert("Limite máximo de 20 palavras por caça-palavras atingido.");
         return;
       }
       const newWord: Word = {
@@ -782,11 +782,11 @@ export default function CacaPalavras() {
                   />
                   <Button
                     onClick={addWord}
-                    disabled={words.length >= 25}
+                    disabled={words.length >= 20}
                     className="bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                   >
                     <Plus className="w-4 h-4 mr-1" />
-                    Adicionar {words.length >= 25 ? "(Limite: 25)" : ""}
+                    Adicionar {words.length >= 20 ? "(Limite: 20)" : ""}
                   </Button>
                 </div>
               ) : (
@@ -840,18 +840,18 @@ export default function CacaPalavras() {
                         htmlFor="ai-count"
                         className="text-sm font-medium text-gray-700 mb-2 block"
                       >
-                        Quantidade (5-25)
+                        Quantidade (5-20)
                       </Label>
                       <Input
                         id="ai-count"
                         type="number"
                         min="5"
-                        max="25"
+                        max="20"
                         value={aiWordCount}
                         onChange={(e) =>
                           setAiWordCount(
                             Math.min(
-                              25,
+                              20,
                               Math.max(5, parseInt(e.target.value) || 10),
                             ),
                           )
@@ -890,9 +890,9 @@ export default function CacaPalavras() {
                   <div className="flex items-center gap-2">
                     <Badge
                       variant="secondary"
-                      className={`${words.length >= 25 ? "bg-red-200 text-red-800" : "bg-yellow-200 text-yellow-800"}`}
+                      className={`${words.length >= 20 ? "bg-red-200 text-red-800" : "bg-yellow-200 text-yellow-800"}`}
                     >
-                      {words.length}/25
+                      {words.length}/20
                     </Badge>
                     Palavras Adicionadas
                   </div>
