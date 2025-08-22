@@ -925,19 +925,19 @@ export default function CacaPalavras() {
 
             {/* Coluna direita - Lista de palavras */}
             <div>
-              {words.length > 0 && (
-                <Card className="shadow-xl border-0 bg-gradient-to-r from-white to-yellow-50 hover:shadow-2xl transition-shadow duration-300 h-fit">
-                  <CardHeader>
-                    <CardTitle className="text-yellow-700 flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <Badge
-                          variant="secondary"
-                          className={`${words.length >= 20 ? "bg-red-200 text-red-800" : "bg-yellow-200 text-yellow-800"}`}
-                        >
-                          {words.length}/20
-                        </Badge>
-                        Palavras Adicionadas
-                      </div>
+              <Card className="shadow-xl border-0 bg-gradient-to-r from-white to-yellow-50 hover:shadow-2xl transition-shadow duration-300 h-fit">
+                <CardHeader>
+                  <CardTitle className="text-yellow-700 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Badge
+                        variant="secondary"
+                        className={`${words.length >= 20 ? "bg-red-200 text-red-800" : "bg-yellow-200 text-yellow-800"}`}
+                      >
+                        {words.length}/20
+                      </Badge>
+                      Palavras Adicionadas
+                    </div>
+                    {words.length > 0 && (
                       <Button
                         variant="outline"
                         size="sm"
@@ -947,9 +947,19 @@ export default function CacaPalavras() {
                         <X className="w-4 h-4 mr-1" />
                         Limpar Todas
                       </Button>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
+                    )}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {words.length === 0 ? (
+                    <div className="text-center py-8">
+                      <div className="text-gray-400 mb-4">
+                        <Search className="w-12 h-12 mx-auto" />
+                      </div>
+                      <p className="text-gray-600 mb-2">Nenhuma palavra adicionada ainda</p>
+                      <p className="text-sm text-gray-500">Adicione no mínimo 3 palavras para gerar o caça-palavras</p>
+                    </div>
+                  ) : (
                     <div className="grid gap-3 max-h-96 overflow-y-auto">
                       {words.map((w) => (
                         <div
@@ -975,19 +985,19 @@ export default function CacaPalavras() {
                         </div>
                       ))}
                     </div>
-                    <div className="mt-6">
-                      <Button
-                        onClick={generateWordSearchGrid}
-                        className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
-                        disabled={words.length < 3}
-                      >
-                        <Search className="w-4 h-4 mr-2" />
-                        Gerar Caça-Palavras
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
+                  )}
+                  <div className="mt-6">
+                    <Button
+                      onClick={generateWordSearchGrid}
+                      className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
+                      disabled={words.length < 3}
+                    >
+                      <Search className="w-4 h-4 mr-2" />
+                      Gerar Caça-Palavras
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           </div>
 
