@@ -43,9 +43,9 @@ export default function Index() {
       bgColor: "from-emerald-50 to-teal-50",
       iconColor: "text-emerald-600",
       features: [
-        "Palavras em todas direções",
-        "Grade customizável",
-        "Banco de palavras IA",
+        "Modo Manual e IA",
+        "Palavras em todas as direções",
+        "PDF com respostas",
         "Até 20 palavras",
       ],
     },
