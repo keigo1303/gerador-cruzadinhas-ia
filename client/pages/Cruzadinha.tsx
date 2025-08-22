@@ -515,8 +515,7 @@ export default function Cruzadinha() {
                       htmlFor="header-info"
                       className="text-sm font-medium text-gray-700"
                     >
-                      Incluir campos para Nome, Turma e Data no PDF (linhas em
-                      branco para o aluno preencher)
+                      Incluir campos para Nome, Turma e Data no PDF
                     </Label>
                   </div>
                 </CardContent>
