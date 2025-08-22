@@ -25,6 +25,7 @@ import {
   X,
   Bot,
   User,
+  RotateCcw,
 } from "lucide-react";
 import { wordDatabase } from "@shared/word-database";
 
@@ -759,18 +760,32 @@ export default function Cruzadinha() {
 
           {/* Crossword Grid */}
           {crosswordGrid.length > 0 && (
-            <Card
-              ref={crosswordRef}
-              className="shadow-2xl border-0 bg-gradient-to-r from-white to-blue-50 hover:shadow-3xl transition-shadow duration-300"
-            >
-              <CardHeader>
-                <CardTitle className="text-blue-700 flex items-center gap-2">
-                  <Sparkles className="w-5 h-5" />
-                  {title || "Cruzadinha Gerada"}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>{renderGrid()}</CardContent>
-            </Card>
+            <div className="space-y-6">
+              {/* Regenerate Button */}
+              <div className="flex justify-center">
+                <Button
+                  onClick={generateCrossword}
+                  variant="outline"
+                  className="flex items-center gap-2 border-2 border-blue-300 hover:bg-blue-50 shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200"
+                >
+                  <RotateCcw className="w-4 h-4" />
+                  Regerar com Novo Posicionamento
+                </Button>
+              </div>
+
+              <Card
+                ref={crosswordRef}
+                className="shadow-2xl border-0 bg-gradient-to-r from-white to-blue-50 hover:shadow-3xl transition-shadow duration-300"
+              >
+                <CardHeader>
+                  <CardTitle className="text-blue-700 flex items-center gap-2">
+                    <Sparkles className="w-5 h-5" />
+                    {title || "Cruzadinha Gerada"}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>{renderGrid()}</CardContent>
+              </Card>
+            </div>
           )}
 
           {/* Export Buttons */}
