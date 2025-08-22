@@ -53,6 +53,7 @@ export default function BingoPalavras() {
   const [aiTheme, setAiTheme] = React.useState("");
   const [isGenerating, setIsGenerating] = React.useState(false);
   const [currentCardIndex, setCurrentCardIndex] = React.useState(0);
+  const [showStudentInfo, setShowStudentInfo] = React.useState(true);
   const wordInputRef = React.useRef<HTMLInputElement>(null);
   const cardsRef = React.useRef<HTMLDivElement>(null);
 
@@ -293,11 +294,26 @@ export default function BingoPalavras() {
         const card = bingoCards[i + j];
         const cardY = j * (pageHeight / 2) + 20;
 
-        // Student name field
-        pdf.setFontSize(12);
-        pdf.setFont("helvetica", "normal");
-        pdf.text("Nome:", 20, cardY + 10);
-        pdf.line(35, cardY + 11, pageWidth - 20, cardY + 11);
+        // Student info fields (if enabled)
+        let infoFieldsHeight = 0;
+        if (showStudentInfo) {
+          pdf.setFontSize(10);
+          pdf.setFont("helvetica", "normal");
+
+          // Name field
+          pdf.text("Nome:", 20, cardY + 10);
+          pdf.line(35, cardY + 11, 120, cardY + 11);
+
+          // Class field
+          pdf.text("Turma:", 125, cardY + 10);
+          pdf.line(140, cardY + 11, pageWidth - 20, cardY + 11);
+
+          // Date field
+          pdf.text("Data:", 20, cardY + 20);
+          pdf.line(32, cardY + 21, 100, cardY + 21);
+
+          infoFieldsHeight = 25;
+        }
 
         // Calculate grid position and size
         const maxGridSize = 120; // max size in mm
@@ -305,7 +321,7 @@ export default function BingoPalavras() {
         const gridWidth = size * cellSize;
         const gridHeight = size * cellSize;
         const gridStartX = (pageWidth - gridWidth) / 2;
-        const gridStartY = cardY + 25;
+        const gridStartY = cardY + 10 + infoFieldsHeight;
 
         // Draw grid
         pdf.setLineWidth(0.5);
@@ -469,6 +485,20 @@ export default function BingoPalavras() {
                       }
                       className="border-2 border-purple-200 focus:border-purple-400 transition-colors duration-200"
                     />
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="show-student-info"
+                      checked={showStudentInfo}
+                      onCheckedChange={setShowStudentInfo}
+                    />
+                    <Label
+                      htmlFor="show-student-info"
+                      className="text-sm font-medium text-gray-700 cursor-pointer"
+                    >
+                      Exibir campos para nome, turma e data
+                    </Label>
                   </div>
                 </CardContent>
               </Card>
