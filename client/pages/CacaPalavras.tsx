@@ -296,7 +296,15 @@ export default function CacaPalavras() {
     
     if (result) {
       setWordSearchGrid(result);
-      
+
+      // Scroll automático para mostrar a atividade gerada
+      setTimeout(() => {
+        gridRef.current?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }, 100);
+
       if (result.unplacedWords.length > 0) {
         alert(
           `Aviso: ${result.unplacedWords.length} palavra(s) não puderam ser colocadas na grade: ${result.unplacedWords.join(', ')}. ` +
