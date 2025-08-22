@@ -21,6 +21,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <BrowserRouter>
+          <Header />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/cruzadinha" element={<Cruzadinha />} />
