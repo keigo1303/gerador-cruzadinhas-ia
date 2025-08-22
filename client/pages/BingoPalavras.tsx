@@ -19,7 +19,6 @@ import {
   Sparkles,
   Plus,
   X,
-  ArrowLeft,
   Grid3x3,
   Bot,
   User,
@@ -28,7 +27,6 @@ import {
 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { bingoDatabase } from "@shared/bingo-database";
-import { Link } from "react-router-dom";
 
 interface WordDefinition {
   id: string;
@@ -400,15 +398,6 @@ export default function BingoPalavras() {
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-purple-50">
       <div className="container mx-auto px-4 py-8">
         <div className="text-center mb-12">
-          <div className="flex justify-center items-center gap-4 mb-6">
-            <Link
-              to="/"
-              className="inline-flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-800 bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-200"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Voltar
-            </Link>
-          </div>
 
           <h1 className="text-5xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-purple-800 bg-clip-text text-transparent mb-4">
             Gerador de Bingo de Palavras
