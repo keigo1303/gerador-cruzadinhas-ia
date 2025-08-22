@@ -179,15 +179,6 @@ export default function CacaPalavras() {
     const placedWords: string[] = [];
     const unplacedWords: string[] = [];
 
-    // Prepare word list with mirrored options if enabled
-    const wordsToPlace: Array<{word: string, reversed: boolean}> = [];
-    wordList.forEach(word => {
-      wordsToPlace.push({word, reversed: false});
-      if (allowMirrored) {
-        wordsToPlace.push({word: word.split('').reverse().join(''), reversed: true});
-      }
-    });
-
     // Sort words by length (longest first) for better placement
     const sortedWords = [...wordList].sort((a, b) => b.length - a.length);
 
@@ -206,9 +197,9 @@ export default function CacaPalavras() {
         const direction =
           availableDirections[Math.floor(Math.random() * availableDirections.length)];
 
-        // Try normal word
-        let wordToUse = word;
-        let isReversed = false;
+        // Decide whether to use normal or reversed word (if mirroring is allowed)
+        const useReversed = allowMirrored && Math.random() < 0.5; // 50% chance to reverse if allowed
+        const wordToUse = useReversed ? word.split('').reverse().join('') : word;
 
         if (canPlaceWord(grid, wordToUse, startRow, startCol, direction, gridSize)) {
           const wordPosition = placeWord(
@@ -222,28 +213,8 @@ export default function CacaPalavras() {
           placedWords.push(word); // Always store original word
           placed = true;
           console.log(
-            `Placed "${wordToUse}" at (${startRow},${startCol}) direction: ${direction.name}`,
+            `Placed "${wordToUse}"${useReversed ? ' (reversed)' : ''} at (${startRow},${startCol}) direction: ${direction.name}`,
           );
-        } else if (allowMirrored) {
-          // Try reversed word if mirroring is allowed
-          wordToUse = word.split('').reverse().join('');
-          isReversed = true;
-
-          if (canPlaceWord(grid, wordToUse, startRow, startCol, direction, gridSize)) {
-            const wordPosition = placeWord(
-              grid,
-              wordToUse,
-              startRow,
-              startCol,
-              direction,
-            );
-            solutions.push(wordPosition);
-            placedWords.push(word); // Always store original word
-            placed = true;
-            console.log(
-              `Placed "${wordToUse}" (reversed) at (${startRow},${startCol}) direction: ${direction.name}`,
-            );
-          }
         }
 
         attempts++;
@@ -560,7 +531,7 @@ export default function CacaPalavras() {
       // Calcular espaçamento baseado na largura da página
       const margin = 20;
       const availableWidth = pageWidth - margin * 2; // Largura disponível
-      const fieldSpacing = 8; // Espa��amento entre campos
+      const fieldSpacing = 8; // Espaçamento entre campos
 
       // Larguras dos textos dos labels
       const nomeTextWidth = pdf.getTextWidth("Nome:");
