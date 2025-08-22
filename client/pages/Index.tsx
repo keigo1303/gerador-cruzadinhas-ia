@@ -11,6 +11,7 @@ import {
   Zap,
   Users,
   BookOpen,
+  Trophy,
 } from "lucide-react";
 
 export default function Index() {
@@ -43,10 +44,27 @@ export default function Index() {
       bgColor: "from-emerald-50 to-teal-50",
       iconColor: "text-emerald-600",
       features: [
-        "Palavras em todas direções",
-        "Grade customizável",
-        "Banco de palavras IA",
+        "Modo Manual e IA",
+        "Palavras em todas as direções",
+        "PDF com respostas",
         "Até 20 palavras",
+      ],
+    },
+    {
+      id: "bingo-palavras",
+      title: "Gerador de Bingo de Palavras",
+      description:
+        "Crie cartelas de bingo personalizadas com palavras e definições. Perfeito para revisão de conteúdo.",
+      icon: Trophy,
+      path: "/bingo-palavras",
+      color: "from-purple-600 to-pink-600",
+      bgColor: "from-purple-50 to-pink-50",
+      iconColor: "text-purple-600",
+      features: [
+        "Cartelas 4x4, 5x5 e 6x6",
+        "Múltiplas cartelas únicas",
+        "PDF com definições",
+        "Campo para nome do aluno",
       ],
     },
   ];
@@ -110,7 +128,7 @@ export default function Index() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8 mb-16">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
             {activities.map((activity) => {
               const IconComponent = activity.icon;
 

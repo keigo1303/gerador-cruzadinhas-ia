@@ -10,6 +10,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Cruzadinha from "./pages/Cruzadinha";
 import CacaPalavras from "./pages/CacaPalavras";
+import BingoPalavras from "./pages/BingoPalavras";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -23,6 +24,7 @@ function App() {
             <Route path="/" element={<Index />} />
             <Route path="/cruzadinha" element={<Cruzadinha />} />
             <Route path="/caca-palavras" element={<CacaPalavras />} />
+            <Route path="/bingo-palavras" element={<BingoPalavras />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

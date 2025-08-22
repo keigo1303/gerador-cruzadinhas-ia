@@ -1,0 +1,410 @@
+export const bingoDatabase = {
+  "gramatica-portuguesa": {
+    palavras: [
+      {
+        palavra: "Substantivo",
+        definicao:
+          "Palavra que nomeia seres, objetos, lugares, sentimentos ou ideias.",
+      },
+      {
+        palavra: "Adjetivo",
+        definicao:
+          "Palavra que caracteriza um substantivo, atribuindo-lhe uma qualidade.",
+      },
+      {
+        palavra: "Verbo",
+        definicao: "Palavra que indica ação, estado ou fenômeno da natureza.",
+      },
+      {
+        palavra: "Advérbio",
+        definicao:
+          "Palavra que modifica o sentido de um verbo, adjetivo ou outro advérbio.",
+      },
+      {
+        palavra: "Pronome",
+        definicao: "Palavra que substitui ou acompanha o substantivo.",
+      },
+      {
+        palavra: "Artigo",
+        definicao: "Palavra que define ou indefina o substantivo.",
+      },
+      {
+        palavra: "Preposição",
+        definicao:
+          "Palavra que liga termos da oração, estabelecendo relação entre eles.",
+      },
+      {
+        palavra: "Conjunção",
+        definicao: "Palavra que liga orações ou termos de mesma função.",
+      },
+      {
+        palavra: "Interjeição",
+        definicao: "Palavra que expressa emoção, sentimento ou reação.",
+      },
+      {
+        palavra: "Sujeito",
+        definicao: "Termo da oração que indica quem pratica ou sofre a ação.",
+      },
+      {
+        palavra: "Predicado",
+        definicao: "Termo da oração que traz a informação sobre o sujeito.",
+      },
+      {
+        palavra: "Objeto Direto",
+        definicao:
+          "Complemento verbal que completa o sentido do verbo sem preposição.",
+      },
+      {
+        palavra: "Objeto Indireto",
+        definicao:
+          "Complemento verbal que completa o sentido do verbo com preposição.",
+      },
+      {
+        palavra: "Adjunto Adnominal",
+        definicao:
+          "Termo que acompanha o substantivo, caracterizando-o ou determinando-o.",
+      },
+      {
+        palavra: "Adjunto Adverbial",
+        definicao:
+          "Termo que indica circunstância do verbo, como tempo, lugar ou modo.",
+      },
+      {
+        palavra: "Predicativo",
+        definicao: "Termo que atribui característica ao sujeito ou ao objeto.",
+      },
+      {
+        palavra: "Vocativo",
+        definicao: "Termo usado para chamar ou invocar o interlocutor.",
+      },
+      {
+        palavra: "Complemento Nominal",
+        definicao:
+          "Termo que completa o sentido de um substantivo, adjetivo ou advérbio.",
+      },
+      {
+        palavra: "Orações Coordenadas",
+        definicao: "Orações independentes ligadas por conjunções.",
+      },
+      {
+        palavra: "Orações Subordinadas",
+        definicao: "Orações que dependem de outra para fazer sentido.",
+      },
+      {
+        palavra: "Hiato",
+        definicao: "Encontro de duas vogais em sílabas diferentes.",
+      },
+      {
+        palavra: "Ditongo",
+        definicao: "Encontro de uma vogal e uma semivogal na mesma sílaba.",
+      },
+      {
+        palavra: "Tritongo",
+        definicao:
+          "Encontro de uma vogal entre duas semivogais na mesma sílaba.",
+      },
+      {
+        palavra: "Oxítona",
+        definicao: "Palavra cuja última sílaba é a tônica.",
+      },
+      {
+        palavra: "Paroxítona",
+        definicao: "Palavra cuja penúltima sílaba é a tônica.",
+      },
+      {
+        palavra: "Proparoxítona",
+        definicao: "Palavra cuja antepenúltima sílaba é a tônica.",
+      },
+      {
+        palavra: "Monossílabo",
+        definicao: "Palavra formada por uma única sílaba.",
+      },
+      {
+        palavra: "Polissílaba",
+        definicao: "Palavra formada por quatro ou mais sílabas.",
+      },
+      {
+        palavra: "Sinônimo",
+        definicao: "Palavra que possui sentido semelhante a outra.",
+      },
+      {
+        palavra: "Antônimo",
+        definicao: "Palavra que possui sentido oposto a outra.",
+      },
+      {
+        palavra: "Homônimo",
+        definicao:
+          "Palavra que tem a mesma forma que outra, mas significado diferente.",
+      },
+      {
+        palavra: "Parônimo",
+        definicao:
+          "Palavra parecida na forma ou som com outra, mas de significado diferente.",
+      },
+      {
+        palavra: "Onomatopeia",
+        definicao: "Figura de linguagem que imita sons naturais.",
+      },
+      {
+        palavra: "Metáfora",
+        definicao:
+          "Figura de linguagem que compara elementos de forma implícita.",
+      },
+      {
+        palavra: "Metonímia",
+        definicao:
+          "Figura de linguagem que substitui uma palavra por outra relacionada.",
+      },
+      { palavra: "Antítese", definicao: "Figura que opõe ideias contrárias." },
+      {
+        palavra: "Eufemismo",
+        definicao: "Figura que suaviza uma expressão dura ou desagradável.",
+      },
+      {
+        palavra: "Hipérbole",
+        definicao: "Figura que exagera uma ideia para dar ênfase.",
+      },
+      {
+        palavra: "Ironia",
+        definicao: "Figura que expressa o contrário do que se quer dizer.",
+      },
+      {
+        palavra: "Aliteração",
+        definicao: "Repetição de sons consonantais em sequência.",
+      },
+      {
+        palavra: "Assonância",
+        definicao: "Repetição de sons vocálicos em sequência.",
+      },
+      {
+        palavra: "Paradoxo",
+        definicao: "Figura que une ideias contraditórias.",
+      },
+      {
+        palavra: "Prosopopeia",
+        definicao:
+          "Figura que atribui características humanas a seres inanimados.",
+      },
+      { palavra: "Personificação", definicao: "Outro nome para prosopopeia." },
+      {
+        palavra: "Perífrase",
+        definicao:
+          "Uso de mais palavras para dizer algo que poderia ser dito com menos.",
+      },
+      {
+        palavra: "Pleonasmo",
+        definicao: "Repetição desnecessária de ideias ou palavras.",
+      },
+      {
+        palavra: "Elipse",
+        definicao: "Omissão de um termo facilmente identificado pelo contexto.",
+      },
+      {
+        palavra: "Zeugma",
+        definicao: "Omissão de termo já mencionado anteriormente.",
+      },
+      {
+        palavra: "Anacoluto",
+        definicao: "Quebra da estrutura sintática da frase.",
+      },
+      {
+        palavra: "Anáfora",
+        definicao: "Repetição de palavras no início de frases ou versos.",
+      },
+      {
+        palavra: "Catacrese",
+        definicao:
+          "Uso de uma palavra fora do seu sentido original por falta de termo específico.",
+      },
+      {
+        palavra: "Silepse",
+        definicao:
+          "Concordância feita com a ideia, e não com a forma da palavra.",
+      },
+      {
+        palavra: "Polissíndeto",
+        definicao: "Uso repetido de conjunções para dar ênfase.",
+      },
+      {
+        palavra: "Assíndeto",
+        definicao: "Omissão de conjunções coordenativas.",
+      },
+      {
+        palavra: "Vocabulário",
+        definicao: "Conjunto de palavras usadas por um indivíduo ou grupo.",
+      },
+      {
+        palavra: "Ortografia",
+        definicao:
+          "Conjunto de regras que orientam a forma correta de escrever as palavras.",
+      },
+      {
+        palavra: "Acentuação",
+        definicao:
+          "Uso de sinais gráficos para indicar a tonicidade das palavras.",
+      },
+      {
+        palavra: "Concordância Nominal",
+        definicao: "Regra que faz adjetivos concordarem com substantivos.",
+      },
+      {
+        palavra: "Concordância Verbal",
+        definicao: "Regra que faz o verbo concordar com o sujeito.",
+      },
+      {
+        palavra: "Regência Nominal",
+        definicao:
+          "Relação de dependência entre substantivos, adjetivos ou advérbios com preposição.",
+      },
+      {
+        palavra: "Regência Verbal",
+        definicao: "Relação de dependência entre verbo e complemento.",
+      },
+      {
+        palavra: "Colocação Pronominal",
+        definicao:
+          "Regras para posicionar pronomes oblíquos em relação ao verbo.",
+      },
+      {
+        palavra: "Próclise",
+        definicao: "Colocação do pronome antes do verbo.",
+      },
+      {
+        palavra: "Ênclise",
+        definicao: "Colocação do pronome depois do verbo.",
+      },
+      {
+        palavra: "Mesóclise",
+        definicao: "Colocação do pronome no meio do verbo.",
+      },
+      {
+        palavra: "Infinitivo",
+        definicao:
+          "Forma nominal do verbo que exprime a ideia de ação sem tempo definido.",
+      },
+      {
+        palavra: "Gerúndio",
+        definicao: "Forma nominal do verbo que indica ação em andamento.",
+      },
+      {
+        palavra: "Particípio",
+        definicao:
+          "Forma nominal do verbo usada em tempos compostos e voz passiva.",
+      },
+      { palavra: "Voz Ativa", definicao: "Quando o sujeito pratica a ação." },
+      { palavra: "Voz Passiva", definicao: "Quando o sujeito sofre a ação." },
+      {
+        palavra: "Voz Reflexiva",
+        definicao: "Quando o sujeito pratica e sofre a ação ao mesmo tempo.",
+      },
+      { palavra: "Período Simples", definicao: "Frase com apenas uma oração." },
+      {
+        palavra: "Período Composto",
+        definicao: "Frase com duas ou mais orações.",
+      },
+      {
+        palavra: "Frase",
+        definicao: "Enunciado que transmite uma ideia, com ou sem verbo.",
+      },
+      { palavra: "Oração", definicao: "Enunciado que possui verbo." },
+      {
+        palavra: "Período",
+        definicao: "Enunciado formado por uma ou mais orações.",
+      },
+      {
+        palavra: "Discurso Direto",
+        definicao: "Reprodução literal da fala de alguém.",
+      },
+      {
+        palavra: "Discurso Indireto",
+        definicao: "Reprodução da fala de alguém de forma adaptada.",
+      },
+      {
+        palavra: "Discurso Indireto Livre",
+        definicao:
+          "Mistura de discurso direto e indireto em um mesmo enunciado.",
+      },
+      {
+        palavra: "Texto Narrativo",
+        definicao: "Texto que relata fatos reais ou imaginários.",
+      },
+      {
+        palavra: "Texto Descritivo",
+        definicao:
+          "Texto que detalha características de pessoas, objetos ou lugares.",
+      },
+      {
+        palavra: "Texto Dissertativo",
+        definicao: "Texto que apresenta ideias, argumentos e opiniões.",
+      },
+      {
+        palavra: "Texto Injuntivo",
+        definicao: "Texto que orienta ou instrui o leitor a realizar uma ação.",
+      },
+      {
+        palavra: "Texto Expositivo",
+        definicao: "Texto que explica ou informa sobre determinado assunto.",
+      },
+      {
+        palavra: "Coesão",
+        definicao:
+          "Relação harmônica entre palavras e frases que garantem a ligação textual.",
+      },
+      {
+        palavra: "Coerência",
+        definicao: "Lógica e clareza das ideias dentro de um texto.",
+      },
+      {
+        palavra: "Parágrafo",
+        definicao: "Unidade de sentido de um texto que desenvolve uma ideia.",
+      },
+      { palavra: "Tema", definicao: "Assunto central tratado em um texto." },
+      {
+        palavra: "Tese",
+        definicao: "Ideia principal defendida em um texto argumentativo.",
+      },
+      {
+        palavra: "Argumento",
+        definicao: "Razoamento usado para defender uma tese.",
+      },
+      {
+        palavra: "Conclusão",
+        definicao: "Parte final de um texto que encerra o raciocínio.",
+      },
+      {
+        palavra: "Resumo",
+        definicao: "Apresentação condensada das ideias principais de um texto.",
+      },
+      {
+        palavra: "Resenha",
+        definicao: "Texto que resume e avalia uma obra ou produção cultural.",
+      },
+      {
+        palavra: "Crônica",
+        definicao: "Texto curto que narra fatos do cotidiano.",
+      },
+      {
+        palavra: "Fábula",
+        definicao:
+          "Narrativa curta com animais personificados e moral da história.",
+      },
+      {
+        palavra: "Conto",
+        definicao: "Narrativa breve com poucos personagens e enredo conciso.",
+      },
+      {
+        palavra: "Poema",
+        definicao: "Composição literária estruturada em versos.",
+      },
+      {
+        palavra: "Rima",
+        definicao:
+          "Repetição de sons iguais ou semelhantes no final dos versos.",
+      },
+      {
+        palavra: "Estrofe",
+        definicao: "Conjunto de versos dentro de um poema.",
+      },
+    ],
+  },
+};

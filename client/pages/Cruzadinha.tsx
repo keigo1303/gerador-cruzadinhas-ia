@@ -133,8 +133,8 @@ export default function Cruzadinha() {
   };
 
   const generateCrossword = () => {
-    if (wordClues.length < 2) {
-      alert("Adicione pelo menos 2 palavras para gerar a cruzadinha");
+    if (wordClues.length < 5) {
+      alert("Adicione pelo menos 5 palavras para gerar a cruzadinha");
       return;
     }
 
@@ -266,9 +266,6 @@ export default function Cruzadinha() {
                     >
                       <span className="font-bold text-purple-600 mr-2">
                         {index + 1}.
-                      </span>
-                      <span className="text-xs text-gray-500 mr-2">
-                        {cw.vertical ? "↓" : "→"}
                       </span>
                       <span className="text-gray-700">{cw.clue}</span>
                     </div>
@@ -442,8 +439,7 @@ export default function Cruzadinha() {
       if (cluesY > pageHeight - 15) return; // Prevent overflow
 
       const sequentialNumber = index + 1;
-      const direction = cw.vertical ? "↓" : "→";
-      const clueText = `${sequentialNumber}. ${direction} ${cw.clue}`;
+      const clueText = `${sequentialNumber}. ${cw.clue}`;
 
       // Split text if too long
       const maxWidth = rightColumnWidth - 10;
@@ -481,7 +477,7 @@ export default function Cruzadinha() {
             Gerador de Cruzadinhas
           </h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Crie cruzadinhas personalizadas de forma fácil e r��pida
+            Crie cruzadinhas personalizadas de forma fácil e rápida
           </p>
           <div className="flex justify-center mt-4">
             <Sparkles className="w-6 h-6 text-purple-500 animate-pulse" />
@@ -691,19 +687,19 @@ export default function Cruzadinha() {
 
             {/* Coluna direita - Lista de palavras */}
             <div>
-              {wordClues.length > 0 && (
-                <Card className="shadow-xl border-0 bg-gradient-to-r from-white to-yellow-50 hover:shadow-2xl transition-shadow duration-300 h-fit">
-                  <CardHeader>
-                    <CardTitle className="text-yellow-700 flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <Badge
-                          variant="secondary"
-                          className={`${wordClues.length >= 20 ? "bg-red-200 text-red-800" : "bg-yellow-200 text-yellow-800"}`}
-                        >
-                          {wordClues.length}/20
-                        </Badge>
-                        Palavras Adicionadas
-                      </div>
+              <Card className="shadow-xl border-0 bg-gradient-to-r from-white to-yellow-50 hover:shadow-2xl transition-shadow duration-300 h-fit">
+                <CardHeader>
+                  <CardTitle className="text-yellow-700 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Badge
+                        variant="secondary"
+                        className={`${wordClues.length >= 20 ? "bg-red-200 text-red-800" : "bg-yellow-200 text-yellow-800"}`}
+                      >
+                        {wordClues.length}/20
+                      </Badge>
+                      Palavras Adicionadas
+                    </div>
+                    {wordClues.length > 0 && (
                       <Button
                         variant="outline"
                         size="sm"
@@ -713,9 +709,23 @@ export default function Cruzadinha() {
                         <X className="w-4 h-4 mr-1" />
                         Limpar Todas
                       </Button>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
+                    )}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {wordClues.length === 0 ? (
+                    <div className="text-center py-8">
+                      <div className="text-gray-400 mb-4">
+                        <Sparkles className="w-12 h-12 mx-auto" />
+                      </div>
+                      <p className="text-gray-600 mb-2">
+                        Nenhuma palavra adicionada ainda
+                      </p>
+                      <p className="text-sm text-gray-500">
+                        Adicione no mínimo 5 palavras para gerar a cruzadinha
+                      </p>
+                    </div>
+                  ) : (
                     <div className="grid gap-3 max-h-96 overflow-y-auto">
                       {wordClues.map((wc) => (
                         <div
@@ -742,19 +752,19 @@ export default function Cruzadinha() {
                         </div>
                       ))}
                     </div>
-                    <div className="mt-6">
-                      <Button
-                        onClick={generateCrossword}
-                        className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
-                        disabled={wordClues.length < 2}
-                      >
-                        <Sparkles className="w-4 h-4 mr-2" />
-                        Gerar Cruzadinha
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
+                  )}
+                  <div className="mt-6">
+                    <Button
+                      onClick={generateCrossword}
+                      className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
+                      disabled={wordClues.length < 5}
+                    >
+                      <Sparkles className="w-4 h-4 mr-2" />
+                      Gerar Cruzadinha
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           </div>
 
