@@ -77,6 +77,7 @@ export default function CacaPalavras() {
   const [aiWordCount, setAiWordCount] = React.useState(10);
   const [isGenerating, setIsGenerating] = React.useState(false);
   const wordInputRef = React.useRef<HTMLInputElement>(null);
+  const gridRef = React.useRef<HTMLDivElement>(null);
 
   const addWord = () => {
     if (word.trim()) {
