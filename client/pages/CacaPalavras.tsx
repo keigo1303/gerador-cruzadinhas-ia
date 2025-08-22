@@ -429,6 +429,30 @@ export default function CacaPalavras() {
     );
   };
 
+  // Cores RGB para PDF (equivalentes às cores Tailwind usadas na grade)
+  const pdfColors = [
+    { r: 254, g: 202, b: 202 }, // red-200
+    { r: 191, g: 219, b: 254 }, // blue-200
+    { r: 187, g: 247, b: 208 }, // green-200
+    { r: 254, g: 240, b: 138 }, // yellow-200
+    { r: 221, g: 214, b: 254 }, // purple-200
+    { r: 251, g: 207, b: 232 }, // pink-200
+    { r: 199, g: 210, b: 254 }, // indigo-200
+    { r: 254, g: 215, b: 170 }, // orange-200
+    { r: 153, g: 246, b: 228 }, // teal-200
+    { r: 165, g: 243, b: 252 }, // cyan-200
+    { r: 217, g: 249, b: 157 }, // lime-200
+    { r: 167, g: 243, b: 208 }, // emerald-200
+    { r: 254, g: 205, b: 211 }, // rose-200
+    { r: 196, g: 181, b: 253 }, // violet-200
+    { r: 186, g: 230, b: 253 }, // sky-200
+    { r: 253, g: 230, b: 138 }, // amber-200
+    { r: 245, g: 208, b: 254 }, // fuchsia-200
+    { r: 226, g: 232, b: 240 }, // slate-200
+    { r: 228, g: 228, b: 231 }, // zinc-200
+    { r: 229, g: 229, b: 229 }, // neutral-200
+  ];
+
   const exportToPDF = (withAnswers: boolean) => {
     if (!wordSearchGrid) {
       alert("Gere um caça-palavras primeiro");
@@ -495,12 +519,13 @@ export default function CacaPalavras() {
     const gridStartX = (pageWidth - gridWidth) / 2;
     const gridStartY = currentY + 10;
 
-    // Create a set of solution cells for fast lookup
-    const solutionCells = new Set<string>();
+    // Create mapping of cells to word colors
+    const cellColorMap = new Map<string, number>();
     if (withAnswers) {
-      wordSearchGrid.solutions.forEach(solution => {
+      wordSearchGrid.solutions.forEach((solution, solutionIndex) => {
+        const colorIndex = solutionIndex % pdfColors.length;
         solution.cells.forEach(cell => {
-          solutionCells.add(`${cell.row}-${cell.col}`);
+          cellColorMap.set(`${cell.row}-${cell.col}`, colorIndex);
         });
       });
     }
@@ -515,16 +540,26 @@ export default function CacaPalavras() {
         const cellX = gridStartX + x * finalCellSize;
         const cellY = gridStartY + y * finalCellSize;
 
+        // Check if cell is part of a solution and get its color
+        const cellKey = `${y}-${x}`;
+        const colorIndex = cellColorMap.get(cellKey);
+        const isHighlighted = colorIndex !== undefined;
+
         // Draw cell border
         pdf.setDrawColor(0, 0, 0);
         pdf.setLineWidth(0.3);
         pdf.rect(cellX, cellY, finalCellSize, finalCellSize);
 
-        // Highlight cell if it's part of a solution
-        if (withAnswers && solutionCells.has(`${y}-${x}`)) {
-          pdf.setFillColor(255, 255, 0); // Yellow highlight
+        // Highlight cell with word-specific color if it's part of a solution
+        if (withAnswers && isHighlighted) {
+          const color = pdfColors[colorIndex];
+          pdf.setFillColor(color.r, color.g, color.b);
           pdf.rect(cellX, cellY, finalCellSize, finalCellSize, 'F');
+          pdf.setDrawColor(100, 100, 100); // Darker border for highlighted cells
+          pdf.setLineWidth(0.5);
           pdf.rect(cellX, cellY, finalCellSize, finalCellSize); // Redraw border
+          pdf.setDrawColor(0, 0, 0); // Reset border color
+          pdf.setLineWidth(0.3);
         }
 
         // Draw letter
@@ -539,7 +574,7 @@ export default function CacaPalavras() {
       }
     }
 
-    // Add word list
+    // Add word list with colors if showing answers
     const wordsStartY = gridStartY + gridHeight + 20;
     pdf.setFontSize(14);
     pdf.setFont("helvetica", "bold");
@@ -548,40 +583,82 @@ export default function CacaPalavras() {
     pdf.setFontSize(10);
     pdf.setFont("helvetica", "normal");
 
-    const wordsToShow = wordSearchGrid.placedWords;
-    const wordsPerColumn = Math.ceil(wordsToShow.length / 3);
-    const columnWidth = (pageWidth - 40) / 3;
+    if (withAnswers) {
+      // Show words with their corresponding colors
+      const wordsPerColumn = Math.ceil(wordSearchGrid.solutions.length / 3);
+      const columnWidth = (pageWidth - 40) / 3;
 
-    wordsToShow.forEach((word, index) => {
-      const column = Math.floor(index / wordsPerColumn);
-      const row = index % wordsPerColumn;
-      const x = 20 + column * columnWidth;
-      const y = wordsStartY + 10 + row * 6;
+      wordSearchGrid.solutions.forEach((solution, index) => {
+        const colorIndex = index % pdfColors.length;
+        const color = pdfColors[colorIndex];
+        const column = Math.floor(index / wordsPerColumn);
+        const row = index % wordsPerColumn;
+        const x = 20 + column * columnWidth;
+        const y = wordsStartY + 10 + row * 8;
 
-      if (y < pageHeight - 10) {
-        pdf.text(`• ${word}`, x, y);
-      }
-    });
+        if (y < pageHeight - 10) {
+          // Draw colored square indicator
+          pdf.setFillColor(color.r, color.g, color.b);
+          pdf.setDrawColor(100, 100, 100);
+          pdf.rect(x, y - 3, 3, 3, 'FD');
+
+          // Draw word
+          pdf.setTextColor(0, 0, 0);
+          pdf.text(`${solution.word}`, x + 5, y);
+        }
+      });
+    } else {
+      // Show words without colors (original layout)
+      const wordsToShow = wordSearchGrid.placedWords;
+      const wordsPerColumn = Math.ceil(wordsToShow.length / 3);
+      const columnWidth = (pageWidth - 40) / 3;
+
+      wordsToShow.forEach((word, index) => {
+        const column = Math.floor(index / wordsPerColumn);
+        const row = index % wordsPerColumn;
+        const x = 20 + column * columnWidth;
+        const y = wordsStartY + 10 + row * 6;
+
+        if (y < pageHeight - 10) {
+          pdf.text(`• ${word}`, x, y);
+        }
+      });
+    }
 
     // Add solution info if showing answers
     if (withAnswers && wordSearchGrid.solutions.length > 0) {
       pdf.addPage();
       pdf.setFontSize(16);
       pdf.setFont("helvetica", "bold");
-      pdf.text("Posições das Palavras", 20, 20);
-      
+      pdf.text("Posições das Palavras com Cores", 20, 20);
+
       pdf.setFontSize(10);
       pdf.setFont("helvetica", "normal");
-      
+
       let yPos = 35;
       wordSearchGrid.solutions.forEach((solution, index) => {
+        const colorIndex = index % pdfColors.length;
+        const color = pdfColors[colorIndex];
+
+        // Draw colored square indicator
+        pdf.setFillColor(color.r, color.g, color.b);
+        pdf.setDrawColor(100, 100, 100);
+        pdf.rect(20, yPos - 3, 4, 4, 'FD');
+
+        // Draw position text
+        pdf.setTextColor(0, 0, 0);
         const positionText = `${solution.word}: (${solution.startRow + 1},${solution.startCol + 1}) → (${solution.endRow + 1},${solution.endCol + 1}) [${solution.direction}]`;
-        pdf.text(positionText, 20, yPos);
-        yPos += 6;
-        
+        pdf.text(positionText, 26, yPos);
+        yPos += 8;
+
         if (yPos > pageHeight - 20) {
           pdf.addPage();
-          yPos = 20;
+          pdf.setFontSize(16);
+          pdf.setFont("helvetica", "bold");
+          pdf.text("Posições das Palavras com Cores (cont.)", 20, 20);
+          pdf.setFontSize(10);
+          pdf.setFont("helvetica", "normal");
+          yPos = 35;
         }
       });
     }
