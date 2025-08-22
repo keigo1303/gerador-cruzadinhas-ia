@@ -46,7 +46,9 @@ export default function BingoPalavras() {
   const [word, setWord] = React.useState("");
   const [definition, setDefinition] = React.useState("");
   const [title, setTitle] = React.useState("");
-  const [wordDefinitions, setWordDefinitions] = React.useState<WordDefinition[]>([]);
+  const [wordDefinitions, setWordDefinitions] = React.useState<
+    WordDefinition[]
+  >([]);
   const [gridSize, setGridSize] = React.useState("4x4");
   const [cardCount, setCardCount] = React.useState(4);
   const [bingoCards, setBingoCards] = React.useState<BingoCard[]>([]);
@@ -106,11 +108,13 @@ export default function BingoPalavras() {
       if (bingoDatabase[themeKey] && bingoDatabase[themeKey].palavras) {
         const availableWords = bingoDatabase[themeKey].palavras;
 
-        const newWordDefinitions: WordDefinition[] = availableWords.map((item, index) => ({
-          id: `ai-${Date.now()}-${index}`,
-          word: item.palavra,
-          definition: item.definicao,
-        }));
+        const newWordDefinitions: WordDefinition[] = availableWords.map(
+          (item, index) => ({
+            id: `ai-${Date.now()}-${index}`,
+            word: item.palavra,
+            definition: item.definicao,
+          }),
+        );
 
         setWordDefinitions(newWordDefinitions);
       } else {
@@ -124,18 +128,20 @@ export default function BingoPalavras() {
   // Generate unique bingo cards
   const generateBingoCards = () => {
     if (wordDefinitions.length < minWords) {
-      alert(`Adicione pelo menos ${minWords} palavras para gerar cartelas ${gridSize}`);
+      alert(
+        `Adicione pelo menos ${minWords} palavras para gerar cartelas ${gridSize}`,
+      );
       return;
     }
 
     const cards: BingoCard[] = [];
-    const words = wordDefinitions.map(wd => wd.word);
+    const words = wordDefinitions.map((wd) => wd.word);
 
     for (let cardIndex = 0; cardIndex < cardCount; cardIndex++) {
       // Shuffle words and select subset for this card
       const shuffledWords = [...words].sort(() => Math.random() - 0.5);
       const selectedWords = shuffledWords.slice(0, totalCells);
-      
+
       // Create grid
       const grid: (string | null)[][] = Array(size)
         .fill(null)
@@ -180,7 +186,9 @@ export default function BingoPalavras() {
     };
 
     const goToNext = () => {
-      setCurrentCardIndex(Math.min(bingoCards.length - 1, currentCardIndex + 1));
+      setCurrentCardIndex(
+        Math.min(bingoCards.length - 1, currentCardIndex + 1),
+      );
     };
 
     return (
@@ -256,7 +264,7 @@ export default function BingoPalavras() {
                   >
                     {cell}
                   </div>
-                ))
+                )),
               )}
             </div>
           </CardContent>
@@ -330,7 +338,11 @@ export default function BingoPalavras() {
             if (cellText) {
               const lines = pdf.splitTextToSize(cellText, cellSize - 2);
               const lineHeight = Math.max(3, cellSize * 0.2);
-              let textY = cellY + cellSize / 2 - (lines.length * lineHeight) / 2 + lineHeight;
+              let textY =
+                cellY +
+                cellSize / 2 -
+                (lines.length * lineHeight) / 2 +
+                lineHeight;
 
               lines.forEach((line: string) => {
                 const textWidth = pdf.getTextWidth(line);
@@ -367,13 +379,13 @@ export default function BingoPalavras() {
 
       const definitionText = `${wd.word}: ${wd.definition}`;
       const lines = pdf.splitTextToSize(definitionText, pageWidth - 40);
-      
+
       pdf.setFont("helvetica", "bold");
       pdf.text(`${index + 1}.`, 20, currentY);
-      
+
       pdf.setFont("helvetica", "normal");
       pdf.text(lines, 30, currentY);
-      
+
       currentY += lines.length * 5 + 2;
     });
 
@@ -484,7 +496,10 @@ export default function BingoPalavras() {
                       value={cardCount}
                       onChange={(e) =>
                         setCardCount(
-                          Math.min(50, Math.max(1, parseInt(e.target.value) || 4))
+                          Math.min(
+                            50,
+                            Math.max(1, parseInt(e.target.value) || 4),
+                          ),
                         )
                       }
                       className="border-2 border-purple-200 focus:border-purple-400 transition-colors duration-200"
@@ -606,8 +621,11 @@ export default function BingoPalavras() {
                             : "bg-yellow-200 text-yellow-800"
                         }`}
                       >
-                        {wordDefinitions.length} palavra{wordDefinitions.length !== 1 ? 's' : ''}
-                        {wordDefinitions.length >= minWords ? ' ✓' : ` (mín: ${minWords})`}
+                        {wordDefinitions.length} palavra
+                        {wordDefinitions.length !== 1 ? "s" : ""}
+                        {wordDefinitions.length >= minWords
+                          ? " ✓"
+                          : ` (mín: ${minWords})`}
                       </Badge>
                       Palavras Adicionadas
                     </div>
@@ -630,9 +648,12 @@ export default function BingoPalavras() {
                       <div className="text-gray-400 mb-4">
                         <Grid3x3 className="w-12 h-12 mx-auto" />
                       </div>
-                      <p className="text-gray-600 mb-2">Nenhuma palavra adicionada ainda</p>
+                      <p className="text-gray-600 mb-2">
+                        Nenhuma palavra adicionada ainda
+                      </p>
                       <p className="text-sm text-gray-500">
-                        Adicione no mínimo {minWords} palavras para gerar cartelas {gridSize}
+                        Adicione no mínimo {minWords} palavras para gerar
+                        cartelas {gridSize}
                       </p>
                     </div>
                   ) : (

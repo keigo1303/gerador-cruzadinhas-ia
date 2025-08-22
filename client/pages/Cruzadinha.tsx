@@ -718,8 +718,12 @@ export default function Cruzadinha() {
                       <div className="text-gray-400 mb-4">
                         <Sparkles className="w-12 h-12 mx-auto" />
                       </div>
-                      <p className="text-gray-600 mb-2">Nenhuma palavra adicionada ainda</p>
-                      <p className="text-sm text-gray-500">Adicione no mínimo 5 palavras para gerar a cruzadinha</p>
+                      <p className="text-gray-600 mb-2">
+                        Nenhuma palavra adicionada ainda
+                      </p>
+                      <p className="text-sm text-gray-500">
+                        Adicione no mínimo 5 palavras para gerar a cruzadinha
+                      </p>
                     </div>
                   ) : (
                     <div className="grid gap-3 max-h-96 overflow-y-auto">

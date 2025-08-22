@@ -76,7 +76,9 @@ export default function CacaPalavras() {
   const [aiDifficulty, setAiDifficulty] = React.useState("");
   const [aiWordCount, setAiWordCount] = React.useState(10);
   const [isGenerating, setIsGenerating] = React.useState(false);
-  const [directionMode, setDirectionMode] = React.useState("horizontal-vertical");
+  const [directionMode, setDirectionMode] = React.useState(
+    "horizontal-vertical",
+  );
   const [allowMirrored, setAllowMirrored] = React.useState(false);
   const wordInputRef = React.useRef<HTMLInputElement>(null);
   const gridRef = React.useRef<HTMLDivElement>(null);
@@ -153,9 +155,12 @@ export default function CacaPalavras() {
     if (wordList.length === 0) return null;
 
     // Filter directions based on selected mode
-    const availableDirections = directionMode === "horizontal-vertical"
-      ? DIRECTIONS.filter(d => d.name === "horizontal" || d.name === "vertical")
-      : DIRECTIONS; // all-directions includes diagonal
+    const availableDirections =
+      directionMode === "horizontal-vertical"
+        ? DIRECTIONS.filter(
+            (d) => d.name === "horizontal" || d.name === "vertical",
+          )
+        : DIRECTIONS; // all-directions includes diagonal
 
     // Calculate optimal grid size
     const longestWord = Math.max(...wordList.map((w) => w.length));
@@ -195,13 +200,19 @@ export default function CacaPalavras() {
 
         // Random direction from available directions
         const direction =
-          availableDirections[Math.floor(Math.random() * availableDirections.length)];
+          availableDirections[
+            Math.floor(Math.random() * availableDirections.length)
+          ];
 
         // Decide whether to use normal or reversed word (if mirroring is allowed)
         const useReversed = allowMirrored && Math.random() < 0.5; // 50% chance to reverse if allowed
-        const wordToUse = useReversed ? word.split('').reverse().join('') : word;
+        const wordToUse = useReversed
+          ? word.split("").reverse().join("")
+          : word;
 
-        if (canPlaceWord(grid, wordToUse, startRow, startCol, direction, gridSize)) {
+        if (
+          canPlaceWord(grid, wordToUse, startRow, startCol, direction, gridSize)
+        ) {
           const wordPosition = placeWord(
             grid,
             wordToUse,
@@ -213,7 +224,7 @@ export default function CacaPalavras() {
           placedWords.push(word); // Always store original word
           placed = true;
           console.log(
-            `Placed "${wordToUse}"${useReversed ? ' (reversed)' : ''} at (${startRow},${startCol}) direction: ${direction.name}`,
+            `Placed "${wordToUse}"${useReversed ? " (reversed)" : ""} at (${startRow},${startCol}) direction: ${direction.name}`,
           );
         }
 
@@ -793,7 +804,10 @@ export default function CacaPalavras() {
                     >
                       Direções das Palavras
                     </Label>
-                    <Select value={directionMode} onValueChange={setDirectionMode}>
+                    <Select
+                      value={directionMode}
+                      onValueChange={setDirectionMode}
+                    >
                       <SelectTrigger className="border-2 border-green-200 focus:border-green-400">
                         <SelectValue placeholder="Selecione as direções" />
                       </SelectTrigger>
@@ -1004,8 +1018,12 @@ export default function CacaPalavras() {
                       <div className="text-gray-400 mb-4">
                         <Search className="w-12 h-12 mx-auto" />
                       </div>
-                      <p className="text-gray-600 mb-2">Nenhuma palavra adicionada ainda</p>
-                      <p className="text-sm text-gray-500">Adicione no mínimo 5 palavras para gerar o caça-palavras</p>
+                      <p className="text-gray-600 mb-2">
+                        Nenhuma palavra adicionada ainda
+                      </p>
+                      <p className="text-sm text-gray-500">
+                        Adicione no mínimo 5 palavras para gerar o caça-palavras
+                      </p>
                     </div>
                   ) : (
                     <div className="grid gap-3 max-h-96 overflow-y-auto">
