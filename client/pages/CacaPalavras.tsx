@@ -625,43 +625,6 @@ export default function CacaPalavras() {
       });
     }
 
-    // Add solution info if showing answers
-    if (withAnswers && wordSearchGrid.solutions.length > 0) {
-      pdf.addPage();
-      pdf.setFontSize(16);
-      pdf.setFont("helvetica", "bold");
-      pdf.text("Posições das Palavras com Cores", 20, 20);
-
-      pdf.setFontSize(10);
-      pdf.setFont("helvetica", "normal");
-
-      let yPos = 35;
-      wordSearchGrid.solutions.forEach((solution, index) => {
-        const colorIndex = index % pdfColors.length;
-        const color = pdfColors[colorIndex];
-
-        // Draw colored square indicator
-        pdf.setFillColor(color.r, color.g, color.b);
-        pdf.setDrawColor(100, 100, 100);
-        pdf.rect(20, yPos - 3, 4, 4, 'FD');
-
-        // Draw position text
-        pdf.setTextColor(0, 0, 0);
-        const positionText = `${solution.word}: (${solution.startRow + 1},${solution.startCol + 1}) → (${solution.endRow + 1},${solution.endCol + 1}) [${solution.direction}]`;
-        pdf.text(positionText, 26, yPos);
-        yPos += 8;
-
-        if (yPos > pageHeight - 20) {
-          pdf.addPage();
-          pdf.setFontSize(16);
-          pdf.setFont("helvetica", "bold");
-          pdf.text("Posições das Palavras com Cores (cont.)", 20, 20);
-          pdf.setFontSize(10);
-          pdf.setFont("helvetica", "normal");
-          yPos = 35;
-        }
-      });
-    }
 
     const filename = `${searchTitle.toLowerCase().replace(/\s+/g, "-")}-${withAnswers ? "gabarito" : "em-branco"}.pdf`;
     pdf.save(filename);
