@@ -1059,32 +1059,29 @@ export default function CacaPalavras() {
 
           {/* Word Search Grid */}
           {wordSearchGrid && (
-            <div className="space-y-6">
-              {/* Regenerate Button */}
-              <div className="flex justify-center">
-                <Button
-                  onClick={generateWordSearchGrid}
-                  variant="outline"
-                  className="flex items-center gap-2 border-2 border-green-300 hover:bg-green-50 shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200"
-                >
-                  <RotateCcw className="w-4 h-4" />
-                  Regerar com Novo Posicionamento
-                </Button>
-              </div>
-
-              <Card
-                ref={gridRef}
-                className="shadow-2xl border-0 bg-gradient-to-r from-white to-green-50 hover:shadow-3xl transition-shadow duration-300"
-              >
-                <CardHeader>
-                  <CardTitle className="text-green-700 flex items-center gap-2">
+            <Card
+              ref={gridRef}
+              className="shadow-2xl border-0 bg-gradient-to-r from-white to-green-50 hover:shadow-3xl transition-shadow duration-300"
+            >
+              <CardHeader>
+                <CardTitle className="text-green-700 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
                     <Search className="w-5 h-5" />
                     {title || "Caça-Palavras Gerado"}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>{renderGrid()}</CardContent>
-              </Card>
-            </div>
+                  </div>
+                  <Button
+                    onClick={generateWordSearchGrid}
+                    variant="outline"
+                    size="sm"
+                    className="flex items-center gap-2 border-2 border-green-300 hover:bg-green-50 shadow-md hover:shadow-lg transition-all duration-200"
+                  >
+                    <RotateCcw className="w-4 h-4" />
+                    Regerar
+                  </Button>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>{renderGrid()}</CardContent>
+            </Card>
           )}
 
           {/* Export Buttons */}
