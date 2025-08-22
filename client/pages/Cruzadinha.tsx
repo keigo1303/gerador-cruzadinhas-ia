@@ -687,19 +687,19 @@ export default function Cruzadinha() {
 
             {/* Coluna direita - Lista de palavras */}
             <div>
-              {wordClues.length > 0 && (
-                <Card className="shadow-xl border-0 bg-gradient-to-r from-white to-yellow-50 hover:shadow-2xl transition-shadow duration-300 h-fit">
-                  <CardHeader>
-                    <CardTitle className="text-yellow-700 flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <Badge
-                          variant="secondary"
-                          className={`${wordClues.length >= 20 ? "bg-red-200 text-red-800" : "bg-yellow-200 text-yellow-800"}`}
-                        >
-                          {wordClues.length}/20
-                        </Badge>
-                        Palavras Adicionadas
-                      </div>
+              <Card className="shadow-xl border-0 bg-gradient-to-r from-white to-yellow-50 hover:shadow-2xl transition-shadow duration-300 h-fit">
+                <CardHeader>
+                  <CardTitle className="text-yellow-700 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Badge
+                        variant="secondary"
+                        className={`${wordClues.length >= 20 ? "bg-red-200 text-red-800" : "bg-yellow-200 text-yellow-800"}`}
+                      >
+                        {wordClues.length}/20
+                      </Badge>
+                      Palavras Adicionadas
+                    </div>
+                    {wordClues.length > 0 && (
                       <Button
                         variant="outline"
                         size="sm"
@@ -709,9 +709,19 @@ export default function Cruzadinha() {
                         <X className="w-4 h-4 mr-1" />
                         Limpar Todas
                       </Button>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
+                    )}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {wordClues.length === 0 ? (
+                    <div className="text-center py-8">
+                      <div className="text-gray-400 mb-4">
+                        <Sparkles className="w-12 h-12 mx-auto" />
+                      </div>
+                      <p className="text-gray-600 mb-2">Nenhuma palavra adicionada ainda</p>
+                      <p className="text-sm text-gray-500">Adicione no mínimo 2 palavras para gerar a cruzadinha</p>
+                    </div>
+                  ) : (
                     <div className="grid gap-3 max-h-96 overflow-y-auto">
                       {wordClues.map((wc) => (
                         <div
@@ -738,19 +748,19 @@ export default function Cruzadinha() {
                         </div>
                       ))}
                     </div>
-                    <div className="mt-6">
-                      <Button
-                        onClick={generateCrossword}
-                        className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
-                        disabled={wordClues.length < 2}
-                      >
-                        <Sparkles className="w-4 h-4 mr-2" />
-                        Gerar Cruzadinha
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
+                  )}
+                  <div className="mt-6">
+                    <Button
+                      onClick={generateCrossword}
+                      className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
+                      disabled={wordClues.length < 2}
+                    >
+                      <Sparkles className="w-4 h-4 mr-2" />
+                      Gerar Cruzadinha
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           </div>
 
