@@ -87,6 +87,37 @@ export default function BingoPalavras() {
     setBingoCards([]);
   };
 
+  // AI word generation function
+  const generateAIWords = () => {
+    if (!aiTheme) {
+      alert("Por favor, selecione um tema.");
+      return;
+    }
+
+    setIsGenerating(true);
+
+    // Simulate API delay
+    setTimeout(() => {
+      const themeKey = aiTheme.toLowerCase();
+
+      if (bingoDatabase[themeKey] && bingoDatabase[themeKey].palavras) {
+        const availableWords = bingoDatabase[themeKey].palavras;
+
+        const newWordDefinitions: WordDefinition[] = availableWords.map((item, index) => ({
+          id: `ai-${Date.now()}-${index}`,
+          word: item.palavra,
+          definition: item.definicao,
+        }));
+
+        setWordDefinitions(newWordDefinitions);
+      } else {
+        alert("Tema não encontrado no banco de dados.");
+      }
+
+      setIsGenerating(false);
+    }, 2000); // 2 second delay to simulate API call
+  };
+
   // Generate unique bingo cards
   const generateBingoCards = () => {
     if (wordDefinitions.length < minWords) {
