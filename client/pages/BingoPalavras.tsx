@@ -172,52 +172,103 @@ export default function BingoPalavras() {
   const renderCards = () => {
     if (bingoCards.length === 0) return null;
 
-    return (
-      <div className="grid gap-8">
-        {bingoCards.map((card, index) => (
-          <Card
-            key={card.id}
-            className="border-2 border-purple-200 shadow-lg hover:shadow-xl transition-shadow duration-300"
-          >
-            <CardHeader className="bg-gradient-to-r from-purple-50 to-pink-50">
-              <CardTitle className="text-purple-700 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Grid3x3 className="w-5 h-5" />
-                  Cartela {index + 1}
-                </div>
-                <Badge className="bg-purple-100 text-purple-700">
-                  {gridSize}
-                </Badge>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-6">
-              {/* Student name field */}
-              <div className="mb-6 p-4 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
-                <Label className="text-sm font-medium text-gray-700 mb-2 block">
-                  Nome do aluno:
-                </Label>
-                <div className="h-8 border-b-2 border-gray-400"></div>
-              </div>
+    const card = bingoCards[currentCardIndex];
+    if (!card) return null;
 
-              {/* Bingo grid */}
-              <div
-                className="grid gap-2 mx-auto w-fit p-4 bg-white border-2 border-purple-200 rounded-xl shadow-inner"
-                style={{ gridTemplateColumns: `repeat(${size}, 1fr)` }}
-              >
-                {card.grid.map((row, rowIndex) =>
-                  row.map((cell, colIndex) => (
-                    <div
-                      key={`${rowIndex}-${colIndex}`}
-                      className="w-20 h-20 border-2 border-purple-300 flex items-center justify-center bg-purple-50 text-xs font-bold text-purple-800 p-1 text-center leading-tight"
-                    >
-                      {cell}
-                    </div>
-                  ))
-                )}
+    const goToPrevious = () => {
+      setCurrentCardIndex(Math.max(0, currentCardIndex - 1));
+    };
+
+    const goToNext = () => {
+      setCurrentCardIndex(Math.min(bingoCards.length - 1, currentCardIndex + 1));
+    };
+
+    return (
+      <div className="space-y-6">
+        {/* Navigation Header */}
+        <div className="flex items-center justify-between bg-white p-4 rounded-lg border border-purple-200 shadow-sm">
+          <Button
+            onClick={goToPrevious}
+            disabled={currentCardIndex === 0}
+            variant="outline"
+            size="sm"
+            className="flex items-center gap-2 disabled:opacity-50"
+          >
+            <ChevronLeft className="w-4 h-4" />
+            Anterior
+          </Button>
+
+          <div className="flex items-center gap-4">
+            <span className="text-sm text-gray-600">
+              Cartela {currentCardIndex + 1} de {bingoCards.length}
+            </span>
+            <div className="flex gap-1">
+              {bingoCards.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentCardIndex(index)}
+                  className={`w-2 h-2 rounded-full transition-colors ${
+                    index === currentCardIndex
+                      ? "bg-purple-600"
+                      : "bg-gray-300 hover:bg-gray-400"
+                  }`}
+                />
+              ))}
+            </div>
+          </div>
+
+          <Button
+            onClick={goToNext}
+            disabled={currentCardIndex === bingoCards.length - 1}
+            variant="outline"
+            size="sm"
+            className="flex items-center gap-2 disabled:opacity-50"
+          >
+            Próxima
+            <ChevronRight className="w-4 h-4" />
+          </Button>
+        </div>
+
+        {/* Current Card */}
+        <Card className="border-2 border-purple-200 shadow-lg hover:shadow-xl transition-shadow duration-300">
+          <CardHeader className="bg-gradient-to-r from-purple-50 to-pink-50">
+            <CardTitle className="text-purple-700 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Grid3x3 className="w-5 h-5" />
+                Cartela {currentCardIndex + 1}
               </div>
-            </CardContent>
-          </Card>
-        ))}
+              <Badge className="bg-purple-100 text-purple-700">
+                {gridSize}
+              </Badge>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-6">
+            {/* Student name field */}
+            <div className="mb-6 p-4 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
+              <Label className="text-sm font-medium text-gray-700 mb-2 block">
+                Nome do aluno:
+              </Label>
+              <div className="h-8 border-b-2 border-gray-400"></div>
+            </div>
+
+            {/* Bingo grid */}
+            <div
+              className="grid gap-2 mx-auto w-fit p-4 bg-white border-2 border-purple-200 rounded-xl shadow-inner"
+              style={{ gridTemplateColumns: `repeat(${size}, 1fr)` }}
+            >
+              {card.grid.map((row, rowIndex) =>
+                row.map((cell, colIndex) => (
+                  <div
+                    key={`${rowIndex}-${colIndex}`}
+                    className="w-20 h-20 border-2 border-purple-300 flex items-center justify-center bg-purple-50 text-xs font-bold text-purple-800 p-1 text-center leading-tight"
+                  >
+                    {cell}
+                  </div>
+                ))
+              )}
+            </div>
+          </CardContent>
+        </Card>
       </div>
     );
   };
