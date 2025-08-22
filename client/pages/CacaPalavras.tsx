@@ -478,27 +478,27 @@ export default function CacaPalavras() {
       pdf.setFontSize(12);
       pdf.setFont("helvetica", "normal");
 
-      const underlineLength = 40;
-      const spacing = 60;
+      // Ajustar tamanhos e posições dos campos
+      const nomeLength = 60;    // Campo nome maior
+      const turmaLength = 35;   // Campo turma
+      const dataLength = 30;    // Campo data
 
-      pdf.text("Nome:", 20, currentY);
-      pdf.line(35, currentY + 1, 35 + underlineLength, currentY + 1);
+      // Posições calculadas para caber na página
+      const nomeX = 20;
+      const turmaX = nomeX + 30 + nomeLength + 10; // Nome + espaço + campo + margem
+      const dataX = turmaX + 35 + turmaLength + 10; // Turma + espaço + campo + margem
 
-      pdf.text("Turma:", 20 + spacing + underlineLength, currentY);
-      pdf.line(
-        35 + spacing + underlineLength + 15,
-        currentY + 1,
-        35 + spacing + underlineLength + 15 + 25,
-        currentY + 1,
-      );
+      // Campo Nome
+      pdf.text("Nome:", nomeX, currentY);
+      pdf.line(nomeX + 30, currentY + 1, nomeX + 30 + nomeLength, currentY + 1);
 
-      pdf.text("Data:", 20 + (spacing + underlineLength) * 1.7, currentY);
-      pdf.line(
-        35 + (spacing + underlineLength) * 1.7 + 15,
-        currentY + 1,
-        35 + (spacing + underlineLength) * 1.7 + 15 + 25,
-        currentY + 1,
-      );
+      // Campo Turma
+      pdf.text("Turma:", turmaX, currentY);
+      pdf.line(turmaX + 35, currentY + 1, turmaX + 35 + turmaLength, currentY + 1);
+
+      // Campo Data
+      pdf.text("Data:", dataX, currentY);
+      pdf.line(dataX + 30, currentY + 1, dataX + 30 + dataLength, currentY + 1);
 
       currentY += 15;
     }
