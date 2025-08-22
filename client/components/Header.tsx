@@ -72,44 +72,38 @@ export default function Header() {
             </Link>
 
             {/* Activities Dropdown */}
-            <div className="relative">
-              <NavigationMenu>
-                <NavigationMenuList>
-                  <NavigationMenuItem>
-                    <NavigationMenuTrigger className="flex items-center gap-2">
-                      <Grid3x3 className="w-4 h-4" />
-                      Atividades
-                    </NavigationMenuTrigger>
-                    <NavigationMenuContent className="md:right-0 md:left-auto">
-                      <div className="grid gap-3 p-6 w-[320px] md:w-[380px]">
-                        {activities.map((activity) => {
-                          const Icon = activity.icon;
-                          return (
-                            <Link
-                              key={activity.path}
-                              to={activity.path}
-                              className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                            >
-                              <div className="flex items-center gap-3">
-                                <Icon className={`w-5 h-5 ${activity.color}`} />
-                                <div>
-                                  <div className="text-sm font-medium leading-none mb-1">
-                                    {activity.title}
-                                  </div>
-                                  <p className="line-clamp-2 text-xs leading-snug text-muted-foreground">
-                                    {activity.description}
-                                  </p>
-                                </div>
-                              </div>
-                            </Link>
-                          );
-                        })}
-                      </div>
-                    </NavigationMenuContent>
-                  </NavigationMenuItem>
-                </NavigationMenuList>
-              </NavigationMenu>
-            </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="flex items-center gap-2">
+                  <Grid3x3 className="w-4 h-4" />
+                  Atividades
+                  <ChevronDown className="w-4 h-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-[320px] md:w-[380px]">
+                {activities.map((activity) => {
+                  const Icon = activity.icon;
+                  return (
+                    <DropdownMenuItem key={activity.path} asChild>
+                      <Link
+                        to={activity.path}
+                        className="flex items-center gap-3 p-3 cursor-pointer"
+                      >
+                        <Icon className={`w-5 h-5 ${activity.color}`} />
+                        <div>
+                          <div className="text-sm font-medium leading-none mb-1">
+                            {activity.title}
+                          </div>
+                          <p className="text-xs leading-snug text-muted-foreground">
+                            {activity.description}
+                          </p>
+                        </div>
+                      </Link>
+                    </DropdownMenuItem>
+                  );
+                })}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </div>
