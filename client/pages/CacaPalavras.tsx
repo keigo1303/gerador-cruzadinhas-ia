@@ -942,7 +942,7 @@ export default function CacaPalavras() {
 
           {/* Word Search Grid */}
           {wordSearchGrid && (
-            <Card className="shadow-2xl border-0 bg-gradient-to-r from-white to-green-50 hover:shadow-3xl transition-shadow duration-300">
+            <Card ref={gridRef} className="shadow-2xl border-0 bg-gradient-to-r from-white to-green-50 hover:shadow-3xl transition-shadow duration-300">
               <CardHeader>
                 <CardTitle className="text-green-700 flex items-center gap-2">
                   <Search className="w-5 h-5" />
