@@ -133,8 +133,8 @@ export default function Cruzadinha() {
   };
 
   const generateCrossword = () => {
-    if (wordClues.length < 2) {
-      alert("Adicione pelo menos 2 palavras para gerar a cruzadinha");
+    if (wordClues.length < 5) {
+      alert("Adicione pelo menos 5 palavras para gerar a cruzadinha");
       return;
     }
 
@@ -719,7 +719,7 @@ export default function Cruzadinha() {
                         <Sparkles className="w-12 h-12 mx-auto" />
                       </div>
                       <p className="text-gray-600 mb-2">Nenhuma palavra adicionada ainda</p>
-                      <p className="text-sm text-gray-500">Adicione no mínimo 2 palavras para gerar a cruzadinha</p>
+                      <p className="text-sm text-gray-500">Adicione no mínimo 5 palavras para gerar a cruzadinha</p>
                     </div>
                   ) : (
                     <div className="grid gap-3 max-h-96 overflow-y-auto">
@@ -753,7 +753,7 @@ export default function Cruzadinha() {
                     <Button
                       onClick={generateCrossword}
                       className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
-                      disabled={wordClues.length < 2}
+                      disabled={wordClues.length < 5}
                     >
                       <Sparkles className="w-4 h-4 mr-2" />
                       Gerar Cruzadinha
