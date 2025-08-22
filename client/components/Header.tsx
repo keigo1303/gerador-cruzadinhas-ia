@@ -1,19 +1,19 @@
 import * as React from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-} from "@/components/ui/navigation-menu";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { 
-  BookOpen, 
-  Home, 
-  Grid3x3, 
-  Search, 
-  Sparkles 
+import {
+  BookOpen,
+  Home,
+  Grid3x3,
+  Search,
+  Sparkles,
+  ChevronDown
 } from "lucide-react";
 
 export default function Header() {
