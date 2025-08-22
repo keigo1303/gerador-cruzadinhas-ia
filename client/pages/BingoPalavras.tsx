@@ -488,11 +488,11 @@ export default function BingoPalavras() {
                       id="card-count"
                       type="number"
                       min="1"
-                      max="20"
+                      max="50"
                       value={cardCount}
                       onChange={(e) =>
                         setCardCount(
-                          Math.min(20, Math.max(1, parseInt(e.target.value) || 4))
+                          Math.min(50, Math.max(1, parseInt(e.target.value) || 4))
                         )
                       }
                       className="border-2 border-purple-200 focus:border-purple-400 transition-colors duration-200"
