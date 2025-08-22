@@ -307,8 +307,43 @@ export default function CacaPalavras() {
     }
   };
 
+  // Array de cores vibrantes para destacar cada palavra
+  const colors = [
+    { bg: 'bg-red-200', text: 'text-red-800', name: 'Vermelho' },
+    { bg: 'bg-blue-200', text: 'text-blue-800', name: 'Azul' },
+    { bg: 'bg-green-200', text: 'text-green-800', name: 'Verde' },
+    { bg: 'bg-yellow-200', text: 'text-yellow-800', name: 'Amarelo' },
+    { bg: 'bg-purple-200', text: 'text-purple-800', name: 'Roxo' },
+    { bg: 'bg-pink-200', text: 'text-pink-800', name: 'Rosa' },
+    { bg: 'bg-indigo-200', text: 'text-indigo-800', name: 'Índigo' },
+    { bg: 'bg-orange-200', text: 'text-orange-800', name: 'Laranja' },
+    { bg: 'bg-teal-200', text: 'text-teal-800', name: 'Verde-água' },
+    { bg: 'bg-cyan-200', text: 'text-cyan-800', name: 'Ciano' },
+    { bg: 'bg-lime-200', text: 'text-lime-800', name: 'Lima' },
+    { bg: 'bg-emerald-200', text: 'text-emerald-800', name: 'Esmeralda' },
+    { bg: 'bg-rose-200', text: 'text-rose-800', name: 'Rosa-escuro' },
+    { bg: 'bg-violet-200', text: 'text-violet-800', name: 'Violeta' },
+    { bg: 'bg-sky-200', text: 'text-sky-800', name: 'Céu' },
+    { bg: 'bg-amber-200', text: 'text-amber-800', name: 'Âmbar' },
+    { bg: 'bg-fuchsia-200', text: 'text-fuchsia-800', name: 'Fúcsia' },
+    { bg: 'bg-slate-200', text: 'text-slate-800', name: 'Ardósia' },
+    { bg: 'bg-zinc-200', text: 'text-zinc-800', name: 'Zinco' },
+    { bg: 'bg-neutral-200', text: 'text-neutral-800', name: 'Neutro' },
+  ];
+
   const renderGrid = () => {
     if (!wordSearchGrid) return null;
+
+    // Criar mapa de células para palavras com suas cores
+    const cellColorMap = new Map<string, { colorIndex: number, word: string }>();
+
+    wordSearchGrid.solutions.forEach((solution, index) => {
+      const colorIndex = index % colors.length;
+      solution.cells.forEach(cell => {
+        const key = `${cell.row}-${cell.col}`;
+        cellColorMap.set(key, { colorIndex, word: solution.word });
+      });
+    });
 
     return (
       <div className="flex flex-col items-center gap-8">
@@ -319,38 +354,69 @@ export default function CacaPalavras() {
           }}
         >
           {wordSearchGrid.grid.map((row, y) =>
-            row.map((cell, x) => (
-              <div
-                key={`${x}-${y}`}
-                className="w-8 h-8 border border-gray-300 flex items-center justify-center text-sm font-bold bg-white hover:bg-green-50 transition-colors duration-200"
-              >
-                <span className="text-gray-800">{cell}</span>
-              </div>
-            )),
+            row.map((cell, x) => {
+              const cellKey = `${y}-${x}`;
+              const cellInfo = cellColorMap.get(cellKey);
+              const isHighlighted = cellInfo !== undefined;
+              const color = isHighlighted ? colors[cellInfo.colorIndex] : null;
+
+              return (
+                <div
+                  key={`${x}-${y}`}
+                  className={`w-8 h-8 border border-gray-300 flex items-center justify-center text-sm font-bold transition-all duration-200 ${
+                    isHighlighted
+                      ? `${color?.bg} ${color?.text} border-2 border-gray-400 shadow-sm scale-105`
+                      : 'bg-white text-gray-800 hover:bg-gray-50'
+                  }`}
+                  title={isHighlighted ? `Palavra: ${cellInfo.word}` : undefined}
+                >
+                  <span className="font-extrabold">{cell}</span>
+                </div>
+              );
+            }),
           )}
         </div>
 
+        {/* Legenda de cores */}
         <div className="w-full max-w-4xl">
           <Card className="border-l-4 border-l-green-500 shadow-lg hover:shadow-xl transition-all duration-300">
             <CardHeader className="bg-gradient-to-r from-green-50 to-green-100">
               <CardTitle className="text-green-700 flex items-center gap-2">
                 <Search className="w-5 h-5" />
-                Palavras para Encontrar
+                Palavras Encontradas com Cores
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-6">
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                {wordSearchGrid.placedWords.map((word, index) => (
-                  <div
-                    key={index}
-                    className="text-sm p-3 rounded-lg bg-green-50 hover:bg-green-100 transition-colors duration-200 text-center"
-                  >
-                    <span className="font-bold text-green-600">{word}</span>
-                  </div>
-                ))}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {wordSearchGrid.solutions.map((solution, index) => {
+                  const colorIndex = index % colors.length;
+                  const color = colors[colorIndex];
+
+                  return (
+                    <div
+                      key={`${solution.word}-${index}`}
+                      className={`flex items-center gap-3 p-4 rounded-lg border-2 ${color.bg} border-gray-300 shadow-sm hover:shadow-md transition-all duration-200`}
+                    >
+                      <div
+                        className={`w-6 h-6 rounded-full ${color.bg} border-2 border-gray-400 flex items-center justify-center`}
+                      >
+                        <span className="text-xs font-bold text-gray-600">{index + 1}</span>
+                      </div>
+                      <div className="flex-1">
+                        <span className={`font-bold text-base ${color.text}`}>
+                          {solution.word}
+                        </span>
+                        <div className="text-xs text-gray-600 mt-1">
+                          {solution.direction} • ({solution.startRow + 1},{solution.startCol + 1}) → ({solution.endRow + 1},{solution.endCol + 1})
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
+
               {wordSearchGrid.unplacedWords.length > 0 && (
-                <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
                   <p className="text-sm text-yellow-700">
                     <strong>Palavras não colocadas:</strong> {wordSearchGrid.unplacedWords.join(', ')}
                   </p>
