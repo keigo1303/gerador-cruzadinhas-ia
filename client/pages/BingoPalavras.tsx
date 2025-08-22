@@ -243,14 +243,6 @@ export default function BingoPalavras() {
             </CardTitle>
           </CardHeader>
           <CardContent className="p-6">
-            {/* Student name field */}
-            <div className="mb-6 p-4 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
-              <Label className="text-sm font-medium text-gray-700 mb-2 block">
-                Nome do aluno:
-              </Label>
-              <div className="h-8 border-b-2 border-gray-400"></div>
-            </div>
-
             {/* Bingo grid */}
             <div
               className="grid gap-2 mx-auto w-fit p-4 bg-white border-2 border-purple-200 rounded-xl shadow-inner"
