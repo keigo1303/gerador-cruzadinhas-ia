@@ -748,7 +748,7 @@ export default function Cruzadinha() {
 
           {/* Crossword Grid */}
           {crosswordGrid.length > 0 && (
-            <Card className="shadow-2xl border-0 bg-gradient-to-r from-white to-blue-50 hover:shadow-3xl transition-shadow duration-300">
+            <Card ref={crosswordRef} className="shadow-2xl border-0 bg-gradient-to-r from-white to-blue-50 hover:shadow-3xl transition-shadow duration-300">
               <CardHeader>
                 <CardTitle className="text-blue-700 flex items-center gap-2">
                   <Sparkles className="w-5 h-5" />
