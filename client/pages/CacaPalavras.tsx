@@ -814,6 +814,43 @@ export default function CacaPalavras() {
                       Incluir campos para Nome, Turma e Data no PDF
                     </Label>
                   </div>
+
+                  <div>
+                    <Label
+                      htmlFor="direction-mode"
+                      className="text-sm font-medium text-gray-700 mb-2 block"
+                    >
+                      Direções das Palavras
+                    </Label>
+                    <Select value={directionMode} onValueChange={setDirectionMode}>
+                      <SelectTrigger className="border-2 border-green-200 focus:border-green-400">
+                        <SelectValue placeholder="Selecione as direções" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="horizontal-vertical">
+                          Horizontal e Vertical
+                        </SelectItem>
+                        <SelectItem value="all-directions">
+                          Horizontal, Vertical e Diagonal
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="allow-mirrored"
+                      checked={allowMirrored}
+                      onCheckedChange={setAllowMirrored}
+                      className="border-2 border-green-300"
+                    />
+                    <Label
+                      htmlFor="allow-mirrored"
+                      className="text-sm font-medium text-gray-700"
+                    >
+                      Permitir palavras espelhadas (de trás para frente)
+                    </Label>
+                  </div>
                 </CardContent>
               </Card>
 
