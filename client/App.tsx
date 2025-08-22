@@ -24,6 +24,7 @@ function App() {
             <Route path="/" element={<Index />} />
             <Route path="/cruzadinha" element={<Cruzadinha />} />
             <Route path="/caca-palavras" element={<CacaPalavras />} />
+            <Route path="/bingo-palavras" element={<BingoPalavras />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
