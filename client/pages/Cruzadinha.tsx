@@ -59,6 +59,7 @@ export default function Cruzadinha() {
   const [aiWordCount, setAiWordCount] = React.useState(10);
   const [isGenerating, setIsGenerating] = React.useState(false);
   const wordInputRef = React.useRef<HTMLInputElement>(null);
+  const crosswordRef = React.useRef<HTMLDivElement>(null);
 
   const addWordClue = () => {
     if (word.trim() && clue.trim()) {
