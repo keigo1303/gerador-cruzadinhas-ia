@@ -158,6 +158,7 @@ export default function BingoPalavras() {
     }
 
     setBingoCards(cards);
+    setCurrentCardIndex(0); // Reset to first card
 
     // Scroll to cards
     setTimeout(() => {
