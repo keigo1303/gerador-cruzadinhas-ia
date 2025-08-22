@@ -695,7 +695,7 @@ export default function BingoPalavras() {
                 <CardHeader>
                   <CardTitle className="text-purple-700 flex items-center gap-2">
                     <Grid3x3 className="w-5 h-5" />
-                    Cartelas Geradas ({bingoCards.length})
+                    Cartelas do Bingo ({bingoCards.length} cartelas)
                   </CardTitle>
                 </CardHeader>
                 <CardContent>{renderCards()}</CardContent>
