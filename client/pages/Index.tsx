@@ -64,7 +64,7 @@ export default function Index() {
         "Cartelas 4x4, 5x5 e 6x6",
         "Múltiplas cartelas únicas",
         "PDF com definições",
-        "Campo para nome do aluno",
+        "Modo Manual e IA",
       ],
     },
   ];
