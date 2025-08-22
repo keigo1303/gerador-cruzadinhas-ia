@@ -139,7 +139,9 @@ export default function Cruzadinha() {
 
     try {
       // Convert to the format expected by the library
-      const inputJson = wordClues.map((wc) => ({
+      // Shuffle the word order to get different layouts
+      const shuffledWordClues = [...wordClues].sort(() => Math.random() - 0.5);
+      const inputJson = shuffledWordClues.map((wc) => ({
         clue: wc.clue,
         answer: wc.word,
       }));
@@ -759,32 +761,29 @@ export default function Cruzadinha() {
 
           {/* Crossword Grid */}
           {crosswordGrid.length > 0 && (
-            <div className="space-y-6">
-              {/* Regenerate Button */}
-              <div className="flex justify-center">
-                <Button
-                  onClick={generateCrossword}
-                  variant="outline"
-                  className="flex items-center gap-2 border-2 border-blue-300 hover:bg-blue-50 shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200"
-                >
-                  <RotateCcw className="w-4 h-4" />
-                  Regerar com Novo Posicionamento
-                </Button>
-              </div>
-
-              <Card
-                ref={crosswordRef}
-                className="shadow-2xl border-0 bg-gradient-to-r from-white to-blue-50 hover:shadow-3xl transition-shadow duration-300"
-              >
-                <CardHeader>
-                  <CardTitle className="text-blue-700 flex items-center gap-2">
+            <Card
+              ref={crosswordRef}
+              className="shadow-2xl border-0 bg-gradient-to-r from-white to-blue-50 hover:shadow-3xl transition-shadow duration-300"
+            >
+              <CardHeader>
+                <CardTitle className="text-blue-700 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
                     <Sparkles className="w-5 h-5" />
                     {title || "Cruzadinha Gerada"}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>{renderGrid()}</CardContent>
-              </Card>
-            </div>
+                  </div>
+                  <Button
+                    onClick={generateCrossword}
+                    variant="outline"
+                    size="sm"
+                    className="flex items-center gap-2 border-2 border-blue-300 hover:bg-blue-50 shadow-md hover:shadow-lg transition-all duration-200"
+                  >
+                    <RotateCcw className="w-4 h-4" />
+                    Regerar
+                  </Button>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>{renderGrid()}</CardContent>
+            </Card>
           )}
 
           {/* Export Buttons */}
