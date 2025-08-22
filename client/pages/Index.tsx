@@ -11,6 +11,7 @@ import {
   Zap,
   Users,
   BookOpen,
+  Trophy,
 } from "lucide-react";
 
 export default function Index() {
