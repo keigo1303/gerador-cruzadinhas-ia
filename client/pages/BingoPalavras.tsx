@@ -45,7 +45,6 @@ interface BingoCard {
 export default function BingoPalavras() {
   const [word, setWord] = React.useState("");
   const [definition, setDefinition] = React.useState("");
-  const [title, setTitle] = React.useState("");
   const [wordDefinitions, setWordDefinitions] = React.useState<
     WordDefinition[]
   >([]);
@@ -296,21 +295,11 @@ export default function BingoPalavras() {
         const card = bingoCards[i + j];
         const cardY = j * (pageHeight / 2) + 20;
 
-        // Title
-        const bingoTitle = title || "Bingo de Palavras";
-        pdf.setFontSize(16);
-        pdf.setFont("helvetica", "bold");
-        const titleWidth = pdf.getTextWidth(bingoTitle);
-        pdf.text(bingoTitle, (pageWidth - titleWidth) / 2, cardY);
-
-        // Card number
+        // Student name field
         pdf.setFontSize(12);
         pdf.setFont("helvetica", "normal");
-        pdf.text(`Cartela ${i + j + 1}`, 20, cardY + 10);
-
-        // Student name field
-        pdf.text("Nome:", 20, cardY + 25);
-        pdf.line(35, cardY + 26, pageWidth - 20, cardY + 26);
+        pdf.text("Nome:", 20, cardY + 10);
+        pdf.line(35, cardY + 11, pageWidth - 20, cardY + 11);
 
         // Calculate grid position and size
         const maxGridSize = 120; // max size in mm
@@ -318,7 +307,7 @@ export default function BingoPalavras() {
         const gridWidth = size * cellSize;
         const gridHeight = size * cellSize;
         const gridStartX = (pageWidth - gridWidth) / 2;
-        const gridStartY = cardY + 40;
+        const gridStartY = cardY + 25;
 
         // Draw grid
         pdf.setLineWidth(0.5);
@@ -377,19 +366,22 @@ export default function BingoPalavras() {
         currentY = 20;
       }
 
+      // Add checkbox
+      pdf.rect(20, currentY - 3, 3, 3); // Draw checkbox square
+
       const definitionText = `${wd.word}: ${wd.definition}`;
-      const lines = pdf.splitTextToSize(definitionText, pageWidth - 40);
+      const lines = pdf.splitTextToSize(definitionText, pageWidth - 50);
 
       pdf.setFont("helvetica", "bold");
-      pdf.text(`${index + 1}.`, 20, currentY);
+      pdf.text(`${index + 1}.`, 28, currentY);
 
       pdf.setFont("helvetica", "normal");
-      pdf.text(lines, 30, currentY);
+      pdf.text(lines, 38, currentY);
 
       currentY += lines.length * 5 + 2;
     });
 
-    const filename = `${(title || "bingo-palavras").toLowerCase().replace(/\s+/g, "-")}.pdf`;
+    const filename = "bingo-palavras.pdf";
     pdf.save(filename);
   };
 
@@ -434,7 +426,7 @@ export default function BingoPalavras() {
           <div className="grid lg:grid-cols-2 gap-8">
             {/* Coluna esquerda - Configurações */}
             <div className="space-y-6">
-              {/* Title Section */}
+              {/* Configuration Section */}
               <Card className="shadow-xl border-0 bg-gradient-to-r from-white to-purple-50 hover:shadow-2xl transition-shadow duration-300">
                 <CardHeader>
                   <CardTitle className="text-purple-700 flex items-center gap-2">
@@ -443,22 +435,6 @@ export default function BingoPalavras() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                  <div>
-                    <Label
-                      htmlFor="title"
-                      className="text-sm font-medium text-gray-700 mb-2 block"
-                    >
-                      Título do Bingo
-                    </Label>
-                    <Input
-                      id="title"
-                      placeholder="Digite o título do bingo"
-                      value={title}
-                      onChange={(e) => setTitle(e.target.value)}
-                      className="border-2 border-purple-200 focus:border-purple-400 transition-colors duration-200"
-                    />
-                  </div>
-
                   <div>
                     <Label
                       htmlFor="grid-size"
