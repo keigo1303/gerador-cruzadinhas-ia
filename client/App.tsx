@@ -10,6 +10,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Cruzadinha from "./pages/Cruzadinha";
 import CacaPalavras from "./pages/CacaPalavras";
+import BingoPalavras from "./pages/BingoPalavras";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
