@@ -21,7 +21,11 @@ import {
   X,
   ArrowLeft,
   Grid3x3,
+  Bot,
+  User,
 } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { bingoDatabase } from "@shared/bingo-database";
 import { Link } from "react-router-dom";
 
 interface WordDefinition {
