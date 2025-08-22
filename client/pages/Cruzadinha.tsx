@@ -178,6 +178,14 @@ export default function Cruzadinha() {
 
         setCrosswordGrid(crosswordWords);
         setGridSize({ width: maxX + 1, height: maxY + 1 });
+
+        // Scroll automático para mostrar a cruzadinha gerada
+        setTimeout(() => {
+          crosswordRef.current?.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+        }, 100);
       } else {
         alert(
           "Não foi possível gerar a cruzadinha com essas palavras. Tente palavras diferentes.",
