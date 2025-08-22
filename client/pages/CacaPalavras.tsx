@@ -304,8 +304,8 @@ export default function CacaPalavras() {
   };
 
   const generateWordSearchGrid = () => {
-    if (words.length < 3) {
-      alert("Adicione pelo menos 3 palavras para gerar o caça-palavras");
+    if (words.length < 5) {
+      alert("Adicione pelo menos 5 palavras para gerar o caça-palavras");
       return;
     }
 
@@ -957,7 +957,7 @@ export default function CacaPalavras() {
                         <Search className="w-12 h-12 mx-auto" />
                       </div>
                       <p className="text-gray-600 mb-2">Nenhuma palavra adicionada ainda</p>
-                      <p className="text-sm text-gray-500">Adicione no mínimo 3 palavras para gerar o caça-palavras</p>
+                      <p className="text-sm text-gray-500">Adicione no mínimo 5 palavras para gerar o caça-palavras</p>
                     </div>
                   ) : (
                     <div className="grid gap-3 max-h-96 overflow-y-auto">
@@ -990,7 +990,7 @@ export default function CacaPalavras() {
                     <Button
                       onClick={generateWordSearchGrid}
                       className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
-                      disabled={words.length < 3}
+                      disabled={words.length < 5}
                     >
                       <Search className="w-4 h-4 mr-2" />
                       Gerar Caça-Palavras
