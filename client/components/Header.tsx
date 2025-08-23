@@ -14,6 +14,8 @@ import {
   Search,
   Sparkles,
   ChevronDown,
+  Hash,
+  Trophy,
 } from "lucide-react";
 
 export default function Header() {
@@ -37,9 +39,16 @@ export default function Header() {
     {
       title: "Bingo de Palavras",
       description: "Crie cartelas de bingo personalizadas",
-      icon: Sparkles,
+      icon: Trophy,
       path: "/bingo-palavras",
       color: "text-purple-600",
+    },
+    {
+      title: "Gerador de Sudoku",
+      description: "Crie puzzles de Sudoku com diferentes dificuldades",
+      icon: Hash,
+      path: "/sudoku",
+      color: "text-indigo-600",
     },
   ];
 
