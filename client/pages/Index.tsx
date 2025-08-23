@@ -79,10 +79,8 @@ export default function Index() {
       bgColor: "from-indigo-50 to-blue-50",
       iconColor: "text-indigo-600",
       features: [
-        "Tabuleiros 9x9 e 16x16",
-        "5 níveis de dificuldade",
+        "4 níveis de dificuldade",
         "PDF com resolução",
-        "Solução automática",
       ],
     },
   ];
