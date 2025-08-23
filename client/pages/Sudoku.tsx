@@ -126,14 +126,14 @@ export default function Sudoku() {
       );
     }
 
-    const cellSize = gridSize === 9 ? "w-10 h-10" : "w-8 h-8";
-    const fontSize = gridSize === 9 ? "text-lg" : "text-sm";
-    const subGridSize = gridSize === 9 ? 3 : 4;
+    const cellSize = "w-10 h-10";
+    const fontSize = "text-lg";
+    const subGridSize = 3;
 
     return (
       <div
         className={`grid gap-0.5 p-4 bg-white border-4 border-gray-800 rounded-lg shadow-2xl transition-all duration-300 hover:shadow-3xl`}
-        style={{ gridTemplateColumns: `repeat(${gridSize}, 1fr)` }}
+        style={{ gridTemplateColumns: `repeat(9, 1fr)` }}
       >
         {board.map((row, rowIndex) => {
           // Validate each row
@@ -141,8 +141,8 @@ export default function Sudoku() {
             return null;
           }
           return row.map((cell, colIndex) => {
-            const isRightBorder = (colIndex + 1) % subGridSize === 0 && colIndex !== gridSize - 1;
-            const isBottomBorder = (rowIndex + 1) % subGridSize === 0 && rowIndex !== gridSize - 1;
+            const isRightBorder = (colIndex + 1) % subGridSize === 0 && colIndex !== 8;
+            const isBottomBorder = (rowIndex + 1) % subGridSize === 0 && rowIndex !== 8;
 
             return (
               <div
