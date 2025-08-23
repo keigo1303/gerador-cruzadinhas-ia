@@ -220,8 +220,8 @@ export default function Sudoku() {
     // Add some spacing after title
     currentY += 10;
 
-    // Calculate grid dimensions (always 9x9)
-    const maxGridSize = Math.min(pageWidth - 40, pageHeight - currentY - 30);
+    // Calculate grid dimensions (always 9x9) - smaller size for better page layout
+    const maxGridSize = Math.min(pageWidth - 60, pageHeight - currentY - 50) * 0.8;
     const cellSize = maxGridSize / 9;
     const gridWidth = 9 * cellSize;
     const gridHeight = 9 * cellSize;
