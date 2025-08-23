@@ -31,8 +31,8 @@ export default function Sudoku() {
   const [gridSize, setGridSize] = React.useState<9 | 16>(9);
   const [difficulty, setDifficulty] = React.useState<1 | 2 | 3 | 4 | 5>(3);
   const [puzzle, setPuzzle] = React.useState<SudokuPuzzle | null>(null);
-  const [title, setTitle] = React.useState("Sudoku");
-  const [showHeaderInfo, setShowHeaderInfo] = React.useState(false);
+  const [title] = React.useState("Sudoku");
+  const [showHeaderInfo] = React.useState(false);
   const [isGenerating, setIsGenerating] = React.useState(false);
   const sudokuRef = React.useRef<HTMLDivElement>(null);
 
@@ -370,26 +370,15 @@ export default function Sudoku() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="grid md:grid-cols-3 gap-6">
-                <div>
-                  <Label htmlFor="title" className="text-sm font-medium text-gray-700 mb-2 block">
-                    Título
-                  </Label>
-                  <input
-                    id="title"
-                    type="text"
-                    placeholder="Título do Sudoku"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    className="w-full px-3 py-2 border-2 border-indigo-200 rounded-md focus:border-indigo-400 transition-colors duration-200"
-                  />
-                </div>
-                
+              <div className="grid md:grid-cols-2 gap-6">
                 <div>
                   <Label htmlFor="grid-size" className="text-sm font-medium text-gray-700 mb-2 block">
                     Tamanho da Grade
                   </Label>
-                  <Select value={gridSize.toString()} onValueChange={(value) => setGridSize(parseInt(value) as 9 | 16)}>
+                  <Select value={gridSize.toString()} onValueChange={(value) => {
+                    setGridSize(parseInt(value) as 9 | 16);
+                    setPuzzle(null); // Clear existing puzzle when grid size changes
+                  }}>
                     <SelectTrigger className="border-2 border-indigo-200 focus:border-indigo-400">
                       <SelectValue />
                     </SelectTrigger>
@@ -404,7 +393,10 @@ export default function Sudoku() {
                   <Label htmlFor="difficulty" className="text-sm font-medium text-gray-700 mb-2 block">
                     Dificuldade
                   </Label>
-                  <Select value={difficulty.toString()} onValueChange={(value) => setDifficulty(parseInt(value) as 1 | 2 | 3 | 4 | 5)}>
+                  <Select value={difficulty.toString()} onValueChange={(value) => {
+                    setDifficulty(parseInt(value) as 1 | 2 | 3 | 4 | 5);
+                    setPuzzle(null); // Clear existing puzzle when difficulty changes
+                  }}>
                     <SelectTrigger className="border-2 border-indigo-200 focus:border-indigo-400">
                       <SelectValue />
                     </SelectTrigger>
@@ -419,17 +411,6 @@ export default function Sudoku() {
                 </div>
               </div>
 
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="header-info"
-                  checked={showHeaderInfo}
-                  onCheckedChange={(checked) => setShowHeaderInfo(checked === true)}
-                  className="border-2 border-indigo-300"
-                />
-                <Label htmlFor="header-info" className="text-sm font-medium text-gray-700">
-                  Incluir campos para Nome, Turma e Data no PDF
-                </Label>
-              </div>
 
               <Button
                 onClick={generateNewSudoku}
