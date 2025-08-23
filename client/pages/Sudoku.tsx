@@ -36,6 +36,52 @@ export default function Sudoku() {
   const [isGenerating, setIsGenerating] = React.useState(false);
   const sudokuRef = React.useRef<HTMLDivElement>(null);
 
+  // Fallback function to create a simple Sudoku puzzle if the library fails
+  const createFallbackSudoku = (size: 9 | 16) => {
+    if (size === 9) {
+      // Simple 9x9 Sudoku example
+      const solution = [
+        [5, 3, 4, 6, 7, 8, 9, 1, 2],
+        [6, 7, 2, 1, 9, 5, 3, 4, 8],
+        [1, 9, 8, 3, 4, 2, 5, 6, 7],
+        [8, 5, 9, 7, 6, 1, 4, 2, 3],
+        [4, 2, 6, 8, 5, 3, 7, 9, 1],
+        [7, 1, 3, 9, 2, 4, 8, 5, 6],
+        [9, 6, 1, 5, 3, 7, 2, 8, 4],
+        [2, 8, 7, 4, 1, 9, 6, 3, 5],
+        [3, 4, 5, 2, 8, 6, 1, 7, 9]
+      ];
+
+      // Create puzzle by removing some numbers based on difficulty
+      const puzzle = solution.map(row => [...row]);
+      const removeCount = difficulty === 1 ? 35 : difficulty === 2 ? 45 : difficulty === 3 ? 55 : difficulty === 4 ? 60 : 65;
+
+      for (let i = 0; i < removeCount; i++) {
+        const row = Math.floor(Math.random() * 9);
+        const col = Math.floor(Math.random() * 9);
+        puzzle[row][col] = 0;
+      }
+
+      return { board: puzzle, solution };
+    } else {
+      // Simple 16x16 example (partial)
+      const solution = Array(16).fill(null).map((_, i) =>
+        Array(16).fill(null).map((_, j) => ((i * 16 + j) % 16) + 1)
+      );
+
+      const puzzle = solution.map(row => [...row]);
+      const removeCount = Math.floor(256 * (difficulty / 10)); // Remove percentage based on difficulty
+
+      for (let i = 0; i < removeCount; i++) {
+        const row = Math.floor(Math.random() * 16);
+        const col = Math.floor(Math.random() * 16);
+        puzzle[row][col] = 0;
+      }
+
+      return { board: puzzle, solution };
+    }
+  };
+
   const difficultyLabels = {
     1: "Muito Fácil",
     2: "Fácil", 
