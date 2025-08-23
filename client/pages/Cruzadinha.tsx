@@ -164,21 +164,42 @@ export default function Cruzadinha() {
           },
         );
 
-        // Calculate grid dimensions
+        // Calculate grid dimensions with validation
         let maxX = 0,
           maxY = 0;
         crosswordWords.forEach((cw) => {
+          // Validate coordinates are finite numbers
+          if (!Number.isFinite(cw.x) || !Number.isFinite(cw.y) || !cw.word || cw.word.length === 0) {
+            console.warn('Invalid crossword word data:', cw);
+            return;
+          }
+
+          // Ensure coordinates are valid (non-negative)
+          const validX = Math.max(0, Math.floor(cw.x));
+          const validY = Math.max(0, Math.floor(cw.y));
+
           if (cw.vertical) {
-            maxX = Math.max(maxX, cw.x);
-            maxY = Math.max(maxY, cw.y + cw.word.length - 1);
+            maxX = Math.max(maxX, validX);
+            maxY = Math.max(maxY, validY + cw.word.length - 1);
           } else {
-            maxX = Math.max(maxX, cw.x + cw.word.length - 1);
-            maxY = Math.max(maxY, cw.y);
+            maxX = Math.max(maxX, validX + cw.word.length - 1);
+            maxY = Math.max(maxY, validY);
           }
         });
 
+        // Validate calculated dimensions
+        if (!Number.isFinite(maxX) || !Number.isFinite(maxY) || maxX < 0 || maxY < 0) {
+          console.error('Invalid calculated grid dimensions:', { maxX, maxY });
+          alert("Erro ao calcular dimensões da grade. Tente novamente.");
+          return;
+        }
+
+        // Ensure minimum grid size and reasonable maximums
+        const safeWidth = Math.max(1, Math.min(maxX + 1, 50));
+        const safeHeight = Math.max(1, Math.min(maxY + 1, 50));
+
         setCrosswordGrid(crosswordWords);
-        setGridSize({ width: maxX + 1, height: maxY + 1 });
+        setGridSize({ width: safeWidth, height: safeHeight });
 
         // Scroll automático para mostrar a cruzadinha gerada
         setTimeout(() => {
@@ -201,22 +222,82 @@ export default function Cruzadinha() {
   const renderGrid = () => {
     if (crosswordGrid.length === 0) return null;
 
-    const grid: (string | null)[][] = Array(gridSize.height)
+    // Comprehensive validation for grid dimensions
+    const rawWidth = gridSize.width;
+    const rawHeight = gridSize.height;
+
+    // Check for invalid values (NaN, Infinity, etc.) or zero dimensions
+    if (!Number.isFinite(rawWidth) || !Number.isFinite(rawHeight) || rawWidth < 1 || rawHeight < 1) {
+      console.error('Invalid grid dimensions:', { width: rawWidth, height: rawHeight, crosswordLength: crosswordGrid.length });
+
+      // If we have crossword data but invalid grid size, try to recalculate
+      if (crosswordGrid.length > 0) {
+        console.log('Attempting to recalculate grid dimensions...');
+        let maxX = 0, maxY = 0;
+        crosswordGrid.forEach((cw) => {
+          if (Number.isFinite(cw.x) && Number.isFinite(cw.y) && cw.word) {
+            const validX = Math.max(0, Math.floor(cw.x));
+            const validY = Math.max(0, Math.floor(cw.y));
+
+            if (cw.vertical) {
+              maxX = Math.max(maxX, validX);
+              maxY = Math.max(maxY, validY + cw.word.length - 1);
+            } else {
+              maxX = Math.max(maxX, validX + cw.word.length - 1);
+              maxY = Math.max(maxY, validY);
+            }
+          }
+        });
+
+        if (maxX >= 0 && maxY >= 0) {
+          const recalcWidth = Math.max(1, Math.min(maxX + 1, 50));
+          const recalcHeight = Math.max(1, Math.min(maxY + 1, 50));
+          setGridSize({ width: recalcWidth, height: recalcHeight });
+          return <div className="text-blue-500 p-4">Recalculando dimensões da grade...</div>;
+        }
+      }
+
+      return <div className="text-red-500 p-4">Erro ao renderizar a grade - dimensões inválidas</div>;
+    }
+
+    // Ensure safe integer values within reasonable bounds
+    const safeWidth = Math.max(1, Math.min(Math.floor(rawWidth), 50));
+    const safeHeight = Math.max(1, Math.min(Math.floor(rawHeight), 50));
+
+    // Final safety check
+    if (!Number.isInteger(safeWidth) || !Number.isInteger(safeHeight) || safeWidth <= 0 || safeHeight <= 0) {
+      console.error('Failed to create safe grid dimensions:', { safeWidth, safeHeight, original: gridSize });
+      return <div className="text-red-500 p-4">Erro ao renderizar a grade</div>;
+    }
+
+    const grid: (string | null)[][] = Array(safeHeight)
       .fill(null)
-      .map(() => Array(gridSize.width).fill(null));
-    const numbers: (number | null)[][] = Array(gridSize.height)
+      .map(() => Array(safeWidth).fill(null));
+    const numbers: (number | null)[][] = Array(safeHeight)
       .fill(null)
-      .map(() => Array(gridSize.width).fill(null));
+      .map(() => Array(safeWidth).fill(null));
 
     // Fill the grid with letters and numbers
     crosswordGrid.forEach((cw) => {
-      numbers[cw.y][cw.x] = cw.number;
+      // Ensure coordinates are within bounds
+      const x = Math.max(0, Math.min(cw.x, safeWidth - 1));
+      const y = Math.max(0, Math.min(cw.y, safeHeight - 1));
 
-      for (let i = 0; i < cw.word.length; i++) {
-        if (cw.vertical) {
-          grid[cw.y + i][cw.x] = cw.word[i];
-        } else {
-          grid[cw.y][cw.x + i] = cw.word[i];
+      if (y < safeHeight && x < safeWidth) {
+        numbers[y][x] = cw.number;
+
+        for (let i = 0; i < cw.word.length; i++) {
+          if (cw.vertical) {
+            const targetY = y + i;
+            if (targetY < safeHeight && x < safeWidth) {
+              grid[targetY][x] = cw.word[i];
+            }
+          } else {
+            const targetX = x + i;
+            if (y < safeHeight && targetX < safeWidth) {
+              grid[y][targetX] = cw.word[i];
+            }
+          }
         }
       }
     });
@@ -225,7 +306,7 @@ export default function Cruzadinha() {
       <div className="flex flex-col items-center gap-8">
         <div
           className="grid gap-1 p-6 bg-white border-2 border-blue-200 rounded-xl shadow-2xl transition-all duration-300 hover:shadow-3xl"
-          style={{ gridTemplateColumns: `repeat(${gridSize.width}, 1fr)` }}
+          style={{ gridTemplateColumns: `repeat(${safeWidth}, 1fr)` }}
         >
           {grid.map((row, y) =>
             row.map((cell, x) => (

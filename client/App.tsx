@@ -12,6 +12,7 @@ import Index from "./pages/Index";
 import Cruzadinha from "./pages/Cruzadinha";
 import CacaPalavras from "./pages/CacaPalavras";
 import BingoPalavras from "./pages/BingoPalavras";
+import Sudoku from "./pages/Sudoku";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -27,6 +28,7 @@ function App() {
             <Route path="/cruzadinha" element={<Cruzadinha />} />
             <Route path="/caca-palavras" element={<CacaPalavras />} />
             <Route path="/bingo-palavras" element={<BingoPalavras />} />
+            <Route path="/sudoku" element={<Sudoku />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

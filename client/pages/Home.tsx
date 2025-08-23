@@ -11,6 +11,8 @@ import {
   Zap,
   Users,
   BookOpen,
+  Hash,
+  Target,
 } from "lucide-react";
 
 export default function Home() {
@@ -47,6 +49,40 @@ export default function Home() {
         "Grade customizável",
         "Banco de palavras IA",
         "Até 25 palavras",
+      ],
+    },
+    {
+      id: "bingo-palavras",
+      title: "Gerador de Bingo de Palavras",
+      description:
+        "Crie bingos educativos personalizados. Perfeito para dinâmicas e revisão de conteúdo.",
+      icon: Target,
+      path: "/bingo-palavras",
+      color: "from-orange-600 to-red-600",
+      bgColor: "from-orange-50 to-red-50",
+      iconColor: "text-orange-600",
+      features: [
+        "Cartelas personalizadas",
+        "Temas educativos",
+        "Modo manual e IA",
+        "PDF para impressão",
+      ],
+    },
+    {
+      id: "sudoku",
+      title: "Gerador de Sudoku",
+      description:
+        "Crie puzzles de Sudoku personalizados. Desenvolva raciocínio lógico e concentração.",
+      icon: Hash,
+      path: "/sudoku",
+      color: "from-indigo-600 to-purple-600",
+      bgColor: "from-indigo-50 to-purple-50",
+      iconColor: "text-indigo-600",
+      features: [
+        "9x9 e 16x16",
+        "5 níveis dificuldade",
+        "PDF com gabarito",
+        "Solução automática",
       ],
     },
   ];
@@ -110,7 +146,7 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8 mb-16">
+          <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-8 mb-16">
             {activities.map((activity) => {
               const IconComponent = activity.icon;
 

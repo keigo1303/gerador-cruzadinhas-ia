@@ -12,6 +12,7 @@ import {
   Users,
   BookOpen,
   Trophy,
+  Hash,
 } from "lucide-react";
 
 export default function Index() {
@@ -65,6 +66,23 @@ export default function Index() {
         "Múltiplas cartelas únicas",
         "PDF com definições",
         "Modo Manual e IA",
+      ],
+    },
+    {
+      id: "sudoku",
+      title: "Gerador de Sudoku",
+      description:
+        "Crie puzzles de Sudoku personalizados com diferentes tamanhos e níveis de dificuldade.",
+      icon: Hash,
+      path: "/sudoku",
+      color: "from-indigo-600 to-blue-600",
+      bgColor: "from-indigo-50 to-blue-50",
+      iconColor: "text-indigo-600",
+      features: [
+        "Tabuleiros 9x9 e 16x16",
+        "5 níveis de dificuldade",
+        "PDF com resolução",
+        "Solução automática",
       ],
     },
   ];
@@ -128,7 +146,7 @@ export default function Index() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8 mb-16">
+          <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8 mb-16">
             {activities.map((activity) => {
               const IconComponent = activity.icon;
 
