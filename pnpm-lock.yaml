@@ -23,6 +23,9 @@ importers:
       jspdf:
         specifier: ^3.0.1
         version: 3.0.1
+      sudoku-puzzle:
+        specifier: ^1.0.1
+        version: 1.0.1
       zod:
         specifier: ^3.25.76
         version: 3.25.76
@@ -2674,6 +2677,9 @@ packages:
     resolution: {integrity: sha512-8EbVDiu9iN/nESwxeSxDKe0dunta1GOlHufmSSXxMD2z2/tMZpDMpvXQGsc+ajGo8y2uYUmixaSRUc/QPoQ0GA==}
     engines: {node: '>=16 || 14 >=14.17'}
     hasBin: true
+
+  sudoku-puzzle@1.0.1:
+    resolution: {integrity: sha512-1f16bynIUdu6UCFKEdY9WzYoP6RsF8UFyO3WQ00v18Uv1waCXXzB8s374JrJgptUm5rCNo0dNipikZ6cGvj/1g==}
 
   supports-preserve-symlinks-flag@1.0.0:
     resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==}
@@ -5397,6 +5403,8 @@ snapshots:
       mz: 2.7.0
       pirates: 4.0.7
       ts-interface-checker: 0.1.13
+
+  sudoku-puzzle@1.0.1: {}
 
   supports-preserve-symlinks-flag@1.0.0: {}
 
