@@ -28,7 +28,7 @@ interface SudokuPuzzle {
 
 export default function Sudoku() {
   const [gridSize] = React.useState<9>(9); // sudoku-gen only supports 9x9
-  const [difficulty, setDifficulty] = React.useState<1 | 2 | 3 | 4 | 5>(3);
+  const [difficulty, setDifficulty] = React.useState<1 | 2 | 3 | 4>(2);
   const [puzzle, setPuzzle] = React.useState<SudokuPuzzle | null>(null);
   const [title] = React.useState("Sudoku");
   const [showHeaderInfo] = React.useState(false);
@@ -63,12 +63,10 @@ export default function Sudoku() {
       case 1:
         return "easy";
       case 2:
-        return "easy";
-      case 3:
         return "medium";
-      case 4:
+      case 3:
         return "hard";
-      case 5:
+      case 4:
         return "expert";
       default:
         return "medium";
@@ -76,11 +74,10 @@ export default function Sudoku() {
   };
 
   const difficultyLabels = {
-    1: "Muito Fácil",
-    2: "Fácil",
-    3: "Médio",
-    4: "Difícil",
-    5: "Expert",
+    1: "Fácil",
+    2: "Médio",
+    3: "Difícil",
+    4: "Muito Difícil",
   };
 
   const generateNewSudoku = () => {
@@ -333,7 +330,7 @@ export default function Sudoku() {
                   <Select
                     value={difficulty.toString()}
                     onValueChange={(value) => {
-                      setDifficulty(parseInt(value) as 1 | 2 | 3 | 4 | 5);
+                      setDifficulty(parseInt(value) as 1 | 2 | 3 | 4);
                       setPuzzle(null); // Clear existing puzzle when difficulty changes
                     }}
                   >
@@ -341,11 +338,10 @@ export default function Sudoku() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="1">Muito Fácil</SelectItem>
-                      <SelectItem value="2">Fácil</SelectItem>
-                      <SelectItem value="3">Médio</SelectItem>
-                      <SelectItem value="4">Difícil</SelectItem>
-                      <SelectItem value="5">Expert</SelectItem>
+                      <SelectItem value="1">Fácil</SelectItem>
+                      <SelectItem value="2">Médio</SelectItem>
+                      <SelectItem value="3">Difícil</SelectItem>
+                      <SelectItem value="4">Muito Difícil</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
