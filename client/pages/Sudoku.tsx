@@ -51,8 +51,20 @@ export default function Sudoku() {
     setTimeout(() => {
       try {
         const newPuzzle = generateSudoku(gridSize, difficulty);
+        console.log("Generated puzzle:", newPuzzle);
+
+        // Validate the puzzle structure
+        if (!newPuzzle || typeof newPuzzle !== 'object') {
+          throw new Error("Invalid puzzle structure returned");
+        }
+
+        // Log the structure to understand what we're getting
+        console.log("Puzzle keys:", Object.keys(newPuzzle));
+        console.log("Board:", newPuzzle.board);
+        console.log("Solution:", newPuzzle.solution);
+
         setPuzzle(newPuzzle);
-        
+
         // Scroll to show the generated puzzle
         setTimeout(() => {
           sudokuRef.current?.scrollIntoView({
