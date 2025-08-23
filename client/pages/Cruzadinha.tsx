@@ -209,12 +209,23 @@ export default function Cruzadinha() {
   const renderGrid = () => {
     if (crosswordGrid.length === 0) return null;
 
-    // Validate grid dimensions to prevent RangeError
-    const safeWidth = Math.max(1, Math.min(gridSize.width, 50));
-    const safeHeight = Math.max(1, Math.min(gridSize.height, 50));
+    // Comprehensive validation for grid dimensions
+    const rawWidth = gridSize.width;
+    const rawHeight = gridSize.height;
 
-    if (safeWidth <= 0 || safeHeight <= 0) {
-      console.error('Invalid grid dimensions:', gridSize);
+    // Check for invalid values (NaN, Infinity, etc.)
+    if (!Number.isFinite(rawWidth) || !Number.isFinite(rawHeight) || rawWidth < 1 || rawHeight < 1) {
+      console.error('Invalid grid dimensions:', { width: rawWidth, height: rawHeight });
+      return <div className="text-red-500 p-4">Erro ao renderizar a grade - dimensões inválidas</div>;
+    }
+
+    // Ensure safe integer values within reasonable bounds
+    const safeWidth = Math.max(1, Math.min(Math.floor(rawWidth), 50));
+    const safeHeight = Math.max(1, Math.min(Math.floor(rawHeight), 50));
+
+    // Final safety check
+    if (!Number.isInteger(safeWidth) || !Number.isInteger(safeHeight) || safeWidth <= 0 || safeHeight <= 0) {
+      console.error('Failed to create safe grid dimensions:', { safeWidth, safeHeight, original: gridSize });
       return <div className="text-red-500 p-4">Erro ao renderizar a grade</div>;
     }
 
