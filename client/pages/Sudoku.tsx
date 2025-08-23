@@ -70,25 +70,38 @@ export default function Sudoku() {
   };
 
   const renderSudokuGrid = (board: number[][], showSolution: boolean = false) => {
+    // Validate board exists and is properly structured
+    if (!board || !Array.isArray(board) || board.length === 0) {
+      return (
+        <div className="p-4 text-center text-red-500 border-2 border-red-200 rounded-lg">
+          Erro: Tabuleiro não disponível
+        </div>
+      );
+    }
+
     const cellSize = gridSize === 9 ? "w-10 h-10" : "w-8 h-8";
     const fontSize = gridSize === 9 ? "text-lg" : "text-sm";
     const subGridSize = gridSize === 9 ? 3 : 4;
 
     return (
-      <div 
+      <div
         className={`grid gap-0.5 p-4 bg-white border-4 border-gray-800 rounded-lg shadow-2xl transition-all duration-300 hover:shadow-3xl`}
         style={{ gridTemplateColumns: `repeat(${gridSize}, 1fr)` }}
       >
-        {board.map((row, rowIndex) =>
-          row.map((cell, colIndex) => {
+        {board.map((row, rowIndex) => {
+          // Validate each row
+          if (!Array.isArray(row)) {
+            return null;
+          }
+          return row.map((cell, colIndex) => {
             const isRightBorder = (colIndex + 1) % subGridSize === 0 && colIndex !== gridSize - 1;
             const isBottomBorder = (rowIndex + 1) % subGridSize === 0 && rowIndex !== gridSize - 1;
-            
+
             return (
               <div
                 key={`${rowIndex}-${colIndex}`}
                 className={`
-                  ${cellSize} border border-gray-300 flex items-center justify-center 
+                  ${cellSize} border border-gray-300 flex items-center justify-center
                   ${fontSize} font-bold transition-all duration-200 hover:bg-blue-50
                   ${isRightBorder ? 'border-r-4 border-r-gray-800' : ''}
                   ${isBottomBorder ? 'border-b-4 border-b-gray-800' : ''}
@@ -102,8 +115,8 @@ export default function Sudoku() {
                 )}
               </div>
             );
-          })
-        )}
+          });
+        })}
       </div>
     );
   };
