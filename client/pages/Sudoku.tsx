@@ -42,7 +42,12 @@ export default function Sudoku() {
       const row: number[] = [];
       for (let j = 0; j < 9; j++) {
         const char = sudokuString[i * 9 + j];
-        row.push(char === "." ? 0 : parseInt(char));
+        if (char === "." || char === "0" || !char) {
+          row.push(0);
+        } else {
+          const num = parseInt(char, 10);
+          row.push(isNaN(num) ? 0 : num);
+        }
       }
       grid.push(row);
     }
@@ -92,6 +97,11 @@ export default function Sudoku() {
         // Generate puzzle using sudoku-gen
         const result = getSudoku(difficultyString);
         console.log("Generated puzzle result:", result);
+
+        // Validate result
+        if (!result || !result.puzzle || !result.solution) {
+          throw new Error("Invalid result from sudoku-gen");
+        }
 
         // Convert strings to 2D arrays
         const puzzleBoard = stringToGrid(result.puzzle);
@@ -168,7 +178,7 @@ export default function Sudoku() {
                   ${cell === 0 ? "bg-gray-50" : showSolution ? "bg-blue-50 text-blue-700" : "bg-white text-gray-800"}
                 `}
               >
-                {cell !== 0 && (
+                {cell !== 0 && !isNaN(cell) && (
                   <span
                     className={showSolution ? "text-blue-700" : "text-gray-800"}
                   >
