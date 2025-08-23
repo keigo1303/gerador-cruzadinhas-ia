@@ -42,7 +42,7 @@ export default function Sudoku() {
       const row: number[] = [];
       for (let j = 0; j < 9; j++) {
         const char = sudokuString[i * 9 + j];
-        row.push(char === '.' ? 0 : parseInt(char));
+        row.push(char === "." ? 0 : parseInt(char));
       }
       grid.push(row);
     }
@@ -50,14 +50,22 @@ export default function Sudoku() {
   };
 
   // Map numeric difficulty to string difficulty for sudoku-gen
-  const mapDifficultyToString = (numDifficulty: number): "easy" | "medium" | "hard" | "expert" => {
+  const mapDifficultyToString = (
+    numDifficulty: number,
+  ): "easy" | "medium" | "hard" | "expert" => {
     switch (numDifficulty) {
-      case 1: return "easy";
-      case 2: return "easy";
-      case 3: return "medium";
-      case 4: return "hard";
-      case 5: return "expert";
-      default: return "medium";
+      case 1:
+        return "easy";
+      case 2:
+        return "easy";
+      case 3:
+        return "medium";
+      case 4:
+        return "hard";
+      case 5:
+        return "expert";
+      default:
+        return "medium";
     }
   };
 
@@ -66,12 +74,12 @@ export default function Sudoku() {
     2: "Fácil",
     3: "Médio",
     4: "Difícil",
-    5: "Expert"
+    5: "Expert",
   };
 
   const generateNewSudoku = () => {
     setIsGenerating(true);
-    
+
     // Small delay to show loading state
     setTimeout(() => {
       try {
@@ -95,7 +103,7 @@ export default function Sudoku() {
         // Create the puzzle object
         const newPuzzle = {
           board: puzzleBoard,
-          solution: solutionBoard
+          solution: solutionBoard,
         };
 
         setPuzzle(newPuzzle);
@@ -116,7 +124,10 @@ export default function Sudoku() {
     }, 500);
   };
 
-  const renderSudokuGrid = (board: number[][], showSolution: boolean = false) => {
+  const renderSudokuGrid = (
+    board: number[][],
+    showSolution: boolean = false,
+  ) => {
     // Validate board exists and is properly structured
     if (!board || !Array.isArray(board) || board.length === 0) {
       return (
@@ -141,8 +152,10 @@ export default function Sudoku() {
             return null;
           }
           return row.map((cell, colIndex) => {
-            const isRightBorder = (colIndex + 1) % subGridSize === 0 && colIndex !== 8;
-            const isBottomBorder = (rowIndex + 1) % subGridSize === 0 && rowIndex !== 8;
+            const isRightBorder =
+              (colIndex + 1) % subGridSize === 0 && colIndex !== 8;
+            const isBottomBorder =
+              (rowIndex + 1) % subGridSize === 0 && rowIndex !== 8;
 
             return (
               <div
@@ -150,13 +163,15 @@ export default function Sudoku() {
                 className={`
                   ${cellSize} border border-gray-300 flex items-center justify-center
                   ${fontSize} font-bold transition-all duration-200 hover:bg-blue-50
-                  ${isRightBorder ? 'border-r-4 border-r-gray-800' : ''}
-                  ${isBottomBorder ? 'border-b-4 border-b-gray-800' : ''}
-                  ${cell === 0 ? 'bg-gray-50' : (showSolution ? 'bg-blue-50 text-blue-700' : 'bg-white text-gray-800')}
+                  ${isRightBorder ? "border-r-4 border-r-gray-800" : ""}
+                  ${isBottomBorder ? "border-b-4 border-b-gray-800" : ""}
+                  ${cell === 0 ? "bg-gray-50" : showSolution ? "bg-blue-50 text-blue-700" : "bg-white text-gray-800"}
                 `}
               >
                 {cell !== 0 && (
-                  <span className={showSolution ? "text-blue-700" : "text-gray-800"}>
+                  <span
+                    className={showSolution ? "text-blue-700" : "text-gray-800"}
+                  >
                     {cell}
                   </span>
                 )}
@@ -175,7 +190,12 @@ export default function Sudoku() {
     }
 
     // Validate puzzle structure
-    if (!puzzle.board || !puzzle.solution || !Array.isArray(puzzle.board) || !Array.isArray(puzzle.solution)) {
+    if (
+      !puzzle.board ||
+      !puzzle.solution ||
+      !Array.isArray(puzzle.board) ||
+      !Array.isArray(puzzle.solution)
+    ) {
       alert("Erro: Estrutura do Sudoku inválida. Gere um novo Sudoku.");
       return;
     }
@@ -214,10 +234,10 @@ export default function Sudoku() {
       for (let col = 0; col < 9; col++) {
         const x = gridStartX + col * cellSize;
         const y = gridStartY + row * cellSize;
-        
+
         // Draw cell border
         pdf.rect(x, y, cellSize, cellSize);
-        
+
         // Draw thicker borders for sub-grids
         if (col % subGridSize === 0) {
           pdf.setLineWidth(1);
@@ -229,7 +249,7 @@ export default function Sudoku() {
           pdf.line(gridStartX, y, gridStartX + gridWidth, y);
           pdf.setLineWidth(0.3);
         }
-        
+
         // Add number if present
         const cellValue = boardToUse[row][col];
         if (cellValue !== 0) {
@@ -239,7 +259,7 @@ export default function Sudoku() {
           pdf.text(
             cellValue.toString(),
             x + (cellSize - textWidth) / 2,
-            y + cellSize * 0.7
+            y + cellSize * 0.7,
           );
         }
       }
@@ -248,12 +268,22 @@ export default function Sudoku() {
     // Draw final borders
     pdf.setLineWidth(1);
     pdf.rect(gridStartX, gridStartY, gridWidth, gridHeight);
-    
+
     // Draw sub-grid separators
     for (let i = 1; i < 3; i++) {
       const pos = i * 3 * cellSize;
-      pdf.line(gridStartX + pos, gridStartY, gridStartX + pos, gridStartY + gridHeight);
-      pdf.line(gridStartX, gridStartY + pos, gridStartX + gridWidth, gridStartY + pos);
+      pdf.line(
+        gridStartX + pos,
+        gridStartY,
+        gridStartX + pos,
+        gridStartY + gridHeight,
+      );
+      pdf.line(
+        gridStartX,
+        gridStartY + pos,
+        gridStartX + gridWidth,
+        gridStartY + pos,
+      );
     }
 
     const filename = `sudoku-9x9-${difficultyLabels[difficulty].toLowerCase().replace(/\s+/g, "-")}-${withSolution ? "gabarito" : "em-branco"}.pdf`;
@@ -268,7 +298,8 @@ export default function Sudoku() {
             Gerador de Sudoku
           </h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Crie puzzles de Sudoku personalizados com diferentes tamanhos e níveis de dificuldade
+            Crie puzzles de Sudoku personalizados com diferentes tamanhos e
+            níveis de dificuldade
           </p>
           <div className="flex justify-center mt-4">
             <Grid3x3 className="w-6 h-6 text-purple-500 animate-pulse" />
@@ -287,13 +318,19 @@ export default function Sudoku() {
             <CardContent className="space-y-6">
               <div className="grid md:grid-cols-1 gap-6">
                 <div>
-                  <Label htmlFor="difficulty" className="text-sm font-medium text-gray-700 mb-2 block">
+                  <Label
+                    htmlFor="difficulty"
+                    className="text-sm font-medium text-gray-700 mb-2 block"
+                  >
                     Dificuldade
                   </Label>
-                  <Select value={difficulty.toString()} onValueChange={(value) => {
-                    setDifficulty(parseInt(value) as 1 | 2 | 3 | 4 | 5);
-                    setPuzzle(null); // Clear existing puzzle when difficulty changes
-                  }}>
+                  <Select
+                    value={difficulty.toString()}
+                    onValueChange={(value) => {
+                      setDifficulty(parseInt(value) as 1 | 2 | 3 | 4 | 5);
+                      setPuzzle(null); // Clear existing puzzle when difficulty changes
+                    }}
+                  >
                     <SelectTrigger className="border-2 border-indigo-200 focus:border-indigo-400">
                       <SelectValue />
                     </SelectTrigger>
@@ -307,7 +344,6 @@ export default function Sudoku() {
                   </Select>
                 </div>
               </div>
-
 
               <Button
                 onClick={generateNewSudoku}
@@ -340,7 +376,10 @@ export default function Sudoku() {
                   <div className="flex items-center gap-2">
                     <Grid3x3 className="w-5 h-5" />
                     {title} 9x9
-                    <Badge variant="secondary" className="bg-purple-200 text-purple-800">
+                    <Badge
+                      variant="secondary"
+                      className="bg-purple-200 text-purple-800"
+                    >
                       {difficultyLabels[difficulty]}
                     </Badge>
                   </div>
@@ -361,7 +400,9 @@ export default function Sudoku() {
                     <h3 className="text-lg font-semibold text-gray-700 mb-4 text-center">
                       Sudoku para Resolver
                     </h3>
-                    {puzzle?.board ? renderSudokuGrid(puzzle.board, false) : (
+                    {puzzle?.board ? (
+                      renderSudokuGrid(puzzle.board, false)
+                    ) : (
                       <div className="p-4 text-center text-gray-500 border-2 border-gray-200 rounded-lg">
                         Tabuleiro não disponível
                       </div>
@@ -372,7 +413,9 @@ export default function Sudoku() {
                     <h3 className="text-lg font-semibold text-gray-700 mb-4 text-center">
                       Solução
                     </h3>
-                    {puzzle?.solution ? renderSudokuGrid(puzzle.solution, true) : (
+                    {puzzle?.solution ? (
+                      renderSudokuGrid(puzzle.solution, true)
+                    ) : (
                       <div className="p-4 text-center text-gray-500 border-2 border-gray-200 rounded-lg">
                         Solução não disponível
                       </div>
