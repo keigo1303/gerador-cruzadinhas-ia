@@ -1,5 +1,5 @@
 import * as React from "react";
-import { generateSudoku } from "sudoku-puzzle";
+import { generateSudoku, solveSudoku } from "sudoku-puzzle";
 import jsPDF from "jspdf";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -50,19 +50,30 @@ export default function Sudoku() {
     // Small delay to show loading state
     setTimeout(() => {
       try {
-        const newPuzzle = generateSudoku(gridSize, difficulty);
-        console.log("Generated puzzle:", newPuzzle);
+        // Generate the puzzle (this returns the board with empty cells)
+        const puzzleBoard = generateSudoku(gridSize, difficulty);
+        console.log("Generated puzzle board:", puzzleBoard);
 
         // Validate the puzzle structure
-        if (!newPuzzle || typeof newPuzzle !== 'object') {
-          throw new Error("Invalid puzzle structure returned");
+        if (!puzzleBoard || !Array.isArray(puzzleBoard)) {
+          throw new Error("Invalid puzzle board returned");
         }
 
-        // Log the structure to understand what we're getting
-        console.log("Puzzle keys:", Object.keys(newPuzzle));
-        console.log("Board:", newPuzzle.board);
-        console.log("Solution:", newPuzzle.solution);
+        // Solve the puzzle to get the complete solution
+        const solution = solveSudoku(puzzleBoard, gridSize);
+        console.log("Generated solution:", solution);
 
+        if (!solution || !Array.isArray(solution)) {
+          throw new Error("Could not generate solution");
+        }
+
+        // Create the puzzle object with both board and solution
+        const newPuzzle = {
+          board: puzzleBoard,
+          solution: solution
+        };
+
+        console.log("Final puzzle object:", newPuzzle);
         setPuzzle(newPuzzle);
 
         // Scroll to show the generated puzzle
