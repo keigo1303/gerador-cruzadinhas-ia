@@ -42,7 +42,13 @@ export default function Sudoku() {
       const row: number[] = [];
       for (let j = 0; j < 9; j++) {
         const char = sudokuString[i * 9 + j];
-        row.push(char === "." ? 0 : parseInt(char));
+        if (char === "." || char === "0") {
+          row.push(0);
+        } else {
+          const num = parseInt(char, 10);
+          // Ensure we only push valid numbers between 1-9, otherwise use 0
+          row.push(isNaN(num) || num < 1 || num > 9 ? 0 : num);
+        }
       }
       grid.push(row);
     }
