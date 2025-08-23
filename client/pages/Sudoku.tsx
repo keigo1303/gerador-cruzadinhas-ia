@@ -39,44 +39,87 @@ export default function Sudoku() {
   // Fallback function to create a simple Sudoku puzzle if the library fails
   const createFallbackSudoku = (size: 9 | 16) => {
     if (size === 9) {
-      // Simple 9x9 Sudoku example
-      const solution = [
-        [5, 3, 4, 6, 7, 8, 9, 1, 2],
-        [6, 7, 2, 1, 9, 5, 3, 4, 8],
-        [1, 9, 8, 3, 4, 2, 5, 6, 7],
-        [8, 5, 9, 7, 6, 1, 4, 2, 3],
-        [4, 2, 6, 8, 5, 3, 7, 9, 1],
-        [7, 1, 3, 9, 2, 4, 8, 5, 6],
-        [9, 6, 1, 5, 3, 7, 2, 8, 4],
-        [2, 8, 7, 4, 1, 9, 6, 3, 5],
-        [3, 4, 5, 2, 8, 6, 1, 7, 9]
+      // Collection of valid 9x9 Sudoku solutions
+      const solutions = [
+        [
+          [5, 3, 4, 6, 7, 8, 9, 1, 2],
+          [6, 7, 2, 1, 9, 5, 3, 4, 8],
+          [1, 9, 8, 3, 4, 2, 5, 6, 7],
+          [8, 5, 9, 7, 6, 1, 4, 2, 3],
+          [4, 2, 6, 8, 5, 3, 7, 9, 1],
+          [7, 1, 3, 9, 2, 4, 8, 5, 6],
+          [9, 6, 1, 5, 3, 7, 2, 8, 4],
+          [2, 8, 7, 4, 1, 9, 6, 3, 5],
+          [3, 4, 5, 2, 8, 6, 1, 7, 9]
+        ],
+        [
+          [1, 2, 3, 4, 5, 6, 7, 8, 9],
+          [4, 5, 6, 7, 8, 9, 1, 2, 3],
+          [7, 8, 9, 1, 2, 3, 4, 5, 6],
+          [2, 1, 4, 3, 6, 5, 8, 9, 7],
+          [3, 6, 5, 8, 9, 7, 2, 1, 4],
+          [8, 9, 7, 2, 1, 4, 3, 6, 5],
+          [5, 3, 1, 6, 4, 2, 9, 7, 8],
+          [6, 4, 2, 9, 7, 8, 5, 3, 1],
+          [9, 7, 8, 5, 3, 1, 6, 4, 2]
+        ],
+        [
+          [9, 1, 2, 3, 4, 5, 6, 7, 8],
+          [3, 4, 5, 6, 7, 8, 9, 1, 2],
+          [6, 7, 8, 9, 1, 2, 3, 4, 5],
+          [1, 2, 3, 4, 5, 6, 7, 8, 9],
+          [4, 5, 6, 7, 8, 9, 1, 2, 3],
+          [7, 8, 9, 1, 2, 3, 4, 5, 6],
+          [2, 3, 1, 5, 6, 4, 8, 9, 7],
+          [5, 6, 4, 8, 9, 7, 2, 3, 1],
+          [8, 9, 7, 2, 3, 1, 5, 6, 4]
+        ]
       ];
+
+      // Randomly select a solution
+      const randomSolution = solutions[Math.floor(Math.random() * solutions.length)];
+      const solution = randomSolution.map(row => [...row]);
 
       // Create puzzle by removing some numbers based on difficulty
       const puzzle = solution.map(row => [...row]);
-      const removeCount = difficulty === 1 ? 35 : difficulty === 2 ? 45 : difficulty === 3 ? 55 : difficulty === 4 ? 60 : 65;
+      const removeCount = difficulty === 1 ? 30 : difficulty === 2 ? 40 : difficulty === 3 ? 50 : difficulty === 4 ? 55 : 60;
 
-      for (let i = 0; i < removeCount; i++) {
+      const cellsToRemove = new Set();
+      while (cellsToRemove.size < removeCount) {
         const row = Math.floor(Math.random() * 9);
         const col = Math.floor(Math.random() * 9);
-        puzzle[row][col] = 0;
+        cellsToRemove.add(`${row}-${col}`);
       }
+
+      cellsToRemove.forEach(cell => {
+        const [row, col] = cell.split('-').map(Number);
+        puzzle[row][col] = 0;
+      });
 
       return { board: puzzle, solution };
     } else {
-      // Simple 16x16 example (partial)
+      // 16x16 Sudoku - create a valid pattern
       const solution = Array(16).fill(null).map((_, i) =>
-        Array(16).fill(null).map((_, j) => ((i * 16 + j) % 16) + 1)
+        Array(16).fill(null).map((_, j) => {
+          // Create a pattern that satisfies basic Sudoku rules
+          return ((i * 4 + Math.floor(i / 4) + j) % 16) + 1;
+        })
       );
 
       const puzzle = solution.map(row => [...row]);
-      const removeCount = Math.floor(256 * (difficulty / 10)); // Remove percentage based on difficulty
+      const removeCount = Math.floor(256 * (0.3 + difficulty * 0.1)); // 30-80% removal based on difficulty
 
-      for (let i = 0; i < removeCount; i++) {
+      const cellsToRemove = new Set();
+      while (cellsToRemove.size < removeCount) {
         const row = Math.floor(Math.random() * 16);
         const col = Math.floor(Math.random() * 16);
-        puzzle[row][col] = 0;
+        cellsToRemove.add(`${row}-${col}`);
       }
+
+      cellsToRemove.forEach(cell => {
+        const [row, col] = cell.split('-').map(Number);
+        puzzle[row][col] = 0;
+      });
 
       return { board: puzzle, solution };
     }
