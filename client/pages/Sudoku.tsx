@@ -28,7 +28,7 @@ interface SudokuPuzzle {
 
 export default function Sudoku() {
   const [gridSize] = React.useState<9>(9); // sudoku-gen only supports 9x9
-  const [difficulty, setDifficulty] = React.useState<1 | 2 | 3 | 4 | 5>(3);
+  const [difficulty, setDifficulty] = React.useState<1 | 2 | 3 | 4>(2);
   const [puzzle, setPuzzle] = React.useState<SudokuPuzzle | null>(null);
   const [title] = React.useState("Sudoku");
   const [showHeaderInfo] = React.useState(false);
@@ -42,7 +42,13 @@ export default function Sudoku() {
       const row: number[] = [];
       for (let j = 0; j < 9; j++) {
         const char = sudokuString[i * 9 + j];
-        row.push(char === "." ? 0 : parseInt(char));
+        if (char === "." || char === "0") {
+          row.push(0);
+        } else {
+          const num = parseInt(char, 10);
+          // Ensure we only push valid numbers between 1-9, otherwise use 0
+          row.push(isNaN(num) || num < 1 || num > 9 ? 0 : num);
+        }
       }
       grid.push(row);
     }
@@ -57,12 +63,10 @@ export default function Sudoku() {
       case 1:
         return "easy";
       case 2:
-        return "easy";
-      case 3:
         return "medium";
-      case 4:
+      case 3:
         return "hard";
-      case 5:
+      case 4:
         return "expert";
       default:
         return "medium";
@@ -71,10 +75,9 @@ export default function Sudoku() {
 
   const difficultyLabels = {
     1: "Fácil",
-    2: "Fácil",
-    3: "Médio",
-    4: "Difícil",
-    5: "Expert",
+    2: "Médio",
+    3: "Difícil",
+    4: "Muito Difícil",
   };
 
   const generateNewSudoku = () => {
@@ -168,7 +171,7 @@ export default function Sudoku() {
                   ${cell === 0 ? "bg-gray-50" : showSolution ? "bg-blue-50 text-blue-700" : "bg-white text-gray-800"}
                 `}
               >
-                {cell !== 0 && (
+                {cell !== 0 && !isNaN(cell) && isFinite(cell) && (
                   <span
                     className={showSolution ? "text-blue-700" : "text-gray-800"}
                   >
@@ -217,8 +220,9 @@ export default function Sudoku() {
     // Add some spacing after title
     currentY += 10;
 
-    // Calculate grid dimensions (always 9x9)
-    const maxGridSize = Math.min(pageWidth - 40, pageHeight - currentY - 30);
+    // Calculate grid dimensions (always 9x9) - smaller size for better page layout
+    const maxGridSize =
+      Math.min(pageWidth - 60, pageHeight - currentY - 50) * 0.8;
     const cellSize = maxGridSize / 9;
     const gridWidth = 9 * cellSize;
     const gridHeight = 9 * cellSize;
@@ -327,7 +331,7 @@ export default function Sudoku() {
                   <Select
                     value={difficulty.toString()}
                     onValueChange={(value) => {
-                      setDifficulty(parseInt(value) as 1 | 2 | 3 | 4 | 5);
+                      setDifficulty(parseInt(value) as 1 | 2 | 3 | 4);
                       setPuzzle(null); // Clear existing puzzle when difficulty changes
                     }}
                   >
@@ -336,10 +340,9 @@ export default function Sudoku() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="1">Fácil</SelectItem>
-                      <SelectItem value="2">Fácil</SelectItem>
-                      <SelectItem value="3">Médio</SelectItem>
-                      <SelectItem value="4">Difícil</SelectItem>
-                      <SelectItem value="5">Expert</SelectItem>
+                      <SelectItem value="2">Médio</SelectItem>
+                      <SelectItem value="3">Difícil</SelectItem>
+                      <SelectItem value="4">Muito Difícil</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
