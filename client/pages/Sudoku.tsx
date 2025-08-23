@@ -249,38 +249,8 @@ export default function Sudoku() {
     pdf.text(sudokuTitle, (pageWidth - titleWidth) / 2, currentY);
     currentY += 15;
 
-    // Header info if enabled
-    if (showHeaderInfo) {
-      pdf.setFontSize(12);
-      pdf.setFont("helvetica", "normal");
-
-      const underlineLength = 40;
-      const spacing = 60;
-
-      // Nome field
-      pdf.text("Nome:", 20, currentY);
-      pdf.line(35, currentY + 1, 35 + underlineLength, currentY + 1);
-
-      // Turma field
-      pdf.text("Turma:", 20 + spacing + underlineLength, currentY);
-      pdf.line(
-        35 + spacing + underlineLength + 15,
-        currentY + 1,
-        35 + spacing + underlineLength + 15 + 25,
-        currentY + 1
-      );
-
-      // Data field
-      pdf.text("Data:", 20 + (spacing + underlineLength) * 1.7, currentY);
-      pdf.line(
-        35 + (spacing + underlineLength) * 1.7 + 15,
-        currentY + 1,
-        35 + (spacing + underlineLength) * 1.7 + 15 + 25,
-        currentY + 1
-      );
-
-      currentY += 15;
-    }
+    // Add some spacing after title
+    currentY += 10;
 
     // Calculate grid dimensions
     const maxGridSize = Math.min(pageWidth - 40, pageHeight - currentY - 30);
