@@ -174,7 +174,7 @@ export default function Sudoku() {
                   ${cell === 0 ? "bg-gray-50" : showSolution ? "bg-blue-50 text-blue-700" : "bg-white text-gray-800"}
                 `}
               >
-                {cell !== 0 && (
+                {cell !== 0 && !isNaN(cell) && isFinite(cell) && (
                   <span
                     className={showSolution ? "text-blue-700" : "text-gray-800"}
                   >
