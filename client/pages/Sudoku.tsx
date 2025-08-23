@@ -91,7 +91,7 @@ export default function Sudoku() {
       }
 
       cellsToRemove.forEach(cell => {
-        const [row, col] = cell.split('-').map(Number);
+        const [row, col] = (cell as string).split('-').map(Number);
         puzzle[row][col] = 0;
       });
 
@@ -116,7 +116,7 @@ export default function Sudoku() {
       }
 
       cellsToRemove.forEach(cell => {
-        const [row, col] = cell.split('-').map(Number);
+        const [row, col] = (cell as string).split('-').map(Number);
         puzzle[row][col] = 0;
       });
 
