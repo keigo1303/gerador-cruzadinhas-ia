@@ -81,6 +81,7 @@ export default function Index() {
       features: [
         "4 níveis de dificuldade",
         "PDF com resolução",
+        "Tabuleiros únicos",
       ],
     },
   ];
