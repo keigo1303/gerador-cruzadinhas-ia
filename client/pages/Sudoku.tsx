@@ -50,9 +50,13 @@ export default function Sudoku() {
     // Small delay to show loading state
     setTimeout(() => {
       try {
-        // Generate the puzzle (this returns the board with empty cells)
-        const puzzleBoard = generateSudoku(gridSize, difficulty);
-        console.log("Generated puzzle board:", puzzleBoard);
+        // Generate the puzzle (this returns an object with .grid property)
+        const puzzleResult = generateSudoku(gridSize, difficulty);
+        console.log("Generated puzzle result:", puzzleResult);
+
+        // Extract the grid from the result
+        const puzzleBoard = puzzleResult?.grid || puzzleResult;
+        console.log("Extracted puzzle board:", puzzleBoard);
 
         // Validate the puzzle structure
         if (!puzzleBoard || !Array.isArray(puzzleBoard)) {
