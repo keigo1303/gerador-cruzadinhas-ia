@@ -168,9 +168,15 @@ export default function Cruzadinha() {
         let maxX = 0,
           maxY = 0;
         crosswordWords.forEach((cw) => {
+          // Validate coordinates are finite numbers
+          if (!Number.isFinite(cw.x) || !Number.isFinite(cw.y) || !cw.word || cw.word.length === 0) {
+            console.warn('Invalid crossword word data:', cw);
+            return;
+          }
+
           // Ensure coordinates are valid (non-negative)
-          const validX = Math.max(0, cw.x);
-          const validY = Math.max(0, cw.y);
+          const validX = Math.max(0, Math.floor(cw.x));
+          const validY = Math.max(0, Math.floor(cw.y));
 
           if (cw.vertical) {
             maxX = Math.max(maxX, validX);
@@ -180,6 +186,13 @@ export default function Cruzadinha() {
             maxY = Math.max(maxY, validY);
           }
         });
+
+        // Validate calculated dimensions
+        if (!Number.isFinite(maxX) || !Number.isFinite(maxY) || maxX < 0 || maxY < 0) {
+          console.error('Invalid calculated grid dimensions:', { maxX, maxY });
+          alert("Erro ao calcular dimensões da grade. Tente novamente.");
+          return;
+        }
 
         // Ensure minimum grid size and reasonable maximums
         const safeWidth = Math.max(1, Math.min(maxX + 1, 50));
