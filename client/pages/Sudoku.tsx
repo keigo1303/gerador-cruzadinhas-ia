@@ -341,7 +341,7 @@ export default function Sudoku() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="1">Fácil</SelectItem>
+                      <SelectItem value="1">Muito Fácil</SelectItem>
                       <SelectItem value="2">Fácil</SelectItem>
                       <SelectItem value="3">Médio</SelectItem>
                       <SelectItem value="4">Difícil</SelectItem>
