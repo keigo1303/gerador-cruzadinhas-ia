@@ -262,12 +262,13 @@ export default function Sudoku() {
 
         // Add number if present
         const cellValue = boardToUse[row][col];
-        if (cellValue !== 0) {
+        if (cellValue !== 0 && !isNaN(cellValue) && Number.isFinite(cellValue)) {
           pdf.setFontSize(Math.max(8, cellSize * 0.6));
           pdf.setFont("helvetica", "normal");
-          const textWidth = pdf.getTextWidth(cellValue.toString());
+          const cellText = cellValue.toString();
+          const textWidth = pdf.getTextWidth(cellText);
           pdf.text(
-            cellValue.toString(),
+            cellText,
             x + (cellSize - textWidth) / 2,
             y + cellSize * 0.7,
           );
