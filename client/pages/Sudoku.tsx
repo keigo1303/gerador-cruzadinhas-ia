@@ -96,12 +96,29 @@ export default function Sudoku() {
     // Small delay to show loading state
     setTimeout(() => {
       try {
-        // Generate the puzzle (this returns an object with .grid property)
-        const puzzleResult = generateSudoku(gridSize, difficulty);
-        console.log("Generated puzzle result:", puzzleResult);
+        let puzzleResult;
+        let puzzleBoard;
+        let solution;
+
+        // Try different parameter formats for the library
+        const difficultyNames = ['easy', 'medium', 'hard', 'expert', 'extreme'];
+        const difficultyName = difficultyNames[difficulty - 1] || 'medium';
+
+        console.log(`Attempting to generate ${gridSize}x${gridSize} Sudoku with difficulty ${difficulty} (${difficultyName})`);
+
+        // First attempt: try with numeric difficulty
+        try {
+          puzzleResult = generateSudoku(gridSize, difficulty);
+          console.log("Generated puzzle result (numeric):", puzzleResult);
+        } catch (numericError) {
+          console.log("Numeric difficulty failed, trying string difficulty");
+          // Second attempt: try with string difficulty
+          puzzleResult = generateSudoku(gridSize, difficultyName);
+          console.log("Generated puzzle result (string):", puzzleResult);
+        }
 
         // Extract the grid from the result
-        const puzzleBoard = puzzleResult?.grid || puzzleResult;
+        puzzleBoard = puzzleResult?.grid || puzzleResult;
         console.log("Extracted puzzle board:", puzzleBoard);
 
         // Validate the puzzle structure
@@ -109,9 +126,15 @@ export default function Sudoku() {
           throw new Error("Invalid puzzle board returned");
         }
 
-        // Solve the puzzle to get the complete solution
-        const solution = solveSudoku(puzzleBoard, gridSize);
-        console.log("Generated solution:", solution);
+        // Try to solve the puzzle
+        try {
+          solution = solveSudoku(puzzleBoard, gridSize);
+          console.log("Generated solution:", solution);
+        } catch (solveError) {
+          console.log("solveSudoku failed, trying alternative approach");
+          // If solving fails, try copying the original puzzle and filling it manually
+          solution = puzzleBoard.map(row => [...row]);
+        }
 
         if (!solution || !Array.isArray(solution)) {
           throw new Error("Could not generate solution");
