@@ -76,7 +76,7 @@ export default function Sudoku() {
   };
 
   const difficultyLabels = {
-    1: "Fácil",
+    1: "Muito Fácil",
     2: "Fácil",
     3: "Médio",
     4: "Difícil",
