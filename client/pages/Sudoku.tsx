@@ -164,17 +164,7 @@ export default function Sudoku() {
         }, 100);
       } catch (error) {
         console.error("Error generating Sudoku:", error);
-
-        // Fallback: create a simple manual puzzle for demonstration
-        console.log("Using fallback manual puzzle generation...");
-
-        try {
-          const fallbackPuzzle = createFallbackSudoku(gridSize);
-          setPuzzle(fallbackPuzzle);
-        } catch (fallbackError) {
-          console.error("Fallback also failed:", fallbackError);
-          alert("Erro ao gerar o Sudoku. Tente novamente ou escolha um tamanho diferente.");
-        }
+        alert("Erro ao gerar o Sudoku. Tente novamente.");
       } finally {
         setIsGenerating(false);
       }
