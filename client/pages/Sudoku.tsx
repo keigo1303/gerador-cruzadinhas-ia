@@ -387,14 +387,22 @@ export default function Sudoku() {
                     <h3 className="text-lg font-semibold text-gray-700 mb-4 text-center">
                       Sudoku para Resolver
                     </h3>
-                    {renderSudokuGrid(puzzle.board, false)}
+                    {puzzle?.board ? renderSudokuGrid(puzzle.board, false) : (
+                      <div className="p-4 text-center text-gray-500 border-2 border-gray-200 rounded-lg">
+                        Tabuleiro não disponível
+                      </div>
+                    )}
                   </div>
-                  
+
                   <div>
                     <h3 className="text-lg font-semibold text-gray-700 mb-4 text-center">
                       Solução
                     </h3>
-                    {renderSudokuGrid(puzzle.solution, true)}
+                    {puzzle?.solution ? renderSudokuGrid(puzzle.solution, true) : (
+                      <div className="p-4 text-center text-gray-500 border-2 border-gray-200 rounded-lg">
+                        Solução não disponível
+                      </div>
+                    )}
                   </div>
                 </div>
               </CardContent>
