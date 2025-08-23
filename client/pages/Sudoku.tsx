@@ -1,5 +1,5 @@
 import * as React from "react";
-import { generateSudoku, solveSudoku } from "sudoku-puzzle";
+import { getSudoku } from "sudoku-gen";
 import jsPDF from "jspdf";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -27,7 +27,7 @@ interface SudokuPuzzle {
 }
 
 export default function Sudoku() {
-  const [gridSize, setGridSize] = React.useState<9 | 16>(9);
+  const [gridSize] = React.useState<9>(9); // sudoku-gen only supports 9x9
   const [difficulty, setDifficulty] = React.useState<1 | 2 | 3 | 4 | 5>(3);
   const [puzzle, setPuzzle] = React.useState<SudokuPuzzle | null>(null);
   const [title] = React.useState("Sudoku");
@@ -35,101 +35,38 @@ export default function Sudoku() {
   const [isGenerating, setIsGenerating] = React.useState(false);
   const sudokuRef = React.useRef<HTMLDivElement>(null);
 
-  // Fallback function to create a simple Sudoku puzzle if the library fails
-  const createFallbackSudoku = (size: 9 | 16) => {
-    if (size === 9) {
-      // Collection of valid 9x9 Sudoku solutions
-      const solutions = [
-        [
-          [5, 3, 4, 6, 7, 8, 9, 1, 2],
-          [6, 7, 2, 1, 9, 5, 3, 4, 8],
-          [1, 9, 8, 3, 4, 2, 5, 6, 7],
-          [8, 5, 9, 7, 6, 1, 4, 2, 3],
-          [4, 2, 6, 8, 5, 3, 7, 9, 1],
-          [7, 1, 3, 9, 2, 4, 8, 5, 6],
-          [9, 6, 1, 5, 3, 7, 2, 8, 4],
-          [2, 8, 7, 4, 1, 9, 6, 3, 5],
-          [3, 4, 5, 2, 8, 6, 1, 7, 9]
-        ],
-        [
-          [1, 2, 3, 4, 5, 6, 7, 8, 9],
-          [4, 5, 6, 7, 8, 9, 1, 2, 3],
-          [7, 8, 9, 1, 2, 3, 4, 5, 6],
-          [2, 1, 4, 3, 6, 5, 8, 9, 7],
-          [3, 6, 5, 8, 9, 7, 2, 1, 4],
-          [8, 9, 7, 2, 1, 4, 3, 6, 5],
-          [5, 3, 1, 6, 4, 2, 9, 7, 8],
-          [6, 4, 2, 9, 7, 8, 5, 3, 1],
-          [9, 7, 8, 5, 3, 1, 6, 4, 2]
-        ],
-        [
-          [9, 1, 2, 3, 4, 5, 6, 7, 8],
-          [3, 4, 5, 6, 7, 8, 9, 1, 2],
-          [6, 7, 8, 9, 1, 2, 3, 4, 5],
-          [1, 2, 3, 4, 5, 6, 7, 8, 9],
-          [4, 5, 6, 7, 8, 9, 1, 2, 3],
-          [7, 8, 9, 1, 2, 3, 4, 5, 6],
-          [2, 3, 1, 5, 6, 4, 8, 9, 7],
-          [5, 6, 4, 8, 9, 7, 2, 3, 1],
-          [8, 9, 7, 2, 3, 1, 5, 6, 4]
-        ]
-      ];
-
-      // Randomly select a solution
-      const randomSolution = solutions[Math.floor(Math.random() * solutions.length)];
-      const solution = randomSolution.map(row => [...row]);
-
-      // Create puzzle by removing some numbers based on difficulty
-      const puzzle = solution.map(row => [...row]);
-      const removeCount = difficulty === 1 ? 30 : difficulty === 2 ? 40 : difficulty === 3 ? 50 : difficulty === 4 ? 55 : 60;
-
-      const cellsToRemove = new Set();
-      while (cellsToRemove.size < removeCount) {
-        const row = Math.floor(Math.random() * 9);
-        const col = Math.floor(Math.random() * 9);
-        cellsToRemove.add(`${row}-${col}`);
+  // Convert sudoku string to 2D array
+  const stringToGrid = (sudokuString: string): number[][] => {
+    const grid: number[][] = [];
+    for (let i = 0; i < 9; i++) {
+      const row: number[] = [];
+      for (let j = 0; j < 9; j++) {
+        const char = sudokuString[i * 9 + j];
+        row.push(char === '.' ? 0 : parseInt(char));
       }
+      grid.push(row);
+    }
+    return grid;
+  };
 
-      cellsToRemove.forEach(cell => {
-        const [row, col] = (cell as string).split('-').map(Number);
-        puzzle[row][col] = 0;
-      });
-
-      return { board: puzzle, solution };
-    } else {
-      // 16x16 Sudoku - create a valid pattern
-      const solution = Array(16).fill(null).map((_, i) =>
-        Array(16).fill(null).map((_, j) => {
-          // Create a pattern that satisfies basic Sudoku rules
-          return ((i * 4 + Math.floor(i / 4) + j) % 16) + 1;
-        })
-      );
-
-      const puzzle = solution.map(row => [...row]);
-      const removeCount = Math.floor(256 * (0.3 + difficulty * 0.1)); // 30-80% removal based on difficulty
-
-      const cellsToRemove = new Set();
-      while (cellsToRemove.size < removeCount) {
-        const row = Math.floor(Math.random() * 16);
-        const col = Math.floor(Math.random() * 16);
-        cellsToRemove.add(`${row}-${col}`);
-      }
-
-      cellsToRemove.forEach(cell => {
-        const [row, col] = (cell as string).split('-').map(Number);
-        puzzle[row][col] = 0;
-      });
-
-      return { board: puzzle, solution };
+  // Map numeric difficulty to string difficulty for sudoku-gen
+  const mapDifficultyToString = (numDifficulty: number): "easy" | "medium" | "hard" | "expert" => {
+    switch (numDifficulty) {
+      case 1: return "easy";
+      case 2: return "easy";
+      case 3: return "medium";
+      case 4: return "hard";
+      case 5: return "expert";
+      default: return "medium";
     }
   };
 
   const difficultyLabels = {
-    1: "Muito Fácil",
-    2: "Fácil", 
+    1: "Fácil",
+    2: "Fácil",
     3: "Médio",
     4: "Difícil",
-    5: "Muito Difícil"
+    5: "Expert"
   };
 
   const generateNewSudoku = () => {
@@ -138,19 +75,28 @@ export default function Sudoku() {
     // Small delay to show loading state
     setTimeout(() => {
       try {
-        console.log(`Generating ${gridSize}x${gridSize} Sudoku with difficulty ${difficulty}`);
+        console.log(`Generating 9x9 Sudoku with difficulty ${difficulty}`);
 
-        // For now, use the reliable fallback manual generation
-        // The sudoku-puzzle library seems to have compatibility issues
-        console.log("Using reliable fallback generation...");
-        const newPuzzle = createFallbackSudoku(gridSize);
-        console.log("Generated puzzle using fallback:", newPuzzle);
+        // Map numeric difficulty to string
+        const difficultyString = mapDifficultyToString(difficulty);
+        console.log(`Using difficulty: ${difficultyString}`);
 
-        // Validate the generated puzzle
-        if (!newPuzzle || !newPuzzle.board || !newPuzzle.solution ||
-            !Array.isArray(newPuzzle.board) || !Array.isArray(newPuzzle.solution)) {
-          throw new Error("Fallback generation failed");
-        }
+        // Generate puzzle using sudoku-gen
+        const result = getSudoku(difficultyString);
+        console.log("Generated puzzle result:", result);
+
+        // Convert strings to 2D arrays
+        const puzzleBoard = stringToGrid(result.puzzle);
+        const solutionBoard = stringToGrid(result.solution);
+
+        console.log("Converted puzzle board:", puzzleBoard);
+        console.log("Converted solution board:", solutionBoard);
+
+        // Create the puzzle object
+        const newPuzzle = {
+          board: puzzleBoard,
+          solution: solutionBoard
+        };
 
         setPuzzle(newPuzzle);
 
@@ -241,7 +187,7 @@ export default function Sudoku() {
     let currentY = 20;
 
     // Title
-    const sudokuTitle = `${title} ${gridSize}x${gridSize} - ${difficultyLabels[difficulty]}`;
+    const sudokuTitle = `${title} 9x9 - ${difficultyLabels[difficulty]}`;
     pdf.setFontSize(20);
     pdf.setFont("helvetica", "bold");
     const titleWidth = pdf.getTextWidth(sudokuTitle);
@@ -251,21 +197,21 @@ export default function Sudoku() {
     // Add some spacing after title
     currentY += 10;
 
-    // Calculate grid dimensions
+    // Calculate grid dimensions (always 9x9)
     const maxGridSize = Math.min(pageWidth - 40, pageHeight - currentY - 30);
-    const cellSize = maxGridSize / gridSize;
-    const gridWidth = gridSize * cellSize;
-    const gridHeight = gridSize * cellSize;
+    const cellSize = maxGridSize / 9;
+    const gridWidth = 9 * cellSize;
+    const gridHeight = 9 * cellSize;
     const gridStartX = (pageWidth - gridWidth) / 2;
     const gridStartY = currentY + 10;
 
     const boardToUse = withSolution ? puzzle.solution : puzzle.board;
-    const subGridSize = gridSize === 9 ? 3 : 4;
+    const subGridSize = 3;
 
     // Draw the grid
     pdf.setLineWidth(0.3);
-    for (let row = 0; row < gridSize; row++) {
-      for (let col = 0; col < gridSize; col++) {
+    for (let row = 0; row < 9; row++) {
+      for (let col = 0; col < 9; col++) {
         const x = gridStartX + col * cellSize;
         const y = gridStartY + row * cellSize;
         
@@ -304,13 +250,13 @@ export default function Sudoku() {
     pdf.rect(gridStartX, gridStartY, gridWidth, gridHeight);
     
     // Draw sub-grid separators
-    for (let i = 1; i < gridSize / subGridSize; i++) {
-      const pos = i * subGridSize * cellSize;
+    for (let i = 1; i < 3; i++) {
+      const pos = i * 3 * cellSize;
       pdf.line(gridStartX + pos, gridStartY, gridStartX + pos, gridStartY + gridHeight);
       pdf.line(gridStartX, gridStartY + pos, gridStartX + gridWidth, gridStartY + pos);
     }
 
-    const filename = `sudoku-${gridSize}x${gridSize}-${difficultyLabels[difficulty].toLowerCase().replace(/\s+/g, "-")}-${withSolution ? "gabarito" : "em-branco"}.pdf`;
+    const filename = `sudoku-9x9-${difficultyLabels[difficulty].toLowerCase().replace(/\s+/g, "-")}-${withSolution ? "gabarito" : "em-branco"}.pdf`;
     pdf.save(filename);
   };
 
@@ -339,25 +285,7 @@ export default function Sudoku() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="grid md:grid-cols-2 gap-6">
-                <div>
-                  <Label htmlFor="grid-size" className="text-sm font-medium text-gray-700 mb-2 block">
-                    Tamanho da Grade
-                  </Label>
-                  <Select value={gridSize.toString()} onValueChange={(value) => {
-                    setGridSize(parseInt(value) as 9 | 16);
-                    setPuzzle(null); // Clear existing puzzle when grid size changes
-                  }}>
-                    <SelectTrigger className="border-2 border-indigo-200 focus:border-indigo-400">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="9">9x9 (Clássico)</SelectItem>
-                      <SelectItem value="16">16x16 (Avançado)</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
+              <div className="grid md:grid-cols-1 gap-6">
                 <div>
                   <Label htmlFor="difficulty" className="text-sm font-medium text-gray-700 mb-2 block">
                     Dificuldade
@@ -370,11 +298,11 @@ export default function Sudoku() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="1">Muito Fácil</SelectItem>
+                      <SelectItem value="1">Fácil</SelectItem>
                       <SelectItem value="2">Fácil</SelectItem>
                       <SelectItem value="3">Médio</SelectItem>
                       <SelectItem value="4">Difícil</SelectItem>
-                      <SelectItem value="5">Muito Difícil</SelectItem>
+                      <SelectItem value="5">Expert</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -411,7 +339,7 @@ export default function Sudoku() {
                 <CardTitle className="text-purple-700 flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Grid3x3 className="w-5 h-5" />
-                    {title} {gridSize}x{gridSize}
+                    {title} 9x9
                     <Badge variant="secondary" className="bg-purple-200 text-purple-800">
                       {difficultyLabels[difficulty]}
                     </Badge>
