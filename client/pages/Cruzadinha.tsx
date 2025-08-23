@@ -226,9 +226,37 @@ export default function Cruzadinha() {
     const rawWidth = gridSize.width;
     const rawHeight = gridSize.height;
 
-    // Check for invalid values (NaN, Infinity, etc.)
+    // Check for invalid values (NaN, Infinity, etc.) or zero dimensions
     if (!Number.isFinite(rawWidth) || !Number.isFinite(rawHeight) || rawWidth < 1 || rawHeight < 1) {
-      console.error('Invalid grid dimensions:', { width: rawWidth, height: rawHeight });
+      console.error('Invalid grid dimensions:', { width: rawWidth, height: rawHeight, crosswordLength: crosswordGrid.length });
+
+      // If we have crossword data but invalid grid size, try to recalculate
+      if (crosswordGrid.length > 0) {
+        console.log('Attempting to recalculate grid dimensions...');
+        let maxX = 0, maxY = 0;
+        crosswordGrid.forEach((cw) => {
+          if (Number.isFinite(cw.x) && Number.isFinite(cw.y) && cw.word) {
+            const validX = Math.max(0, Math.floor(cw.x));
+            const validY = Math.max(0, Math.floor(cw.y));
+
+            if (cw.vertical) {
+              maxX = Math.max(maxX, validX);
+              maxY = Math.max(maxY, validY + cw.word.length - 1);
+            } else {
+              maxX = Math.max(maxX, validX + cw.word.length - 1);
+              maxY = Math.max(maxY, validY);
+            }
+          }
+        });
+
+        if (maxX >= 0 && maxY >= 0) {
+          const recalcWidth = Math.max(1, Math.min(maxX + 1, 50));
+          const recalcHeight = Math.max(1, Math.min(maxY + 1, 50));
+          setGridSize({ width: recalcWidth, height: recalcHeight });
+          return <div className="text-blue-500 p-4">Recalculando dimensões da grade...</div>;
+        }
+      }
+
       return <div className="text-red-500 p-4">Erro ao renderizar a grade - dimensões inválidas</div>;
     }
 
