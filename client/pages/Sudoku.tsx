@@ -139,6 +139,12 @@ export default function Sudoku() {
       return;
     }
 
+    // Validate puzzle structure
+    if (!puzzle.board || !puzzle.solution || !Array.isArray(puzzle.board) || !Array.isArray(puzzle.solution)) {
+      alert("Erro: Estrutura do Sudoku inválida. Gere um novo Sudoku.");
+      return;
+    }
+
     const pdf = new jsPDF("portrait", "mm", "a4");
     const pageWidth = pdf.internal.pageSize.getWidth();
     const pageHeight = pdf.internal.pageSize.getHeight();
